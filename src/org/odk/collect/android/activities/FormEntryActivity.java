@@ -239,8 +239,13 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             Intent intent = getIntent();
             if (intent != null) {
                 Uri uri = intent.getData();
+                
+                //csims@dimagi.com - Jan 24, 2012
+                //Since these are parceled across the content resolver, there's no guarantee of reference equality.
+                //We need to manually check value equality on the type 
+                String contentType = getContentResolver().getType(uri);
 
-                if (getContentResolver().getType(uri) == InstanceColumns.CONTENT_ITEM_TYPE) {
+                if (contentType.equals(InstanceColumns.CONTENT_ITEM_TYPE)) {
                     Cursor instanceCursor = this.managedQuery(uri, null, null, null, null);
                     if (instanceCursor.getCount() != 1) {
                         this.createErrorDialog("Bad URI: " + uri, EXIT);
@@ -278,7 +283,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
                     }
 
-                } else if (getContentResolver().getType(uri) == FormsColumns.CONTENT_ITEM_TYPE) {
+                } else if (contentType.equals(FormsColumns.CONTENT_ITEM_TYPE)) {
                     Cursor c = this.managedQuery(uri, null, null, null, null);
                     if (c.getCount() != 1) {
                         this.createErrorDialog("Bad URI: " + uri, EXIT);
