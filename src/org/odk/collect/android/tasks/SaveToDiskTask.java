@@ -15,18 +15,28 @@
 package org.odk.collect.android.tasks;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.util.StreamsUtil;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.FormSavedListener;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
@@ -36,6 +46,7 @@ import org.odk.collect.android.utilities.EncryptionUtils;
 import org.odk.collect.android.utilities.EncryptionUtils.EncryptedFormInformation;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -55,6 +66,10 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
     private Boolean mMarkCompleted;
     private Uri mUri;
     private String mInstanceName;
+    private Context context;
+    private Uri instanceContentUri;
+    
+    SecretKeySpec symetricKey;
 
     public static final int SAVED = 500;
     public static final int SAVE_ERROR = 501;
@@ -63,11 +78,14 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
     public static final int SAVED_AND_EXIT = 504;
 
 
-    public SaveToDiskTask(Uri uri, Boolean saveAndExit, Boolean markCompleted, String updatedName) {
-        mUri = uri;
+    public SaveToDiskTask(Uri mUri, Boolean saveAndExit, Boolean markCompleted, String updatedName, Context context, Uri instanceContentUri, SecretKeySpec symetricKey) {
+    	this.mUri = mUri;
         mSave = saveAndExit;
         mMarkCompleted = markCompleted;
         mInstanceName = updatedName;
+        this.context = context;
+        this.instanceContentUri = instanceContentUri;
+        this.symetricKey = symetricKey;
     }
 
 
@@ -98,7 +116,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
         
         // Update the instance database...
         // If FormEntryActivity was started with an Instance, just update that instance
-        if (Collect.getInstance().getContentResolver().getType(mUri) == InstanceColumns.CONTENT_ITEM_TYPE) {
+        if (context.getContentResolver().getType(mUri) == InstanceColumns.CONTENT_ITEM_TYPE) {
             ContentValues values = new ContentValues();
             if (mInstanceName != null) {
                 values.put(InstanceColumns.DISPLAY_NAME, mInstanceName);
@@ -110,8 +128,8 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             }
             // update this whether or not the status is complete...
             values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(canEditAfterCompleted));
-            Collect.getInstance().getContentResolver().update(mUri, values, null, null);
-        } else if (Collect.getInstance().getContentResolver().getType(mUri) == FormsColumns.CONTENT_ITEM_TYPE) {
+            context.getContentResolver().update(mUri, values, null, null);
+        } else if (context.getContentResolver().getType(mUri) == FormsColumns.CONTENT_ITEM_TYPE) {
             // If FormEntryActivity was started with a form, then it's likely the first time we're
             // saving.
             // However, it could be a not-first time saving if the user has been using the manual
@@ -121,10 +139,10 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             if (mInstanceName != null) {
                 values.put(InstanceColumns.DISPLAY_NAME, mInstanceName);
             }
-            if (incomplete || mMarkCompleted) {
-                values.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_COMPLETE);
-            } else {
+            if (incomplete || !mMarkCompleted) {
                 values.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_INCOMPLETE);
+            } else {
+                values.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_COMPLETE);
             }
             // update this whether or not the status is complete...
             values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(canEditAfterCompleted));
@@ -133,9 +151,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             String[] whereArgs = {
                 FormEntryActivity.mInstancePath
             };
-            int updated =
-                Collect.getInstance().getContentResolver()
-                        .update(InstanceColumns.CONTENT_URI, values, where, whereArgs);
+            int updated = context.getContentResolver().update(instanceContentUri, values, where, whereArgs);
             if (updated > 1) {
                 Log.w(t, "Updated more than one entry, that's not good");
             } else if (updated == 1) {
@@ -146,7 +162,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
                 // Entry didn't exist, so create it.
                 Cursor c = null;
                 try {
-                	c = Collect.getInstance().getContentResolver().query(mUri, null, null, null, null);
+                	c = context.getContentResolver().query(mUri, null, null, null, null);
 	                c.moveToFirst();
 	                String jrformid = c.getString(c.getColumnIndex(FormsColumns.JR_FORM_ID));
 	                String formname = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
@@ -165,8 +181,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
                 		c.close();
                 	}
                 }
-                mUri = Collect.getInstance().getContentResolver()
-                			.insert(InstanceColumns.CONTENT_URI, values);
+                mUri = context.getContentResolver().insert(instanceContentUri, values);
             }
         }
     }
@@ -188,7 +203,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             payload = (ByteArrayPayload) serializer.createSerializedPayload(datamodel);
 
             // write out xml
-            exportXmlFile(payload, FormEntryActivity.mInstancePath);
+            exportXmlFile(payload, createFileOutputStream(FormEntryActivity.mInstancePath));
 
         } catch (IOException e) {
             Log.e(t, "Error creating serialized payload");
@@ -219,11 +234,15 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             File instanceXml = new File(FormEntryActivity.mInstancePath);
             File submissionXml = new File(instanceXml.getParentFile(), "submission.xml");
             // write out submission.xml -- the data to actually submit to aggregate
-            exportXmlFile(payload, submissionXml.getAbsolutePath());
+            try {
+				exportXmlFile(payload, createFileOutputStream(submissionXml.getAbsolutePath()));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Something is blocking acesss to the file at " + submissionXml.getAbsolutePath());
+			}
             
             // see if the form is encrypted and we can encrypt it...
-            EncryptedFormInformation formInfo = EncryptionUtils.getEncryptedFormInformation(mUri, 
-            		FormEntryActivity.mFormController.getSubmissionMetadata());
+            EncryptedFormInformation formInfo = EncryptionUtils.getEncryptedFormInformation(mUri, FormEntryActivity.mFormController.getSubmissionMetadata(), context, instanceContentUri);
             if ( formInfo != null ) {
                 // if we are encrypting, the form cannot be reopened afterward
                 canEditAfterCompleted = false;
@@ -281,6 +300,35 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
         }
         return true;
     }
+    
+    public OutputStream createFileOutputStream(String path) throws FileNotFoundException {
+    	return createFileOutputStream(new File(path));
+    }
+    
+    private OutputStream createFileOutputStream(File path) throws FileNotFoundException {
+    	FileOutputStream fos = new FileOutputStream(path);
+    	if(symetricKey == null) {
+    		return fos;
+    	} else {
+    		try {
+    			Cipher cipher = Cipher.getInstance("AES");
+    			cipher.init(Cipher.ENCRYPT_MODE, symetricKey);
+				return new CipherOutputStream(fos, cipher);
+				
+				//All of these exceptions imply a bad platform and should be irrecoverable (Don't ever
+				//write out data if the key isn't good, or the crypto isn't available)
+			} catch (InvalidKeyException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e.getMessage());
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e.getMessage());
+			} catch (NoSuchPaddingException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e.getMessage());
+			}
+    	}
+    }
 
 
     /**
@@ -289,39 +337,18 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
      * @param path
      * @return
      */
-    private boolean exportXmlFile(ByteArrayPayload payload, String path) {
+    private boolean exportXmlFile(ByteArrayPayload payload, OutputStream output) {
         // create data stream
         InputStream is = payload.getPayloadStream();
-        int len = (int) payload.getLength();
-
-        // read from data stream
-        byte[] data = new byte[len];
         try {
-            int read = is.read(data, 0, len);
-            if (read > 0) {
-                // write xml file
-                try {
-                    // String filename = path + "/" +
-                    // path.substring(path.lastIndexOf('/') + 1) + ".xml";
-                	FileWriter fw = new FileWriter(path);
-                	fw.write(new String(data, "UTF-8"));
-                	fw.flush();
-                	fw.close();
-                    return true;
-
-                } catch (IOException e) {
-                    Log.e(t, "Error writing XML file");
-                    e.printStackTrace();
-                    return false;
-                }
-            }
+            StreamsUtil.writeFromInputToOutput(is, output);
+            output.close();
+            return true;
         } catch (IOException e) {
             Log.e(t, "Error reading from payload data stream");
             e.printStackTrace();
             return false;
         }
-
-        return false;
     }
 
 

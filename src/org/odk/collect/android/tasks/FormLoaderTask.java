@@ -14,8 +14,18 @@
 
 package org.odk.collect.android.tasks;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import javax.crypto.spec.SecretKeySpec;
+
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManager;
@@ -33,19 +43,15 @@ import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
 import org.odk.collect.android.logic.FormController;
+import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.utilities.FileUtils;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Background task for loading a form.
@@ -53,7 +59,9 @@ import java.io.IOException;
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
-public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FECWrapper> {
+public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWrapper> {
+	
+	public static InstanceInitializationFactory iif;
     private final static String t = "FormLoaderTask";
     /**
      * Classes needed to serialize objects. Need to put anything from JR in here.
@@ -83,6 +91,18 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
 
     private FormLoaderListener mStateListener;
     private String mErrorMsg;
+    private SecretKeySpec symetricKey;
+    
+    private Context context;
+    
+    public FormLoaderTask(Context context) {
+    	this(context, null);
+    }
+    
+    public FormLoaderTask(Context context, SecretKeySpec symetricKey) {
+    	this.context = context;
+    	this.symetricKey = symetricKey;
+    }
 
     protected class FECWrapper {
         FormController controller;
@@ -111,13 +131,18 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
      * an instance, it will be used to fill the {@link FormDef}.
      */
     @Override
-    protected FECWrapper doInBackground(String... path) {
+    protected FECWrapper doInBackground(Uri... form) {
         FormEntryController fec = null;
         FormDef fd = null;
         FileInputStream fis = null;
         mErrorMsg = null;
 
-        String formPath = path[0];
+        Uri theForm = form[0];
+        
+        //TODO: Selection=? helper
+        Cursor c = context.getContentResolver().query(theForm, new String[] {FormsColumns.FORM_FILE_PATH, FormsColumns.FORM_MEDIA_PATH}, null, null, null);
+        if(!c.moveToFirst()) {throw new IllegalArgumentException("Invalid Form URI Provided! No form content found at URI: " + theForm.toString()); }
+        String formPath = c.getString(c.getColumnIndex(FormsColumns.FORM_FILE_PATH));
 
         File formXml = new File(formPath);
         String formHash = FileUtils.getMd5Hash(formXml);
@@ -165,48 +190,62 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
             return null;
         }
 
-        // new evaluation context for function handlers
-        EvaluationContext ec = new EvaluationContext();
-        fd.setEvaluationContext(ec);
-
         // create FormEntryController from formdef
         FormEntryModel fem = new FormEntryModel(fd);
         fec = new FormEntryController(fem);
 
+        //TODO: Get a reasonable IIF object
+        //iif = something
+        
         try {
             // import existing data into formdef
             if (FormEntryActivity.mInstancePath != null) {
                 // This order is important. Import data, then initialize.
                 importData(FormEntryActivity.mInstancePath, fec);
-                fd.initialize(false);
+                fd.initialize(false, iif);
             } else {
-                fd.initialize(true);
+                fd.initialize(true, iif);
             }
         } catch (RuntimeException e) {
+        	e.printStackTrace();
             mErrorMsg = e.getMessage();
             return null;
         }
+        
 
         // set paths to /sdcard/odk/forms/formfilename-media/
         String formFileName = formXml.getName().substring(0, formXml.getName().lastIndexOf("."));
 
         // Remove previous forms
         ReferenceManager._().clearSession();
+        
+        String formMediaPath = c.getString(c.getColumnIndex(FormsColumns.FORM_MEDIA_PATH));
+        
+        if(formMediaPath != null) {
+	        ReferenceManager._().addSessionRootTranslator(
+		            new RootTranslator("jr://images/", formMediaPath));
+		        ReferenceManager._().addSessionRootTranslator(
+		            new RootTranslator("jr://audio/", formMediaPath));
+		        ReferenceManager._().addSessionRootTranslator(
+		            new RootTranslator("jr://video/", formMediaPath));
 
-        // This should get moved to the Application Class
-        if (ReferenceManager._().getFactories().length == 0) {
-            // this is /sdcard/odk
-            ReferenceManager._().addReferenceFactory(
-                new FileReferenceFactory(Environment.getExternalStorageDirectory() + "/odk"));
+        } else {
+	        // This should get moved to the Application Class
+	        if (ReferenceManager._().getFactories().length == 0) {
+	            // this is /sdcard/odk
+	            ReferenceManager._().addReferenceFactory(
+	                new FileReferenceFactory(Environment.getExternalStorageDirectory() + "/odk"));
+	        }
+	
+	        // Set jr://... to point to /sdcard/odk/forms/filename-media/
+	        ReferenceManager._().addSessionRootTranslator(
+	            new RootTranslator("jr://images/", "jr://file/forms/" + formFileName + "-media/"));
+	        ReferenceManager._().addSessionRootTranslator(
+	            new RootTranslator("jr://audio/", "jr://file/forms/" + formFileName + "-media/"));
+	        ReferenceManager._().addSessionRootTranslator(
+	            new RootTranslator("jr://video/", "jr://file/forms/" + formFileName + "-media/"));
+        
         }
-
-        // Set jr://... to point to /sdcard/odk/forms/filename-media/
-        ReferenceManager._().addSessionRootTranslator(
-            new RootTranslator("jr://images/", "jr://file/forms/" + formFileName + "-media/"));
-        ReferenceManager._().addSessionRootTranslator(
-            new RootTranslator("jr://audio/", "jr://file/forms/" + formFileName + "-media/"));
-        ReferenceManager._().addSessionRootTranslator(
-            new RootTranslator("jr://video/", "jr://file/forms/" + formFileName + "-media/"));
 
         // clean up vars
         fis = null;
@@ -224,7 +263,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
 
     public boolean importData(String filePath, FormEntryController fec) {
         // convert files into a byte array
-        byte[] fileBytes = FileUtils.getFileAsBytes(new File(filePath));
+        byte[] fileBytes = FileUtils.getFileAsBytes(new File(filePath), symetricKey);
 
         // get the root of the saved and template instances
         TreeElement savedRoot = XFormParser.restoreDataModel(fileBytes, null).getRoot();

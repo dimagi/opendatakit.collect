@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.crypto.spec.SecretKeySpec;
+
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryController;
@@ -38,6 +40,7 @@ import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.tasks.FormLoaderTask;
 import org.odk.collect.android.tasks.SaveToDiskTask;
+import org.odk.collect.android.utilities.Base64Wrapper;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.views.ODKView;
 import org.odk.collect.android.widgets.QuestionWidget;
@@ -46,6 +49,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -121,10 +125,15 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
     // Identifies the gp of the form used to launch form entry
     public static final String KEY_FORMPATH = "formpath";
-    public static final String KEY_INSTANCEPATH = "instancepath";
+    public static final String KEY_INSTANCEDESTINATION = "instancedestination";
     public static final String KEY_INSTANCES = "instances";
     public static final String KEY_SUCCESS = "success";
     public static final String KEY_ERROR = "error";
+    
+    public static final String KEY_FORM_CONTENT_URI = "form_content_uri";
+    public static final String KEY_INSTANCE_CONTENT_URI = "instance_content_uri";
+    
+    public static final String KEY_AES_STORAGE_KEY = "key_aes_storage";
 
     // Identifies whether this is a new form, or reloading a form after a screen
     // rotation (or similar)
@@ -143,7 +152,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
     private String mFormPath;
     public static String mInstancePath;
+    private String mInstanceDestination;
     private GestureDetector mGestureDetector;
+    
+    private SecretKeySpec symetricKey = null;
 
     public static FormController mFormController;
 
@@ -162,6 +174,9 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
     private FormLoaderTask mFormLoaderTask;
     private SaveToDiskTask mSaveToDiskTask;
+    
+    private Uri formProviderContentURI = FormsColumns.CONTENT_URI;
+    private Uri instanceProviderContentURI = InstanceColumns.CONTENT_URI;
 
     enum AnimationType {
         LEFT, RIGHT, FADE
@@ -240,10 +255,35 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             if (intent != null) {
                 Uri uri = intent.getData();
                 
+                if(intent.hasExtra(KEY_FORM_CONTENT_URI)) {
+                	this.formProviderContentURI = Uri.parse(intent.getStringExtra(KEY_FORM_CONTENT_URI));
+                }
+                if(intent.hasExtra(KEY_INSTANCE_CONTENT_URI)) {
+                	this.instanceProviderContentURI = Uri.parse(intent.getStringExtra(KEY_INSTANCE_CONTENT_URI));
+                }
+                if(intent.hasExtra(KEY_INSTANCEDESTINATION)) {
+                	this.mInstanceDestination = intent.getStringExtra(KEY_INSTANCEDESTINATION);
+                } else {
+                	mInstanceDestination = Collect.INSTANCES_PATH;
+                }
+                if(intent.hasExtra(KEY_AES_STORAGE_KEY)) {
+                	String base64Key = intent.getStringExtra(KEY_AES_STORAGE_KEY);
+                	try {
+						byte[] storageKey = new Base64Wrapper().decode(base64Key);
+						symetricKey = new SecretKeySpec(storageKey, "AES");
+					} catch (ClassNotFoundException e) {
+						throw new RuntimeException("Base64 encoding not available on this platform");
+					}
+                	
+                }
+                
+                
                 //csims@dimagi.com - Jan 24, 2012
                 //Since these are parceled across the content resolver, there's no guarantee of reference equality.
                 //We need to manually check value equality on the type 
                 String contentType = getContentResolver().getType(uri);
+                
+                Uri formUri = null;;
 
                 if (contentType.equals(InstanceColumns.CONTENT_ITEM_TYPE)) {
                     Cursor instanceCursor = this.managedQuery(uri, null, null, null, null);
@@ -266,13 +306,13 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                         String selection = FormsColumns.JR_FORM_ID + " like ?";
 
                         Cursor formCursor =
-                            managedQuery(FormsColumns.CONTENT_URI, null, selection, selectionArgs,
-                                null);
+                            managedQuery(formProviderContentURI, null, selection, selectionArgs,null);
                         if (formCursor.getCount() == 1) {
                             formCursor.moveToFirst();
                             mFormPath =
                                 formCursor.getString(formCursor
                                         .getColumnIndex(FormsColumns.FORM_FILE_PATH));
+                            formUri = ContentUris.withAppendedId(formProviderContentURI, formCursor.getLong(formCursor.getColumnIndex(FormsColumns._ID)));
                         } else if (formCursor.getCount() < 1) {
                             this.createErrorDialog("Parent form does not exist", EXIT);
                             return;
@@ -291,15 +331,21 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     } else {
                         c.moveToFirst();
                         mFormPath = c.getString(c.getColumnIndex(FormsColumns.FORM_FILE_PATH));
+                        formUri = uri;
                     }
                 } else {
                     Log.e(t, "unrecognized URI");
                     this.createErrorDialog("unrecognized URI: " + uri, EXIT);
                     return;
                 }
+                if(formUri == null) {
+                	Log.e(t, "unrecognized URI");
+                    this.createErrorDialog("couldn't locate FormDB entry for the item at: " + uri, EXIT);
+                    return;
+                }
 
-                mFormLoaderTask = new FormLoaderTask();
-                mFormLoaderTask.execute(mFormPath);
+                mFormLoaderTask = new FormLoaderTask(this, symetricKey);
+                mFormLoaderTask.execute(formUri);
                 showDialog(PROGRESS_DIALOG);
             }
         }
@@ -650,7 +696,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     mFormPath
                 };
                 Cursor c =
-                    managedQuery(FormsColumns.CONTENT_URI, projection, selection, selectionArgs,
+                    managedQuery(formProviderContentURI, projection, selection, selectionArgs,
                         null);
                 String mediaDir = null;
                 if (c.getCount() < 1) {
@@ -1088,7 +1134,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
 
         mSaveToDiskTask =
-            new SaveToDiskTask(getIntent().getData(), exit, complete, updatedSaveName);
+            new SaveToDiskTask(getIntent().getData(), exit, complete, updatedSaveName, this, instanceProviderContentURI, symetricKey);
         mSaveToDiskTask.setFormSavedListener(this);
         mSaveToDiskTask.execute();
         showDialog(SAVING_DIALOG);
@@ -1133,7 +1179,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                                                 + mInstancePath + "'";
                                     Cursor c =
                                         FormEntryActivity.this.managedQuery(
-                                            InstanceColumns.CONTENT_URI, null, selection, null,
+                                            instanceProviderContentURI, null, selection, null,
                                             null);
 
                                     // if it's not already saved, erase everything
@@ -1338,7 +1384,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                                     mFormPath
                                 };
                                 int updated =
-                                    getContentResolver().update(FormsColumns.CONTENT_URI, values,
+                                    getContentResolver().update(formProviderContentURI, values,
                                         selection, selectArgs);
                                 Log.i(t, "Updated language to: " + languages[whichButton] + " in "
                                         + updated + " rows");
@@ -1540,7 +1586,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                         .format(Calendar.getInstance().getTime());
             String file =
                 mFormPath.substring(mFormPath.lastIndexOf('/') + 1, mFormPath.lastIndexOf('.'));
-            String path = Collect.INSTANCES_PATH + "/" + file + "_" + time;
+            String path = mInstanceDestination + "/" + file + "_" + time;
             if (FileUtils.createFolder(path)) {
                 mInstancePath = path + "/" + file + "_" + time + ".xml";
             }
@@ -1560,7 +1606,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             String selectArgs[] = {
                 mFormPath
             };
-            Cursor c = managedQuery(FormsColumns.CONTENT_URI, null, selection, selectArgs, null);
+            Cursor c = managedQuery(formProviderContentURI, null, selection, selectArgs, null);
             if (c.getCount() == 1) {
                 c.moveToFirst();
                 newLanguage = c.getString(c.getColumnIndex(FormsColumns.LANGUAGE));
@@ -1664,7 +1710,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             mInstancePath
         };
         Cursor c =
-            getContentResolver().query(InstanceColumns.CONTENT_URI, null, selection, selectionArgs,
+            getContentResolver().query(instanceProviderContentURI, null, selection, selectionArgs,
                 null);
         startManagingCursor(c);
         if (c != null && c.getCount() > 0) {
@@ -1698,12 +1744,12 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 mInstancePath
             };
             Cursor c =
-                managedQuery(InstanceColumns.CONTENT_URI, null, selection, selectionArgs, null);
+                managedQuery(instanceProviderContentURI, null, selection, selectionArgs, null);
             if (c.getCount() > 0) {
                 // should only be one...
                 c.moveToFirst();
                 String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
-                Uri instance = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, id);
+                Uri instance = Uri.withAppendedPath(instanceProviderContentURI, id);
                 setResult(RESULT_OK, new Intent().setData(instance));
             }
         }

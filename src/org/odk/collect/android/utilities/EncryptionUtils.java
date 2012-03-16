@@ -47,12 +47,12 @@ import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
-import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.logic.FormController.InstanceMetadata;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -283,9 +283,9 @@ public class EncryptionUtils {
 	 * @param instanceMetadata 
 	 * @return
 	 */
-	public static EncryptedFormInformation getEncryptedFormInformation(Uri mUri, InstanceMetadata instanceMetadata) {
+	public static EncryptedFormInformation getEncryptedFormInformation(Uri mUri, InstanceMetadata instanceMetadata, Context context, Uri instanceContentUri) {
 		
-		ContentResolver cr = Collect.getInstance().getContentResolver();
+		ContentResolver cr = context.getContentResolver();
 		
 		// fetch the form information
 		String formId;
@@ -316,7 +316,7 @@ public class EncryptionUtils {
 				}
 				String selection = FormsColumns.JR_FORM_ID + " like ?";
 	
-		        formCursor = cr.query(FormsColumns.CONTENT_URI, null, selection, selectionArgs,
+		        formCursor = cr.query(instanceContentUri, null, selection, selectionArgs,
 		                null);
 		        
 		        if (formCursor.getCount() != 1) {

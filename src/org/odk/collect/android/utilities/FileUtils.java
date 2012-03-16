@@ -14,15 +14,7 @@
 
 package org.odk.collect.android.utilities;
 
-import org.javarosa.xform.parse.XFormParser;
-import org.kxml2.kdom.Document;
-import org.kxml2.kdom.Element;
-import org.kxml2.kdom.Node;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
-
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,9 +25,25 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.channels.FileChannel;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.javarosa.core.util.StreamsUtil;
+import org.javarosa.xform.parse.XFormParser;
+import org.kxml2.kdom.Document;
+import org.kxml2.kdom.Element;
+import org.kxml2.kdom.Node;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 
 /**
  * Static methods used for common file operations.
@@ -58,46 +66,41 @@ public class FileUtils {
         return made;
     }
 
-
+    
     public static byte[] getFileAsBytes(File file) {
+    	return getFileAsBytes(file, null);
+    }
+
+    public static byte[] getFileAsBytes(File file, SecretKeySpec symetricKey) {
         byte[] bytes = null;
         InputStream is = null;
         try {
             is = new FileInputStream(file);
-
-            // Get the size of the file
-            long length = file.length();
-            if (length > Integer.MAX_VALUE) {
-                Log.e(t, "File " + file.getName() + "is too large");
-                return null;
+            if(symetricKey != null) {
+            	Cipher cipher = Cipher.getInstance("AES");
+            	cipher.init(Cipher.DECRYPT_MODE, symetricKey);
+            	is = new CipherInputStream(is, cipher);
             }
-
-            // Create the byte array to hold the data
-            bytes = new byte[(int) length];
-
-            // Read in the bytes
-            int offset = 0;
-            int read = 0;
+            
+            //CTS - Removed a lot of weird checks  here. file size < max int? We're shoving this 
+            //form into a _Byte array_, I don't think there's a lot of concern than 2GB of data
+            //are gonna sneak by.
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            
             try {
-                while (offset < bytes.length && read >= 0) {
-                    read = is.read(bytes, offset, bytes.length - offset);
-                    offset += read;
-                }
+                StreamsUtil.writeFromInputToOutput(is, baos);
+                bytes = baos.toByteArray();
             } catch (IOException e) {
                 Log.e(t, "Cannot read " + file.getName());
                 e.printStackTrace();
                 return null;
             }
 
-            // Ensure all the bytes have been read in
-            if (offset < bytes.length) {
-                try {
-                    throw new IOException("Could not completely read file " + file.getName());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
+            //CTS - Removed the byte array length check here. Plenty of
+            //files are smaller than their contents (padded encryption data, etc),
+            //so you can't actually know that's correct. We should be relying on the
+            //methods we use to read data to make sure it's all coming out.
 
             return bytes;
 
@@ -106,7 +109,16 @@ public class FileUtils {
             e.printStackTrace();
             return null;
 
-        } finally {
+        } catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} finally {
             // Close the input stream
             try {
                 is.close();
