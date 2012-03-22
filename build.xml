@@ -45,6 +45,15 @@
             unless="sdk.dir"
     />
 
+	<!-- long story -->
+    <target name="-pre-build">
+    	<!-- copy libraries -->
+		<copy todir="${jar.libs.dir}">
+			<fileset dir="lib" includes="*.jar"/>
+		</copy>
+    </target>
+
+
 
 <!-- extension targets. Uncomment the ones where you want to do custom work
      in between standard targets -->
