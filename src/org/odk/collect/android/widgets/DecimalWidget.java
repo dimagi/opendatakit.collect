@@ -24,7 +24,9 @@ import android.content.Context;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
+import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
+import android.widget.EditText;
 
 /**
  * A widget that restricts values to floating point numbers.
@@ -33,16 +35,17 @@ import android.util.TypedValue;
  */
 public class DecimalWidget extends StringWidget {
 
-    public DecimalWidget(Context context, FormEntryPrompt prompt) {
-        super(context, prompt);
+    public DecimalWidget(Context context, FormEntryPrompt prompt, boolean secret) {
+        super(context, prompt, secret);
 
         // formatting
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
-        mAnswer.setSingleLine(false);
+        if(!secret) {
+        	mAnswer.setSingleLine(false);
+        }
 
         // only numbers are allowed
         mAnswer.setKeyListener(new DigitsKeyListener(true, true));
@@ -75,7 +78,14 @@ public class DecimalWidget extends StringWidget {
             setClickable(false);
         }
     }
-
+    
+    @Override
+    protected void setTextInputType(EditText mAnswer) {
+    	if(secret) {
+        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
+    }
 
     @Override
     public IAnswerData getAnswer() {

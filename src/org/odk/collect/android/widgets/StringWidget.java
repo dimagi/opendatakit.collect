@@ -19,6 +19,8 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import android.content.Context;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.text.method.TextKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
 import android.util.TypedValue;
@@ -37,9 +39,9 @@ public class StringWidget extends QuestionWidget {
 
     boolean mReadOnly = false;
     protected EditText mAnswer;
+    protected boolean secret = false;
 
-
-    public StringWidget(Context context, FormEntryPrompt prompt) {
+    public StringWidget(Context context, FormEntryPrompt prompt, boolean secret) {
         super(context, prompt);
         mAnswer = new EditText(context);
 
@@ -49,12 +51,19 @@ public class StringWidget extends QuestionWidget {
         params.setMargins(7, 5, 7, 5);
         mAnswer.setLayoutParams(params);
         
-        // capitalize the first letter of the sentence
-        mAnswer.setKeyListener(new TextKeyListener(Capitalize.SENTENCES, false));
+        this.secret = secret;
+        
+        if(!secret) {
+        	// capitalize the first letter of the sentence
+        	mAnswer.setKeyListener(new TextKeyListener(Capitalize.SENTENCES, false));
+        }
+        setTextInputType(mAnswer);
 
         // needed to make long read only text scroll
         mAnswer.setHorizontallyScrolling(false);
-        mAnswer.setSingleLine(false);
+        if(!secret) {
+        	mAnswer.setSingleLine(false);
+        }
 
         if (prompt != null) {
             mReadOnly = prompt.isReadOnly();
@@ -72,7 +81,13 @@ public class StringWidget extends QuestionWidget {
 
         addView(mAnswer);
     }
-
+    
+    protected void setTextInputType(EditText mAnswer) {
+    	if(secret) {
+        	mAnswer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
+    }
 
     @Override
     public void clearAnswer() {

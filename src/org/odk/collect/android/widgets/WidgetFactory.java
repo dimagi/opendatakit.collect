@@ -36,8 +36,10 @@ public class WidgetFactory {
     static public QuestionWidget createWidgetFromPrompt(FormEntryPrompt fep, Context context) {
 
         QuestionWidget questionWidget = null;
+        
         switch (fep.getControlType()) {
             case Constants.CONTROL_INPUT:
+            case Constants.CONTROL_SECRET:
                 switch (fep.getDataType()) {
                     case Constants.DATATYPE_DATE_TIME:
                         questionWidget = new DateTimeWidget(context, fep);
@@ -49,10 +51,10 @@ public class WidgetFactory {
                         questionWidget = new TimeWidget(context, fep);
                         break;
                     case Constants.DATATYPE_DECIMAL:
-                        questionWidget = new DecimalWidget(context, fep);
+                        questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
                     case Constants.DATATYPE_INTEGER:
-                        questionWidget = new IntegerWidget(context, fep);
+                        questionWidget = new IntegerWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
                     case Constants.DATATYPE_GEOPOINT:
                         questionWidget = new GeoPointWidget(context, fep);
@@ -62,14 +64,14 @@ public class WidgetFactory {
                         break;
                     case Constants.DATATYPE_TEXT:
                         String appearance = fep.getAppearanceHint();
-                        if (appearance != null && appearance.equalsIgnoreCase("numbers")) {
-                            questionWidget = new StringNumberWidget(context, fep);
+                        if (appearance != null && (appearance.equalsIgnoreCase("numbers") || appearance.equalsIgnoreCase("numeric"))) {
+                            questionWidget = new StringNumberWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         } else {
-                            questionWidget = new StringWidget(context, fep);
+                            questionWidget = new StringWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         }
                         break;
                     default:
-                        questionWidget = new StringWidget(context, fep);
+                        questionWidget = new StringWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
                 }
                 break;
@@ -156,7 +158,7 @@ public class WidgetFactory {
                 questionWidget = new TriggerWidget(context, fep);
                 break;
             default:
-                questionWidget = new StringWidget(context, fep);
+                questionWidget = new StringWidget(context, fep, false);
                 break;
         }
         return questionWidget;

@@ -22,7 +22,9 @@ import android.content.Context;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
+import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
+import android.widget.EditText;
 
 /**
  * Widget that restricts values to integers.
@@ -31,15 +33,16 @@ import android.util.TypedValue;
  */
 public class IntegerWidget extends StringWidget {
 
-    public IntegerWidget(Context context, FormEntryPrompt prompt) {
-        super(context, prompt);
+    public IntegerWidget(Context context, FormEntryPrompt prompt, boolean secret) {
+        super(context, prompt, secret);
 
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
 
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
-        mAnswer.setSingleLine(false);
+        if(!secret) {
+        	mAnswer.setSingleLine(false);
+        }
 
         // only allows numbers and no periods
         mAnswer.setKeyListener(new DigitsKeyListener(true, false));
@@ -61,6 +64,14 @@ public class IntegerWidget extends StringWidget {
 
         if (i != null) {
             mAnswer.setText(i.toString());
+        }
+    }
+    
+    @Override
+    protected void setTextInputType(EditText mAnswer) {
+    	if(secret) {
+        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 

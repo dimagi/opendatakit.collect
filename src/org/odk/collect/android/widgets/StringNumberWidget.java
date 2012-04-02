@@ -21,7 +21,9 @@ import org.javarosa.form.api.FormEntryPrompt;
 import android.content.Context;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
+import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
+import android.widget.EditText;
 
 /**
  * Widget that restricts values to integers.
@@ -30,15 +32,16 @@ import android.util.TypedValue;
  */
 public class StringNumberWidget extends StringWidget {
 
-    public StringNumberWidget(Context context, FormEntryPrompt prompt) {
-        super(context, prompt);
+    public StringNumberWidget(Context context, FormEntryPrompt prompt, boolean secret) {
+        super(context, prompt, secret);
 
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
 
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
-        mAnswer.setSingleLine(false);
+        if(!secret) {
+        	mAnswer.setSingleLine(false);
+        }
 
         mAnswer.setKeyListener(new DigitsKeyListener() {
             @Override
@@ -64,7 +67,14 @@ public class StringNumberWidget extends StringWidget {
             mAnswer.setText(i.toString());
         }
     }
-
+    
+    @Override
+    protected void setTextInputType(EditText mAnswer) {
+    	if(secret) {
+        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
+    }
 
     @Override
     public IAnswerData getAnswer() {
