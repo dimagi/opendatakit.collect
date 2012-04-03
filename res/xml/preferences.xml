@@ -9,7 +9,7 @@
 			android:action="android.intent.action.VIEW"
 			android:data="http://opendatakit.org" />
 	</PreferenceScreen>
-	<PreferenceCategory android:title="@string/server_preferences">
+	<PreferenceCategory android:key="serverprefs" android:title="@string/server_preferences">
 		<ListPreference
 			android:id="@+id/protocol"
 			android:key="protocol"

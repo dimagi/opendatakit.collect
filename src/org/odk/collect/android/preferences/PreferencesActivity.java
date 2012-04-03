@@ -16,6 +16,7 @@ package org.odk.collect.android.preferences;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.AccountList;
+import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.utilities.UrlUtils;
 import org.odk.collect.android.utilities.WebUtils;
 
@@ -69,6 +70,8 @@ public class PreferencesActivity extends PreferenceActivity implements
 
     public static String KEY_AUTH = "auth";
     public static String KEY_ACCOUNT = "account";
+    
+    public static String KEY_SERVER_PREFS = "serverprefs";
 
     public static String googleServerBaseUrl = "https://gather.apis.google.com/odk/n/";
 
@@ -91,23 +94,29 @@ public class PreferencesActivity extends PreferenceActivity implements
 
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.general_preferences));
 
-        setupSplashPathPreference();
-        setupSelectedGoogleAccountPreference();
-
-        updateServerUrl();
-
-        updateUsername();
-        updatePassword();
-
-        updateFormListUrl();
-        updateSubmissionUrl();
-
-        updateSplashPath();
-
+        if(Collect.getInstance() != null) {
+	        setupSplashPathPreference();
+	        setupSelectedGoogleAccountPreference();
+	
+	        updateServerUrl();
+	
+	        updateUsername();
+	        updatePassword();
+	
+	        updateFormListUrl();
+	        updateSubmissionUrl();
+	
+	        updateSplashPath();
+	        
+	        updateProtocol();
+	        updateSelectedGoogleAccount();
+	        updateGoogleCollectionEffort();
+        } else {
+        	//If there's no collect instance we're running in a library, so we should
+        	//hide everything that's irrelevant
+        	this.getPreferenceScreen().removePreference(this.findPreference(KEY_SERVER_PREFS));
+        }
         updateFontSize();
-        updateProtocol();
-        updateSelectedGoogleAccount();
-        updateGoogleCollectionEffort();
     }
 
 
@@ -190,20 +199,24 @@ public class PreferencesActivity extends PreferenceActivity implements
     protected void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        updateServerUrl();
-
-        updateUsername();
-        updatePassword();
-
-        updateFormListUrl();
-        updateSubmissionUrl();
-
-        updateSplashPath();
-
+        
+        if(Collect.getInstance() != null) {
+        	
+	        updateServerUrl();
+	
+	        updateUsername();
+	        updatePassword();
+	
+	        updateFormListUrl();
+	        updateSubmissionUrl();
+	
+	        updateSplashPath();
+	
+	        updateProtocol();
+	        updateSelectedGoogleAccount();
+	        updateGoogleCollectionEffort();
+        }
         updateFontSize();
-        updateProtocol();
-        updateSelectedGoogleAccount();
-        updateGoogleCollectionEffort();
     }
 
 
