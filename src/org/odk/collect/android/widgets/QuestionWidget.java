@@ -1,6 +1,7 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.application.Collect;
@@ -145,5 +146,14 @@ public abstract class QuestionWidget extends LinearLayout {
             mHelpText.cancelLongPress();
         }
     }
-
+    
+    protected IAnswerData getCurrentAnswer() {
+    	IAnswerData current = mPrompt.getAnswerValue();
+    	if(current == null) { return null; }
+    	return getTemplate().cast(current.uncast());
+    }
+    
+    protected IAnswerData getTemplate() {
+    	return AnswerDataFactory.template(mPrompt.getControlType(), mPrompt.getDataType());
+    }
 }

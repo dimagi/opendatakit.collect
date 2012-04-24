@@ -715,8 +715,7 @@ public class FormController {
             // instance id...
             v = e.getChildrenWithName(INSTANCE_ID);
             if ( v.size() == 1 ) {
-                StringData sa = (StringData) v.get(0).getValue();
-                instanceId = (String) sa.getValue();
+            	instanceId = v.get(0).getValue().uncast().toString();
             }
         }
     	

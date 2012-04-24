@@ -79,7 +79,7 @@ public class ListMultiWidget extends QuestionWidget {
 
         Vector<Selection> ve = new Vector<Selection>();
         if (prompt.getAnswerValue() != null) {
-            ve = (Vector<Selection>) prompt.getAnswerValue().getValue();
+            ve = (Vector<Selection>) getCurrentAnswer().getValue();
         }
 
         if (prompt.getSelectChoices() != null) {

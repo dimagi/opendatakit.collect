@@ -98,7 +98,7 @@ public class DateTimeWidget extends QuestionWidget {
 
             DateTime ldt =
                 new DateTime(
-                        ((Date) ((DateTimeData) mPrompt.getAnswerValue()).getValue()).getTime());
+                        ((Date) ((DateTimeData) getCurrentAnswer()).getValue()).getTime());
             mDatePicker.init(ldt.getYear(), ldt.getMonthOfYear() - 1, ldt.getDayOfMonth(),
                 mDateListener);
             mTimePicker.setCurrentHour(ldt.getHourOfDay());

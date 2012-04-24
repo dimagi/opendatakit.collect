@@ -56,7 +56,7 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
 
         String s = null;
         if (prompt.getAnswerValue() != null) {
-            s = ((Selection) prompt.getAnswerValue().getValue()).getValue();
+            s = prompt.getAnswerValue().uncast().getString();
         }
 
         if (prompt.getSelectChoices() != null) {

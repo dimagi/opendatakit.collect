@@ -71,8 +71,8 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         buttonLayout = new LinearLayout(context);
 
         String s = null;
-        if (prompt.getAnswerValue() != null) {
-            s = ((Selection) prompt.getAnswerValue().getValue()).getValue();
+        if (getCurrentAnswer() != null) {
+            s = ((Selection) getCurrentAnswer().getValue()).getValue();
         }
 
         if (prompt.getSelectChoices() != null) {

@@ -15,7 +15,7 @@
 package org.odk.collect.android.widgets;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import android.content.Context;
@@ -59,9 +59,9 @@ public class StringNumberWidget extends StringWidget {
             setClickable(false);
         }
 
-        Integer i = null;
+        Long i = null;
         if (prompt.getAnswerValue() != null)
-            i = (Integer) prompt.getAnswerValue().getValue();
+            i = Long.parseLong(getCurrentAnswer().getValue().toString());
 
         if (i != null) {
             mAnswer.setText(i.toString());
@@ -83,7 +83,8 @@ public class StringNumberWidget extends StringWidget {
             return null;
         } else {
             try {
-                return new IntegerData(Integer.parseInt(s));
+            	Long.parseLong(s);
+                return new StringData(s);
             } catch (Exception NumberFormatException) {
                 return null;
             }

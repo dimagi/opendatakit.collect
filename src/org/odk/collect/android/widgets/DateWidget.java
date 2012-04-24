@@ -78,9 +78,9 @@ public class DateWidget extends QuestionWidget {
 
     private void setAnswer() {
 
-        if (mPrompt.getAnswerValue() != null) {
+        if (getCurrentAnswer() != null) {
             DateTime ldt =
-                new DateTime(((Date) ((DateData) mPrompt.getAnswerValue()).getValue()).getTime());
+                new DateTime(((Date) ((DateData) getCurrentAnswer()).getValue()).getTime());
             mDatePicker.init(ldt.getYear(), ldt.getMonthOfYear() - 1, ldt.getDayOfMonth(),
                 mDateListener);
         } else {

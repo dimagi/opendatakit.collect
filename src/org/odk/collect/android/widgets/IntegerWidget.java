@@ -59,8 +59,8 @@ public class IntegerWidget extends StringWidget {
         }
 
         Integer i = null;
-        if (prompt.getAnswerValue() != null)
-            i = (Integer) prompt.getAnswerValue().getValue();
+        if (getCurrentAnswer() != null)
+            i = (Integer) getCurrentAnswer().getValue();
 
         if (i != null) {
             mAnswer.setText(i.toString());
