@@ -59,13 +59,16 @@ public class StringNumberWidget extends StringWidget {
             setClickable(false);
         }
 
-        Long i = null;
-        if (prompt.getAnswerValue() != null)
-            i = Long.parseLong(getCurrentAnswer().getValue().toString());
-
-        if (i != null) {
-            mAnswer.setText(i.toString());
+        if (prompt.getAnswerValue() != null) {
+	        String curAnswer = getCurrentAnswer().getValue().toString();
+	        try {
+	        	Long.parseLong(curAnswer);
+	        	mAnswer.setText(curAnswer);
+	        } catch (Exception NumberFormatException) {
+	            
+	        }
         }
+
     }
     
     @Override
