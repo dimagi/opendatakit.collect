@@ -501,6 +501,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      * dialogs and restarts caused by screen orientation changes, so they're resynchronized here.
      */
     public void refreshCurrentView() {
+    	if(mFormController == null) { throw new RuntimeException("Form state is lost! Cannot refresh current view. This shouldn't happen, please submit a bug report."); }
         int event = mFormController.getEvent();
 
         // When we refresh, repeat dialog state isn't maintained, so step back to the previous
@@ -590,22 +591,26 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         if (mFormController.getEvent() == FormEntryController.EVENT_QUESTION
                 || (mFormController.getEvent() == FormEntryController.EVENT_GROUP && mFormController
                         .indexIsInFieldList())) {
-            HashMap<FormIndex, IAnswerData> answers = ((ODKView) mCurrentView).getAnswers();
-            Set<FormIndex> indexKeys = answers.keySet();
-            for (FormIndex index : indexKeys) {
-                // Within a group, you can only save for question events
-                if (mFormController.getEvent(index) == FormEntryController.EVENT_QUESTION) {
-                    int saveStatus = saveAnswer(answers.get(index), index, evaluateConstraints);
-                    if (evaluateConstraints && saveStatus != FormEntryController.ANSWER_OK) {
-                        createConstraintToast(mFormController.getQuestionPrompt(index)
-                                .getConstraintText(), saveStatus);
-                        return false;
-                    }
-                } else {
-                    Log.w(t,
-                        "Attempted to save an index referencing something other than a question: "
-                                + index.getReference());
-                }
+        	if(mCurrentView instanceof ODKView) {
+        		HashMap<FormIndex, IAnswerData> answers = ((ODKView) mCurrentView).getAnswers();
+	            Set<FormIndex> indexKeys = answers.keySet();
+	            for (FormIndex index : indexKeys) {
+	                // Within a group, you can only save for question events
+	                if (mFormController.getEvent(index) == FormEntryController.EVENT_QUESTION) {
+	                    int saveStatus = saveAnswer(answers.get(index), index, evaluateConstraints);
+	                    if (evaluateConstraints && saveStatus != FormEntryController.ANSWER_OK) {
+	                        createConstraintToast(mFormController.getQuestionPrompt(index)
+	                                .getConstraintText(), saveStatus);
+	                        return false;
+	                    }
+	                } else {
+	                    Log.w(t,
+	                        "Attempted to save an index referencing something other than a question: "
+	                                + index.getReference());
+	                }
+	        	}
+            } else {
+            	Log.w(t, "Unknown view type rendered while current event was question or group! View type: " + mCurrentView == null ? "null" : mCurrentView.getClass().toString());
             }
         }
         return true;
