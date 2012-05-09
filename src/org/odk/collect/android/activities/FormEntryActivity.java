@@ -226,6 +226,28 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             if (savedInstanceState.containsKey(KEY_ERROR)) {
                 mErrorMessage = savedInstanceState.getString(KEY_ERROR);
             }
+            if (savedInstanceState.containsKey(KEY_FORM_CONTENT_URI)) {
+            	formProviderContentURI = Uri.parse(savedInstanceState.getString(KEY_FORM_CONTENT_URI));
+            }
+            if (savedInstanceState.containsKey(KEY_INSTANCE_CONTENT_URI)) {
+            	instanceProviderContentURI = Uri.parse(savedInstanceState.getString(KEY_INSTANCE_CONTENT_URI));
+            }
+            if (savedInstanceState.containsKey(KEY_INSTANCEDESTINATION)) {
+            	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
+            }
+            if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
+            	 if(symetricKey != null) {
+                 	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
+                 	try {
+     					byte[] storageKey = new Base64Wrapper().decode(base64Key);
+     					symetricKey = new SecretKeySpec(storageKey, "AES");
+     				} catch (ClassNotFoundException e) {
+     					throw new RuntimeException("Base64 encoding not available on this platform");
+     				}
+                 }
+            }
+            
+           
         }
 
         // If a parse error message is showing then nothing else is loaded
@@ -358,6 +380,18 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         outState.putString(KEY_FORMPATH, mFormPath);
         outState.putBoolean(NEWFORM, false);
         outState.putString(KEY_ERROR, mErrorMessage);
+        outState.putString(KEY_FORM_CONTENT_URI, formProviderContentURI.toString());
+        outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
+        outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
+        
+        if(symetricKey != null) {
+        	try {
+				outState.putString(KEY_AES_STORAGE_KEY, new Base64Wrapper().encodeToString(symetricKey.getEncoded()));
+			} catch (ClassNotFoundException e) {
+				// we can't really get here anyway, since we couldn't have decoded the string to begin with
+				throw new RuntimeException("Base 64 encoding unavailable! Can't pass storage key");
+			}
+        }
     }
 
 
