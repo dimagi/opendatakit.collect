@@ -236,15 +236,13 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
             }
             if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
-            	 if(symetricKey != null) {
-                 	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
-                 	try {
-     					byte[] storageKey = new Base64Wrapper().decode(base64Key);
-     					symetricKey = new SecretKeySpec(storageKey, "AES");
-     				} catch (ClassNotFoundException e) {
-     					throw new RuntimeException("Base64 encoding not available on this platform");
-     				}
-                 }
+	         	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
+	         	try {
+					byte[] storageKey = new Base64Wrapper().decode(base64Key);
+					symetricKey = new SecretKeySpec(storageKey, "AES");
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException("Base64 encoding not available on this platform");
+				}
             }
             
            
