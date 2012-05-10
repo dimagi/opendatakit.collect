@@ -777,6 +777,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
                 // edittext to change the displayed name of the instance
                 final EditText saveAs = (EditText) endView.findViewById(R.id.save_name);
+                
+                //TODO: Figure this out based on the content provider or some part of the context
+                saveAs.setVisibility(View.GONE);
+                endView.findViewById(R.id.save_form_as).setVisibility(View.GONE);
 
                 // disallow carriage returns in the name
                 InputFilter returnFilter = new InputFilter() {
