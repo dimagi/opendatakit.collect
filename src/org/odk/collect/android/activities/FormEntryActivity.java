@@ -134,6 +134,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final String KEY_INSTANCE_CONTENT_URI = "instance_content_uri";
     
     public static final String KEY_AES_STORAGE_KEY = "key_aes_storage";
+    
+    public static final String KEY_HEADER_STRING = "form_header";
 
     // Identifies whether this is a new form, or reloading a form after a screen
     // rotation (or similar)
@@ -177,6 +179,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     
     private Uri formProviderContentURI = FormsColumns.CONTENT_URI;
     private Uri instanceProviderContentURI = InstanceColumns.CONTENT_URI;
+    
+    private static String mHeaderString;
 
     enum AnimationType {
         LEFT, RIGHT, FADE
@@ -244,7 +248,9 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 					throw new RuntimeException("Base64 encoding not available on this platform");
 				}
             }
-            
+            if(savedInstanceState.containsKey(KEY_HEADER_STRING)) {
+            	mHeaderString = savedInstanceState.getString(KEY_HEADER_STRING);
+            }
            
         }
 
@@ -295,6 +301,9 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 						throw new RuntimeException("Base64 encoding not available on this platform");
 					}
                 	
+                }
+                if(intent.hasExtra(KEY_HEADER_STRING)) {
+                	this.mHeaderString = intent.getStringExtra(KEY_HEADER_STRING);
                 }
                 
                 
@@ -706,7 +715,16 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
         return null;
     }
+    
+    private String getHeaderString() {
+    	if(mHeaderString != null) {
+    		//Localization?
+    		return mHeaderString;
+    	} else {
+    		return getString(R.string.app_name) + " > " + mFormController.getFormTitle();
+    	}
 
+    }
 
     /**
      * Creates a view given the View type and an event
@@ -715,12 +733,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      * @return newly created View
      */
     private View createView(int event) {
-        setTitle(getString(R.string.app_name) + " > " + mFormController.getFormTitle());
-
+    	setTitle(getHeaderString());
         switch (event) {
             case FormEntryController.EVENT_BEGINNING_OF_FORM:
                 View startView = View.inflate(this, R.layout.form_entry_start, null);
-                setTitle(getString(R.string.app_name) + " > " + mFormController.getFormTitle());
+                setTitle(getHeaderString());
                 ((TextView) startView.findViewById(R.id.description)).setText(getString(
                     R.string.enter_data_description, mFormController.getFormTitle()));
 
