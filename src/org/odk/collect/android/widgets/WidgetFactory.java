@@ -15,9 +15,13 @@
 package org.odk.collect.android.widgets;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.jr.extensions.AndroidXFormExtensions;
+import org.odk.collect.android.jr.extensions.IntentCallout;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -26,6 +30,12 @@ import android.util.Log;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class WidgetFactory {
+	
+	FormDef form;
+	
+	public WidgetFactory(FormDef form) {
+		this.form = form;
+	}
 
     /**
      * Returns the appropriate QuestionWidget for the given FormEntryPrompt.
@@ -33,12 +43,24 @@ public class WidgetFactory {
      * @param fep prompt element to be rendered
      * @param context Android context
      */
-    static public QuestionWidget createWidgetFromPrompt(FormEntryPrompt fep, Context context) {
+    public QuestionWidget createWidgetFromPrompt(FormEntryPrompt fep, Context context) {
 
         QuestionWidget questionWidget = null;
-        
+        String appearance = fep.getAppearanceHint();
         switch (fep.getControlType()) {
             case Constants.CONTROL_INPUT:
+            	if(appearance != null && appearance.startsWith("intent:")) {
+            		String intentId = appearance.substring("intent:".length());
+            		IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId);
+            		//Hm, so what do we do if no callout is found? Error? For now, fail fast
+            		if(ic == null) {
+            			throw new RuntimeException("No intent callout could be found for requested id " + intentId + "!");
+            		}
+            		//NOTE: No path specific stuff for now
+            		Intent i = ic.generate(form.getEvaluationContext());
+            		questionWidget = new IntentWidget(context, fep, i);
+            		break;
+            	}
             case Constants.CONTROL_SECRET:
                 switch (fep.getDataType()) {
                     case Constants.DATATYPE_DATE_TIME:
@@ -63,7 +85,6 @@ public class WidgetFactory {
                         questionWidget = new BarcodeWidget(context, fep);
                         break;
                     case Constants.DATATYPE_TEXT:
-                        String appearance = fep.getAppearanceHint();
                         if (appearance != null && (appearance.equalsIgnoreCase("numbers") || appearance.equalsIgnoreCase("numeric"))) {
                             questionWidget = new StringNumberWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         } else {
@@ -85,8 +106,6 @@ public class WidgetFactory {
                 questionWidget = new VideoWidget(context, fep);
                 break;
             case Constants.CONTROL_SELECT_ONE:
-                String appearance = fep.getAppearanceHint();
-
                 if (appearance != null && appearance.contains("compact")) {
                     int numColumns = -1;
                     try {

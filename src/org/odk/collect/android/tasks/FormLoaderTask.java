@@ -30,9 +30,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
-import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.xform.parse.XFormParseException;
@@ -40,10 +38,12 @@ import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.jr.extensions.IntentExtensionParser;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.utilities.ApkUtils;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
@@ -63,31 +63,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
 	
 	public static InstanceInitializationFactory iif;
     private final static String t = "FormLoaderTask";
-    /**
-     * Classes needed to serialize objects. Need to put anything from JR in here.
-     */
-    public final static String[] SERIALIABLE_CLASSES = {
-            "org.javarosa.core.model.FormDef", "org.javarosa.core.model.GroupDef",
-            "org.javarosa.core.model.QuestionDef", "org.javarosa.core.model.data.DateData",
-            "org.javarosa.core.model.data.DateTimeData",
-            "org.javarosa.core.model.data.DecimalData",
-            "org.javarosa.core.model.data.GeoPointData",
-            "org.javarosa.core.model.data.helper.BasicDataPointer",
-            "org.javarosa.core.model.data.IntegerData",
-            "org.javarosa.core.model.data.MultiPointerAnswerData",
-            "org.javarosa.core.model.data.PointerAnswerData",
-            "org.javarosa.core.model.data.SelectMultiData",
-            "org.javarosa.core.model.data.SelectOneData",
-            "org.javarosa.core.model.data.StringData", "org.javarosa.core.model.data.TimeData",
-            "org.javarosa.core.services.locale.TableLocaleSource",
-            "org.javarosa.xpath.expr.XPathArithExpr", "org.javarosa.xpath.expr.XPathBoolExpr",
-            "org.javarosa.xpath.expr.XPathCmpExpr", "org.javarosa.xpath.expr.XPathEqExpr",
-            "org.javarosa.xpath.expr.XPathFilterExpr", "org.javarosa.xpath.expr.XPathFuncExpr",
-            "org.javarosa.xpath.expr.XPathNumericLiteral",
-            "org.javarosa.xpath.expr.XPathNumNegExpr", "org.javarosa.xpath.expr.XPathPathExpr",
-            "org.javarosa.xpath.expr.XPathStringLiteral", "org.javarosa.xpath.expr.XPathUnionExpr",
-            "org.javarosa.xpath.expr.XPathVariableReference"
-    };
+
 
     private FormLoaderListener mStateListener;
     private String mErrorMsg;
@@ -168,6 +144,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
             try {
                 Log.i(t, "Attempting to load from: " + formXml.getAbsolutePath());
                 fis = new FileInputStream(formXml);
+                XFormParser.registerHandler("intent", new IntentExtensionParser());
                 fd = XFormUtils.getFormFromInputStream(fis);
                 if (fd == null) {
                     mErrorMsg = "Error reading XForm file";
@@ -308,7 +285,6 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
         // TODO: any way to remove reliance on jrsp?
 
         // need a list of classes that formdef uses
-        PrototypeManager.registerPrototypes(SERIALIABLE_CLASSES);
         FileInputStream fis = null;
         FormDef fd = null;
         try {
@@ -318,7 +294,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
             DataInputStream dis = new DataInputStream(fis);
 
             // read serialized formdef into new formdef
-            fd.readExternal(dis, ExtUtil.defaultPrototypes());
+            fd.readExternal(dis, ApkUtils.getPrototypeFactory(context));
             dis.close();
 
         } catch (FileNotFoundException e) {

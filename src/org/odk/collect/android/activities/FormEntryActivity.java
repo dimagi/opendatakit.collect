@@ -119,9 +119,13 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final int IMAGE_CHOOSER = 7;
     public static final int AUDIO_CHOOSER = 8;
     public static final int VIDEO_CHOOSER = 9;
+	public static final int INTENT_CALLOUT = 10;
 
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
+    
+    // Generic Extra from intent callout extensions
+    public static final String INTENT_RESULT = "odk_intent_data";
 
     // Identifies the gp of the form used to launch form entry
     public static final String KEY_FORMPATH = "formpath";
@@ -417,6 +421,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             case BARCODE_CAPTURE:
                 String sb = intent.getStringExtra("SCAN_RESULT");
                 ((ODKView) mCurrentView).setBinaryData(sb);
+                saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+                break;
+            case INTENT_CALLOUT:
+                String result = intent.getStringExtra(INTENT_RESULT);
+                ((ODKView) mCurrentView).setBinaryData(result);
                 saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
                 break;
             case IMAGE_CAPTURE:
@@ -853,7 +862,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 try {
                     odkv =
                         new ODKView(this, mFormController.getQuestionPrompts(),
-                                mFormController.getGroupsForCurrentIndex());
+                                mFormController.getGroupsForCurrentIndex(),
+                                mFormController.getWidgetFactory());
                     Log.i(t, "created view for group");
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), EXIT);

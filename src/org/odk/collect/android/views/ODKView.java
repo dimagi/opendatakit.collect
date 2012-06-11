@@ -43,16 +43,14 @@ public class ODKView extends ScrollView implements OnLongClickListener {
     public final static String FIELD_LIST = "field-list";
 
 
-    public ODKView(Context context, FormEntryPrompt questionPrompt,
-            FormEntryCaption[] groups) {
+    public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory) {
         this(context, new FormEntryPrompt[] {
             questionPrompt
-        }, groups);
+        }, groups, factory);
     }
 
 
-    public ODKView(Context context, FormEntryPrompt[] questionPrompts,
-            FormEntryCaption[] groups) {
+    public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory) {
         super(context);
 
         widgets = new ArrayList<QuestionWidget>();
@@ -84,7 +82,7 @@ public class ODKView extends ScrollView implements OnLongClickListener {
 
             // if question or answer type is not supported, use text widget
             QuestionWidget qw =
-                WidgetFactory.createWidgetFromPrompt(p, getContext());
+                factory.createWidgetFromPrompt(p, getContext());
             qw.setLongClickable(true);
             qw.setOnLongClickListener(this);
             qw.setId(VIEW_ID + id++);

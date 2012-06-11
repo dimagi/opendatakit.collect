@@ -30,6 +30,7 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.odk.collect.android.views.ODKView;
+import org.odk.collect.android.widgets.WidgetFactory;
 
 import android.util.Log;
 
@@ -721,5 +722,12 @@ public class FormController {
     	
         return new InstanceMetadata(instanceId);
     }
+
+
+    //CTS: Added this to protect the JR internal classes, although it's not awesome that
+    //this ended up in the "logic" division. 
+	public WidgetFactory getWidgetFactory() {
+		return new WidgetFactory(mFormEntryController.getModel().getForm());
+	}
 
 }
