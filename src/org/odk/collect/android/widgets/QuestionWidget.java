@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -156,4 +157,9 @@ public abstract class QuestionWidget extends LinearLayout {
     protected IAnswerData getTemplate() {
     	return AnswerDataFactory.template(mPrompt.getControlType(), mPrompt.getDataType());
     }
+
+
+	public void hideHintText() {
+		mHelpText.setVisibility(View.GONE);
+	}
 }

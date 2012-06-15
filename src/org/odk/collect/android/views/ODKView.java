@@ -5,11 +5,16 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -39,6 +44,8 @@ public class ODKView extends ScrollView implements OnLongClickListener {
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
     private ArrayList<QuestionWidget> widgets;
+    
+    private int mQuestionFontsize;
 
     public final static String FIELD_LIST = "field-list";
 
@@ -52,6 +59,16 @@ public class ODKView extends ScrollView implements OnLongClickListener {
 
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory) {
         super(context);
+        
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+
+        String question_font =
+                settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
+
+        mQuestionFontsize = new Integer(question_font).intValue();
+
+
 
         widgets = new ArrayList<QuestionWidget>();
 
@@ -65,11 +82,31 @@ public class ODKView extends ScrollView implements OnLongClickListener {
                     LinearLayout.LayoutParams.WRAP_CONTENT);
         mLayout.setMargins(10, 0, 10, 0);
 
-        // display which group you are in as well as the question
+        //Figure out if we share hint text between questions
+        String hintText = null;
+        if(questionPrompts.length > 1) {
+        	hintText = questionPrompts[0].getHelpText();
+	        for (FormEntryPrompt p : questionPrompts) {
+	        	//If something doesn't have hint text at all,
+	        	//bail
+	        	String curHintText = p.getHelpText();
+        		//Otherwise see if it matches
+        		if(curHintText == null || !curHintText.equals(hintText)) {
+        			//If not, we can't do this trick
+        			hintText = null;
+        			break;
+        		}
+	        }
+        }
 
+        // display which group you are in as well as the question
         addGroupText(groups);
+        
+        addHintText(hintText);
+        
         boolean first = true;
         int id = 0;
+        
         for (FormEntryPrompt p : questionPrompts) {
             if (!first) {
                 View divider = new View(getContext());
@@ -86,6 +123,11 @@ public class ODKView extends ScrollView implements OnLongClickListener {
             qw.setLongClickable(true);
             qw.setOnLongClickListener(this);
             qw.setId(VIEW_ID + id++);
+            
+            //Suppress the hint text if we bubbled it
+            if(hintText != null) {
+            	qw.hideHintText();
+            }
 
             widgets.add(qw);
             mView.addView((View) qw, mLayout);
@@ -147,6 +189,23 @@ public class ODKView extends ScrollView implements OnLongClickListener {
             mView.addView(tv, mLayout);
         }
     }
+    
+    private void addHintText(String hintText) {
+        if (hintText != null && !hintText.equals("")) {
+            TextView mHelpText = new TextView(getContext());
+            mHelpText = new TextView(getContext());
+            mHelpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize - 3);
+            mHelpText.setPadding(0, -5, 0, 7);
+            // wrap to the widget of view
+            mHelpText.setHorizontallyScrolling(false);
+            mHelpText.setText(hintText);
+            mHelpText.setTypeface(null, Typeface.ITALIC);
+
+            mView.addView(mHelpText, mLayout);
+        }
+    }
+    
+    
 
 
     public void setFocus(Context context) {
