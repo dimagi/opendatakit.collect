@@ -67,17 +67,19 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
 
     private FormLoaderListener mStateListener;
     private String mErrorMsg;
-    private SecretKeySpec symetricKey;
+    private SecretKeySpec mSymetricKey;
+    private boolean mReadOnly;
     
     private Context context;
     
     public FormLoaderTask(Context context) {
-    	this(context, null);
+    	this(context, null, false);
     }
     
-    public FormLoaderTask(Context context, SecretKeySpec symetricKey) {
+    public FormLoaderTask(Context context, SecretKeySpec symetricKey, boolean readOnly) {
     	this.context = context;
-    	this.symetricKey = symetricKey;
+    	this.mSymetricKey = symetricKey;
+    	this.mReadOnly = readOnly;
     }
 
     protected class FECWrapper {
@@ -183,6 +185,9 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
             } else {
                 fd.initialize(true, iif);
             }
+            if(mReadOnly) {
+            	fd.getInstance().getRoot().setEnabled(false);
+            }
         } catch (RuntimeException e) {
         	e.printStackTrace();
             mErrorMsg = e.getMessage();
@@ -231,7 +236,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
         formXml = null;
         formPath = null;
 
-        FormController fc = new FormController(fec);
+        FormController fc = new FormController(fec, mReadOnly);
         data = new FECWrapper(fc);
         return data;
 
@@ -240,7 +245,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
 
     public boolean importData(String filePath, FormEntryController fec) {
         // convert files into a byte array
-        byte[] fileBytes = FileUtils.getFileAsBytes(new File(filePath), symetricKey);
+        byte[] fileBytes = FileUtils.getFileAsBytes(new File(filePath), mSymetricKey);
 
         // get the root of the saved and template instances
         TreeElement savedRoot = XFormParser.restoreDataModel(fileBytes, null).getRoot();

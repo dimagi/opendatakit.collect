@@ -276,6 +276,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 refreshCurrentView();
                 return;
             }
+            boolean readOnly = false;
 
             // Not a restart from a screen orientation change (or other).
             mFormController = null;
@@ -332,6 +333,15 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                         String jrFormId =
                             instanceCursor.getString(instanceCursor
                                     .getColumnIndex(InstanceColumns.JR_FORM_ID));
+                        
+                        
+                        //If this form is both already completed 
+                        if(InstanceProviderAPI.STATUS_COMPLETE.equals(instanceCursor.getString(instanceCursor.getColumnIndex(InstanceColumns.STATUS)))) {
+                        	if(!Boolean.parseBoolean(instanceCursor.getString(instanceCursor.getColumnIndex(InstanceColumns.CAN_EDIT_WHEN_COMPLETE)))) {
+                        		readOnly = true;
+                        	}
+                        }
+                        
 
                         String[] selectionArgs = {
                             jrFormId
@@ -377,7 +387,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     return;
                 }
 
-                mFormLoaderTask = new FormLoaderTask(this, symetricKey);
+                mFormLoaderTask = new FormLoaderTask(this, symetricKey, readOnly);
                 mFormLoaderTask.execute(formUri);
                 showDialog(PROGRESS_DIALOG);
             }
@@ -800,6 +810,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 final CheckBox instanceComplete =
                     ((CheckBox) endView.findViewById(R.id.mark_finished));
                 instanceComplete.setChecked(isInstanceComplete(true));
+                
+                if(mFormController.isFormReadOnly()) {
+                	instanceComplete.setVisibility(View.GONE);
+                }
 
                 // edittext to change the displayed name of the instance
                 final EditText saveAs = (EditText) endView.findViewById(R.id.save_name);
@@ -839,20 +853,32 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 saveAs.setText(saveName);
 
                 // Create 'save' button
-                ((Button) endView.findViewById(R.id.save_exit_button))
-                        .setOnClickListener(new OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // Form is marked as 'saved' here.
-                                if (saveAs.getText().length() < 1) {
-                                    Toast.makeText(FormEntryActivity.this, R.string.save_as_error,
-                                        Toast.LENGTH_SHORT).show();
-                                } else {
-                                    saveDataToDisk(EXIT, instanceComplete.isChecked(), saveAs
-                                            .getText().toString());
-                                }
+                Button button = (Button) endView.findViewById(R.id.save_exit_button);
+                if(mFormController.isFormReadOnly()) {
+                	button.setText(getString(R.string.exit));
+                    button.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                        	finishReturnInstance();
+                        }
+                    });
+
+                } else {
+                    button.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // Form is marked as 'saved' here.
+                            if (saveAs.getText().length() < 1) {
+                                Toast.makeText(FormEntryActivity.this, R.string.save_as_error,
+                                    Toast.LENGTH_SHORT).show();
+                            } else {
+                                saveDataToDisk(EXIT, instanceComplete.isChecked(), saveAs
+                                        .getText().toString());
                             }
-                        });
+                        }
+                    });
+
+                }
 
                 return endView;
             case FormEntryController.EVENT_QUESTION:
@@ -876,7 +902,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
                 // Makes a "clear answer" menu pop up on long-click
                 for (QuestionWidget qw : odkv.getWidgets()) {
-                    if (!qw.getPrompt().isReadOnly()) {
+                    if (!qw.getPrompt().isReadOnly() && !mFormController.isFormReadOnly()) {
                         registerForContextMenu(qw);
                     }
                 }
@@ -1218,7 +1244,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         String[] items = {
                 getString(R.string.keep_changes), getString(R.string.do_not_save)
         };
-
+        
         mAlertDialog =
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_info)
@@ -1571,7 +1597,15 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                createQuitDialog();
+            	//If we're just reviewing a read only form, don't worry about saving
+            	//or what not, just quit
+                if(mFormController.isFormReadOnly()) {
+                	//It's possible we just want to "finish" here, but
+                	//I don't really wanna break any c compatibility
+                	finishReturnInstance();
+                } else {
+                	createQuitDialog();
+                }
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 if (event.isAltPressed() && !mBeenSwiped) {

@@ -50,6 +50,8 @@ public class FormController {
 
     private static final String t = "FormController";
     private FormEntryController mFormEntryController;
+    
+    private boolean mReadOnly;
 
     public static final boolean STEP_INTO_GROUP = true;
     public static final boolean STEP_OVER_GROUP = false;
@@ -78,8 +80,14 @@ public class FormController {
 
 
     public FormController(FormEntryController fec) {
-        mFormEntryController = fec;
+        this(fec, false);
     }
+    
+    public FormController(FormEntryController fec, boolean readOnly) {
+        mFormEntryController = fec;
+        mReadOnly = readOnly;
+    }
+    
 
 
     /**
@@ -108,6 +116,13 @@ public class FormController {
      */
     public boolean isIndexReadonly() {
         return mFormEntryController.getModel().isIndexReadonly();
+    }
+    
+    /**
+     * @return true if this form session is in read only mode
+     */
+    public boolean isFormReadOnly() {
+    	return mReadOnly;
     }
 
 
