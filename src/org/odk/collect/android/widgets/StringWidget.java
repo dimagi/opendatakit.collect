@@ -73,6 +73,9 @@ public class StringWidget extends QuestionWidget {
             }
 
             if (mReadOnly) {
+                if (s == null) {
+                    mAnswer.setText("---");
+                }
                 mAnswer.setBackgroundDrawable(null);
                 mAnswer.setFocusable(false);
                 mAnswer.setClickable(false);

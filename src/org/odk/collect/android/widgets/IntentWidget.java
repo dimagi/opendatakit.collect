@@ -71,6 +71,13 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
             public void onClick(View v) {
                 mWaitingForData = true;
                 try {
+                	//Set Data
+                	String data = mStringAnswer.getText().toString();
+                	if(data != null && data != "") {
+                		intent.putExtra(FormEntryActivity.INTENT_RESULT, data);
+                	}
+                	
+                	
                     ((Activity) getContext()).startActivityForResult(intent,
                         FormEntryActivity.INTENT_CALLOUT);
                 } catch (ActivityNotFoundException e) {
