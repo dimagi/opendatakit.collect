@@ -7,6 +7,7 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.views.MediaLayout;
+import org.odk.collect.android.views.ShrinkingTextView;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,7 +16,9 @@ import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public abstract class QuestionWidget extends LinearLayout {
@@ -30,7 +33,7 @@ public abstract class QuestionWidget extends LinearLayout {
     protected final int mAnswerFontsize;
 
     private TextView mQuestionText;
-    private TextView mHelpText;
+    private ShrinkingTextView mHelpText;
 
 
     public QuestionWidget(Context context, FormEntryPrompt p) {
@@ -111,9 +114,14 @@ public abstract class QuestionWidget extends LinearLayout {
 
         addView(mediaLayout, mLayout);
     }
+    
+    public void updateHelpSize(int newMax) {
+    	if(mHelpText != null) {
+    		mHelpText.updateMaxHeight(newMax);
+    	}
+    }
 
-
-    /**
+	/**
      * Add a TextView containing the help text.
      */
     private void addHelpText(FormEntryPrompt p) {
@@ -121,7 +129,7 @@ public abstract class QuestionWidget extends LinearLayout {
         String s = p.getHelpText();
 
         if (s != null && !s.equals("")) {
-            mHelpText = new TextView(getContext());
+            mHelpText = new ShrinkingTextView(getContext(),this.getMaxHintHeight());
             mHelpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize - 3);
             mHelpText.setPadding(0, -5, 0, 7);
             // wrap to the widget of view
@@ -133,8 +141,12 @@ public abstract class QuestionWidget extends LinearLayout {
         }
     }
 
+    protected int getMaxHintHeight() {
+		return -1;
+	}
 
-    /**
+
+	/**
      * Every subclassed widget should override this, adding any views they may contain, and calling
      * super.cancelLongPress()
      */

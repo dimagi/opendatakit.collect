@@ -19,6 +19,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.View.OnLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -158,6 +159,33 @@ public class ODKView extends ScrollView implements OnLongClickListener {
 
         return answers;
     }
+    
+    /* (non-Javadoc)
+	 * @see android.widget.LinearLayout#onMeasure(int, int)
+	 */
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int newHeight = MeasureSpec.getSize(heightMeasureSpec);
+		int oldHeight = this.getMeasuredHeight();
+		
+		if(oldHeight == 0 || Math.abs(((newHeight * 1.0 - oldHeight) / oldHeight)) > .2) {
+			for(QuestionWidget qw : this.widgets) { 
+				qw.updateHelpSize(newHeight / 4);
+			}
+		}
+		
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+				
+//		double change = ((this.getMeasuredHeight() * 1.0 - gmh) / this.getMeasuredHeight()); 
+//		System.out.println("Old: " + gmh + ". New: "+ this.getMeasuredHeight() + ". CurrentHeight: " + height);
+//		
+//		if(gmh == -1 || gmh == 0 || change > .2) {
+//			//If the view size change has changed by more than 20% 
+//			if(mHelpText != null) {
+//				mHelpText.updateMaxHeight((this.getMeasuredHeight() - this.getScrollY())/ 3);
+//			}
+//		}
+	}
 
 
     /**
