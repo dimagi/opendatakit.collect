@@ -62,7 +62,8 @@ public class DateWidget extends QuestionWidget {
                     if (day > max) {
                         mDatePicker.updateDate(year, month, max);
                     } else {
-                        mDatePicker.updateDate(year, month, day);
+                    	//CTS: No reason to change the day if it's already correct?
+                        //mDatePicker.updateDate(year, month, day);
                     }
                 }
             }
