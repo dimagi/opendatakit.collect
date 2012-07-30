@@ -14,6 +14,7 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -21,6 +22,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.views.ODKView;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -149,10 +151,15 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
             }
         });
-
+        
         // finish complex layout
+        //
         addView(mCaptureButton);
         addView(mChooseButton);
+        String acq = prompt.getAppearanceHint();
+        if((QuestionWidget.ACQUIREFIELD.equalsIgnoreCase(acq))){
+        	mChooseButton.setVisibility(View.INVISIBLE);
+        }
         addView(mErrorTextView);
         mErrorTextView.setVisibility(View.GONE);
 

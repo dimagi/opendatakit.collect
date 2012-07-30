@@ -31,6 +31,7 @@ public abstract class QuestionWidget extends LinearLayout {
 
     protected final int mQuestionFontsize;
     protected final int mAnswerFontsize;
+    protected final static String ACQUIREFIELD = "acquire";
 
     private TextView mQuestionText;
     private ShrinkingTextView mHelpText;
