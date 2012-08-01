@@ -164,6 +164,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
         // finish complex layout
         addView(mCaptureButton);
         addView(mChooseButton);
+        String acq = prompt.getAppearanceHint();
+        if((QuestionWidget.ACQUIREFIELD.equalsIgnoreCase(acq))){
+        	mChooseButton.setVisibility(View.INVISIBLE);
+        }
         addView(mPlayButton);
     }
 
