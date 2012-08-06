@@ -44,11 +44,12 @@ public class WidgetFactory {
      * @param context Android context
      */
     public QuestionWidget createWidgetFromPrompt(FormEntryPrompt fep, Context context) {
-
+    	System.out.println("Create Widget from prompt entered");
         QuestionWidget questionWidget = null;
         String appearance = fep.getAppearanceHint();
         switch (fep.getControlType()) {
             case Constants.CONTROL_INPUT:
+            	System.out.println("case control input");
             	if(appearance != null && appearance.startsWith("intent:")) {
             		String intentId = appearance.substring("intent:".length());
             		IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId);
@@ -72,11 +73,14 @@ public class WidgetFactory {
                     case Constants.DATATYPE_TIME:
                         questionWidget = new TimeWidget(context, fep);
                         break;
+                    case Constants.DATATYPE_LONG:
+                    	questionWidget = new IntegerWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, 2);
+                    	break;
                     case Constants.DATATYPE_DECIMAL:
                         questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
                     case Constants.DATATYPE_INTEGER:
-                        questionWidget = new IntegerWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
+                        questionWidget = new IntegerWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET, 1);
                         break;
                     case Constants.DATATYPE_GEOPOINT:
                         questionWidget = new GeoPointWidget(context, fep);
@@ -177,6 +181,7 @@ public class WidgetFactory {
                 questionWidget = new TriggerWidget(context, fep);
                 break;
             default:
+            	System.out.println("case default");
                 questionWidget = new StringWidget(context, fep, false);
                 break;
         }

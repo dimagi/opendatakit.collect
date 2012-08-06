@@ -16,6 +16,7 @@ package org.odk.collect.android.widgets;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import android.content.Context;
@@ -32,11 +33,15 @@ import android.widget.EditText;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class IntegerWidget extends StringWidget {
+	
+	int number_type;
 
-    public IntegerWidget(Context context, FormEntryPrompt prompt, boolean secret) {
+    public IntegerWidget(Context context, FormEntryPrompt prompt, boolean secret, int num_type) {
         super(context, prompt, secret);
 
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+        
+        this.number_type=num_type;
 
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
@@ -49,7 +54,14 @@ public class IntegerWidget extends StringWidget {
 
         // ints can only hold 2,147,483,648. we allow 999,999,999
         InputFilter[] fa = new InputFilter[1];
-        fa[0] = new InputFilter.LengthFilter(9);
+        if(number_type==1){
+        	fa[0] = new InputFilter.LengthFilter(9);
+        }
+        else{
+        	fa[0] = new InputFilter.LengthFilter(15);
+        }
+        
+        
         mAnswer.setFilters(fa);
 
         if (prompt.isReadOnly()) {
@@ -57,13 +69,20 @@ public class IntegerWidget extends StringWidget {
             setFocusable(false);
             setClickable(false);
         }
-
-        Integer i = null;
-        if (getCurrentAnswer() != null)
-            i = (Integer) getCurrentAnswer().getValue();
-
-        if (i != null) {
-            mAnswer.setText(i.toString());
+        
+        if (getCurrentAnswer() != null){
+        	if(number_type==1){
+        		Integer i = (Integer) getCurrentAnswer().getValue();
+        		if (i != null) {
+                    mAnswer.setText(i.toString());
+                }
+        	}
+        	else{
+        		Long i= (Long) getCurrentAnswer().getValue();
+        		if (i != null) {
+                    mAnswer.setText(i.toString());
+                }
+        	}
         }
     }
     
@@ -83,7 +102,12 @@ public class IntegerWidget extends StringWidget {
             return null;
         } else {
             try {
-                return new IntegerData(Integer.parseInt(s));
+            	if(number_type==1){
+            		return new IntegerData(Integer.parseInt(s));
+            	}
+            	else{
+            		return new LongData(Long.parseLong(s));
+            	}
             } catch (Exception NumberFormatException) {
                 return null;
             }
