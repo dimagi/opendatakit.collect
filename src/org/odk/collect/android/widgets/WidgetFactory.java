@@ -44,12 +44,10 @@ public class WidgetFactory {
      * @param context Android context
      */
     public QuestionWidget createWidgetFromPrompt(FormEntryPrompt fep, Context context) {
-    	System.out.println("Create Widget from prompt entered");
         QuestionWidget questionWidget = null;
         String appearance = fep.getAppearanceHint();
         switch (fep.getControlType()) {
             case Constants.CONTROL_INPUT:
-            	System.out.println("case control input");
             	if(appearance != null && appearance.startsWith("intent:")) {
             		String intentId = appearance.substring("intent:".length());
             		IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId);
@@ -181,7 +179,6 @@ public class WidgetFactory {
                 questionWidget = new TriggerWidget(context, fep);
                 break;
             default:
-            	System.out.println("case default");
                 questionWidget = new StringWidget(context, fep, false);
                 break;
         }

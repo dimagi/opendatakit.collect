@@ -86,7 +86,7 @@ public class StringNumberWidget extends StringWidget {
             return null;
         } else {
             try {
-            	Long.parseLong(s);
+            	//Long.parseLong(s);
                 return new StringData(s);
             } catch (Exception NumberFormatException) {
                 return null;
