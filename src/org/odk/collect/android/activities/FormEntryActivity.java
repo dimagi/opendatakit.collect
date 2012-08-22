@@ -43,7 +43,9 @@ import org.odk.collect.android.tasks.SaveToDiskTask;
 import org.odk.collect.android.utilities.Base64Wrapper;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.views.ODKView;
+import org.odk.collect.android.widgets.DateTimeWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
+import org.odk.collect.android.widgets.TimeWidget;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -1590,6 +1592,29 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             createErrorDialog(mErrorMessage, EXIT);
             return;
         }
+        
+        //csims@dimagi.com - 22/08/2012 - For release only, fix immediately.
+        //There is a _horribly obnoxious_ bug in TimePickers that messes up how they work
+        //on screen rotation. We need to re-do any setAnswers that we perform on them after
+        //onResume.
+        try {
+        	if(mCurrentView instanceof ODKView) {
+        		ODKView ov = ((ODKView) mCurrentView);
+        		if(ov.getWidgets() != null) {
+        			for(QuestionWidget qw : ov.getWidgets()) {
+        				if(qw instanceof DateTimeWidget) {
+        					((DateTimeWidget)qw).setAnswer();
+        				} else if(qw instanceof TimeWidget) {
+        					((TimeWidget)qw).setAnswer();
+        				}
+        			}
+        		}
+        	}
+        } catch(Exception e) {
+        	//if this fails, we _really_ don't want to mess anything up. this is a last minute
+        	//fix
+        }
+        
     }
 
 
