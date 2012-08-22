@@ -105,8 +105,15 @@ public class DateTimeWidget extends QuestionWidget {
                         ((Date) ((DateTimeData) getCurrentAnswer()).getValue()).getTime());
             mDatePicker.init(ldt.getYear(), ldt.getMonthOfYear() - 1, ldt.getDayOfMonth(),
                 mDateListener);
+            
+            int altVal = ldt.getHourOfDay() == 1 ? 2 : 1;
+            mTimePicker.setCurrentHour(altVal);
             mTimePicker.setCurrentHour(ldt.getHourOfDay());
+            
+            altVal = ldt.getMinuteOfHour() == 1 ? 2 : 1;
+            mTimePicker.setCurrentMinute(altVal);
             mTimePicker.setCurrentMinute(ldt.getMinuteOfHour());
+
 
         } else {
             // create time widget with current time as of right now

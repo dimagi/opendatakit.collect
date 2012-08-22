@@ -67,9 +67,13 @@ public class TimeWidget extends QuestionWidget {
                 new DateTime(((Date) ((TimeData) getCurrentAnswer()).getValue()).getTime());
             System.out.println("retrieving:" + ldt);
 
+            int altVal = ldt.getHourOfDay() == 1 ? 2 : 1;
+            mTimePicker.setCurrentHour(altVal);
             mTimePicker.setCurrentHour(ldt.getHourOfDay());
+            
+            altVal = ldt.getMinuteOfHour() == 1 ? 2 : 1;
+            mTimePicker.setCurrentMinute(altVal);
             mTimePicker.setCurrentMinute(ldt.getMinuteOfHour());
-
         } else {
             // create time widget with current time as of right now
             clearAnswer();
