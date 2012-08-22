@@ -131,6 +131,7 @@ public class DateTimeWidget extends QuestionWidget {
     @Override
     public IAnswerData getAnswer() {
     	mDatePicker.clearFocus();
+    	mTimePicker.clearFocus();
         DateTime ldt =
             new DateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1,
                     mDatePicker.getDayOfMonth(), mTimePicker.getCurrentHour(),
