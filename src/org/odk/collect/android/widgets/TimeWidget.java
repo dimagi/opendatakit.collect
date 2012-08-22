@@ -49,9 +49,18 @@ public class TimeWidget extends QuestionWidget {
         if (clockType == null || clockType.equalsIgnoreCase("24")) {
             mTimePicker.setIs24HourView(true);
         }
-
+        
         // If there's an answer, use it.
-        if (prompt.getAnswerValue() != null) {
+        setAnswer();
+
+        setGravity(Gravity.LEFT);
+        addView(mTimePicker);
+
+    }
+    
+    public void setAnswer() {
+        // If there's an answer, use it.
+        if (mPrompt.getAnswerValue() != null) {
 
             // create a new date time from date object using default time zone
             DateTime ldt =
@@ -65,10 +74,6 @@ public class TimeWidget extends QuestionWidget {
             // create time widget with current time as of right now
             clearAnswer();
         }
-
-        setGravity(Gravity.LEFT);
-        addView(mTimePicker);
-
     }
 
 
@@ -86,9 +91,12 @@ public class TimeWidget extends QuestionWidget {
     @Override
     public IAnswerData getAnswer() {
     	mTimePicker.clearFocus();
-        // use picker time, convert to today's date, store as utc
+        // use picker time, convert to epoch date (for TZ clarity), store as utc
+    	
+    	//CTS - 8/22/2021 : Adjusted this to store as the time past the Epoch, since the app otherwise can have conflicting
+    	//timezones with the JavaRosa Time storage, which is always stored against the epoch.
         DateTime ldt =
-            (new DateTime()).withTime(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute(),
+            (new DateTime(0)).withTime(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute(),
                 0, 0);
         //DateTime utc = ldt.withZone(DateTimeZone.forID("UTC"));
         System.out.println("storing:" + ldt);

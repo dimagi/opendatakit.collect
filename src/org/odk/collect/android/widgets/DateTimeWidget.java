@@ -96,7 +96,7 @@ public class DateTimeWidget extends QuestionWidget {
     }
 
 
-    private void setAnswer() {
+    public void setAnswer() {
 
         if (mPrompt.getAnswerValue() != null) {
 
