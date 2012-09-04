@@ -74,10 +74,13 @@ public class DateTimeWidget extends QuestionWidget {
                     c.set(year, month, 1);
                     int max = c.getActualMaximum(Calendar.DAY_OF_MONTH);
                     if (day > max) {
+	                    //If the day has fallen out of spec, set it to the correct max
                         mDatePicker.updateDate(year, month, max);
                     } else {
-                    	//CTS: No reason to change the day if it's already correct?
-                        //mDatePicker.updateDate(year, month, day);
+                        if(!(mDatePicker.getDayOfMonth() == day && mDatePicker.getMonth() == month && mDatePicker.getYear() == year)) {
+	                    	//CTS: No reason to change the day if it's already correct?
+	                        mDatePicker.updateDate(year, month, day);
+                        }
                     }
                 }
             }
@@ -93,7 +96,7 @@ public class DateTimeWidget extends QuestionWidget {
     }
 
 
-    private void setAnswer() {
+    public void setAnswer() {
 
         if (mPrompt.getAnswerValue() != null) {
 
@@ -102,8 +105,15 @@ public class DateTimeWidget extends QuestionWidget {
                         ((Date) ((DateTimeData) getCurrentAnswer()).getValue()).getTime());
             mDatePicker.init(ldt.getYear(), ldt.getMonthOfYear() - 1, ldt.getDayOfMonth(),
                 mDateListener);
+            
+            int altVal = ldt.getHourOfDay() == 1 ? 2 : 1;
+            mTimePicker.setCurrentHour(altVal);
             mTimePicker.setCurrentHour(ldt.getHourOfDay());
+            
+            altVal = ldt.getMinuteOfHour() == 1 ? 2 : 1;
+            mTimePicker.setCurrentMinute(altVal);
             mTimePicker.setCurrentMinute(ldt.getMinuteOfHour());
+
 
         } else {
             // create time widget with current time as of right now
@@ -127,6 +137,8 @@ public class DateTimeWidget extends QuestionWidget {
 
     @Override
     public IAnswerData getAnswer() {
+    	mDatePicker.clearFocus();
+    	mTimePicker.clearFocus();
         DateTime ldt =
             new DateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1,
                     mDatePicker.getDayOfMonth(), mTimePicker.getCurrentHour(),
