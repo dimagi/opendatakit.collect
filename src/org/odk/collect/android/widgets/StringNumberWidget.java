@@ -60,7 +60,7 @@ public class StringNumberWidget extends StringWidget {
         }
 
         if (prompt.getAnswerValue() != null) {
-	        String curAnswer = getCurrentAnswer().getValue().toString();
+	        String curAnswer = getCurrentAnswer().getValue().toString().trim();
 	        try {
 	        	Long.parseLong(curAnswer);
 	        	mAnswer.setText(curAnswer);
