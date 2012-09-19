@@ -142,6 +142,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final String KEY_AES_STORAGE_KEY = "key_aes_storage";
     
     public static final String KEY_HEADER_STRING = "form_header";
+    
+    public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
 
     // Identifies whether this is a new form, or reloading a form after a screen
     // rotation (or similar)
@@ -176,6 +178,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     private AlertDialog mAlertDialog;
     private ProgressDialog mProgressDialog;
     private String mErrorMessage;
+    
+    private boolean mFormManagementEnabled = true;
 
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped;
@@ -244,6 +248,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             }
             if (savedInstanceState.containsKey(KEY_INSTANCEDESTINATION)) {
             	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
+            } if(savedInstanceState.containsKey(KEY_FORM_MANAGEMENT)) {
+            	mFormManagementEnabled = savedInstanceState.getBoolean(KEY_FORM_MANAGEMENT);
             }
             if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
 	         	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
@@ -311,6 +317,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 }
                 if(intent.hasExtra(KEY_HEADER_STRING)) {
                 	this.mHeaderString = intent.getStringExtra(KEY_HEADER_STRING);
+                }
+                
+                if(intent.hasExtra(KEY_FORM_MANAGEMENT)) {
+                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_FORM_MANAGEMENT, true);
                 }
                 
                 
@@ -406,6 +416,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         outState.putString(KEY_FORM_CONTENT_URI, formProviderContentURI.toString());
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
+        outState.putBoolean(KEY_FORM_MANAGEMENT, mFormManagementEnabled);
         
         if(symetricKey != null) {
         	try {
@@ -592,8 +603,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         menu.removeItem(MENU_SAVE);
         menu.removeItem(MENU_PREFERENCES);
 
-        menu.add(0, MENU_SAVE, 0, R.string.save_all_answers).setIcon(
-            android.R.drawable.ic_menu_save);
+        if(mFormManagementEnabled) {
+	        menu.add(0, MENU_SAVE, 0, R.string.save_all_answers).setIcon(
+	            android.R.drawable.ic_menu_save);
+        }
         menu.add(0, MENU_HIERARCHY_VIEW, 0, getString(R.string.view_hierarchy)).setIcon(
             R.drawable.ic_menu_goto);
         menu.add(0, MENU_LANGUAGES, 0, getString(R.string.change_language))
@@ -811,9 +824,9 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 // checkbox for if finished or ready to send
                 final CheckBox instanceComplete =
                     ((CheckBox) endView.findViewById(R.id.mark_finished));
-                instanceComplete.setChecked(isInstanceComplete(true));
+                instanceComplete.setChecked(mFormManagementEnabled || isInstanceComplete(true));
                 
-                if(mFormController.isFormReadOnly()) {
+                if(mFormController.isFormReadOnly() || !mFormManagementEnabled) {
                 	instanceComplete.setVisibility(View.GONE);
                 }
 
@@ -1243,9 +1256,13 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      * Create a dialog with options to save and exit, save, or quit without saving
      */
     private void createQuitDialog() {
-        String[] items = {
-                getString(R.string.keep_changes), getString(R.string.do_not_save)
-        };
+        String[] items;
+        
+        if(mFormManagementEnabled) {
+            items = new String[] {getString(R.string.keep_changes), getString(R.string.do_not_save)};
+        } else {
+        	items = new String[] {getString(R.string.do_not_save)};
+        }
         
         mAlertDialog =
             new AlertDialog.Builder(this)
