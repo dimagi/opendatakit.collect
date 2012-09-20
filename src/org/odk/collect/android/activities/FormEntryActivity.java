@@ -655,14 +655,20 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 .getEvent() == FormEntryController.EVENT_GROUP);
     }
 
+    
+    private boolean saveAnswersForCurrentScreen(boolean evaluateConstraints) {
+    	return saveAnswersForCurrentScreen(evaluateConstraints, true);
+    }
 
     /**
      * Attempt to save the answer(s) in the current screen to into the data model.
      * 
      * @param evaluateConstraints
+     * @param failOnRequired Whether or not the constraint evaluation should return false if the question
+     * is only required. (this is helpful for incomplete saves)
      * @return false if any error occurs while saving (constraint violated, etc...), true otherwise.
      */
-    private boolean saveAnswersForCurrentScreen(boolean evaluateConstraints) {
+    private boolean saveAnswersForCurrentScreen(boolean evaluateConstraints, boolean failOnRequired) {
         // only try to save if the current event is a question or a field-list group
         if (mFormController.getEvent() == FormEntryController.EVENT_QUESTION
                 || (mFormController.getEvent() == FormEntryController.EVENT_GROUP && mFormController
@@ -674,9 +680,9 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 	                // Within a group, you can only save for question events
 	                if (mFormController.getEvent(index) == FormEntryController.EVENT_QUESTION) {
 	                    int saveStatus = saveAnswer(answers.get(index), index, evaluateConstraints);
-	                    if (evaluateConstraints && saveStatus != FormEntryController.ANSWER_OK) {
-	                        createConstraintToast(mFormController.getQuestionPrompt(index)
-	                                .getConstraintText(), saveStatus);
+	                    if (evaluateConstraints && (saveStatus != FormEntryController.ANSWER_OK &&
+	                    							(failOnRequired || saveStatus != FormEntryController.ANSWER_REQUIRED_BUT_EMPTY))) {
+	                        createConstraintToast(mFormController.getQuestionPrompt(index) .getConstraintText(), saveStatus);
 	                        return false;
 	                    }
 	                } else {
@@ -1238,7 +1244,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      */
     private boolean saveDataToDisk(boolean exit, boolean complete, String updatedSaveName) {
         // save current answer
-        if (!saveAnswersForCurrentScreen(EVALUATE_CONSTRAINTS)) {
+        if (!saveAnswersForCurrentScreen(EVALUATE_CONSTRAINTS, complete)) {
             Toast.makeText(this, getString(R.string.data_saved_error), Toast.LENGTH_SHORT).show();
             return false;
         }
