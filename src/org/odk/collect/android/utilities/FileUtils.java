@@ -35,7 +35,8 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.javarosa.core.util.StreamsUtil;
+import org.javarosa.core.io.StreamsUtil;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -264,6 +265,9 @@ public class FileUtils {
             Document doc;
             try {
                 doc = XFormParser.getXMLDocument(isr);
+            } catch(IOException e) {
+            	e.printStackTrace();
+            	throw new XFormParseException("IO Exception during form parsing: " + e.getMessage());
             } finally {
                 try {
                     isr.close();
