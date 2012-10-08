@@ -37,6 +37,7 @@ public class TriggerWidget extends QuestionWidget {
 
     private CheckBox mTriggerButton;
     private TextView mStringAnswer;
+    private boolean mInteractive = true; 
     private static String mOK = "OK";
 
     private FormEntryPrompt mPrompt;
@@ -47,9 +48,10 @@ public class TriggerWidget extends QuestionWidget {
     }
 
 
-    public TriggerWidget(Context context, FormEntryPrompt prompt) {
+    public TriggerWidget(Context context, FormEntryPrompt prompt, boolean interactive) {
         super(context, prompt);
         mPrompt = prompt;
+        mInteractive = interactive;
 
         this.setOrientation(LinearLayout.VERTICAL);
 
@@ -85,9 +87,11 @@ public class TriggerWidget extends QuestionWidget {
 
         }
 
-        // finish complex layout
-        this.addView(mTriggerButton);
-        // this.addView(mStringAnswer);
+        if(mInteractive) {
+	        // finish complex layout
+	        this.addView(mTriggerButton);
+	        // this.addView(mStringAnswer);
+        }
     }
 
 
@@ -100,6 +104,9 @@ public class TriggerWidget extends QuestionWidget {
 
     @Override
     public IAnswerData getAnswer() {
+    	if(!mInteractive) {
+    		return new StringData(mOK);
+    	}
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
