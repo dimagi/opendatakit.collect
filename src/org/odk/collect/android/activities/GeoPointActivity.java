@@ -14,9 +14,15 @@
 
 package org.odk.collect.android.activities;
 
+import java.text.DecimalFormat;
+import java.util.List;
+
+import org.javarosa.core.services.locale.Localization;
 import org.odk.collect.android.R;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,13 +32,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.widget.Toast;
-
-import java.text.DecimalFormat;
-import java.util.List;
 
 public class GeoPointActivity extends Activity implements LocationListener {
-
     private ProgressDialog mLocationDialog;
     private LocationManager mLocationManager;
     private Location mLocation;
@@ -50,6 +51,15 @@ public class GeoPointActivity extends Activity implements LocationListener {
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.get_location));
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        
+        evalProviders();
+        
+    	setupLocationDialog();
+
+    }
+
+
+	private void evalProviders() {
 
         // make sure we have a good location provider before continuing
         List<String> providers = mLocationManager.getProviders(true);
@@ -61,18 +71,48 @@ public class GeoPointActivity extends Activity implements LocationListener {
                 mNetworkOn = true;
             }
         }
-        if (!mGPSOn && !mNetworkOn) {
-            Toast.makeText(getBaseContext(), getString(R.string.provider_disabled_error),
-                Toast.LENGTH_SHORT).show();
-            finish();
-        }
 
-        setupLocationDialog();
-
-    }
+	}
 
 
-    @Override
+	private void showNoGpsDialog() {
+		AlertDialog dialog = new AlertDialog.Builder(this).create();
+		dialog.setTitle(getString(R.string.no_gps_title));
+		dialog.setMessage(getString(R.string.no_gps_message));
+        DialogInterface.OnClickListener changeSettingsListener = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int i) {
+                switch (i) {
+                    case DialogInterface.BUTTON1: //Yes, get settings 
+                		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                		startActivity(intent);
+                        break;
+                    case DialogInterface.BUTTON2: //No, bail
+                    	mLocation = null;
+                    	GeoPointActivity.this.finish();
+                    	break;
+                }
+            }
+        };
+        
+
+        DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+            	mLocation = null;
+            	GeoPointActivity.this.finish();
+			}
+        };
+        
+        dialog.setCancelable(true);
+        dialog.setOnCancelListener(onCancelListener);
+        dialog.setButton(getString(R.string.change_settings), changeSettingsListener);
+        dialog.setButton2(getString(R.string.cancel), changeSettingsListener);
+
+        dialog.show();
+	}
+
+
+	@Override
     protected void onPause() {
         super.onPause();
 
@@ -89,13 +129,18 @@ public class GeoPointActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGPSOn) {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        evalProviders();
+        if (!mGPSOn && !mNetworkOn) {
+            showNoGpsDialog();
+        } else {
+	        if (mGPSOn) {
+	            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);            
+	        }
+	        if (mNetworkOn) {
+	            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+	        }
+	        mLocationDialog.show();
         }
-        if (mNetworkOn) {
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        }
-        mLocationDialog.show();
     }
 
 
