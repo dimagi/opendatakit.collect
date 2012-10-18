@@ -199,7 +199,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
 
             // assume no binary data inside the model.
             FormInstance datamodel = FormEntryActivity.mFormController.getInstance();
-            XFormSerializingVisitor serializer = new XFormSerializingVisitor();
+            XFormSerializingVisitor serializer = new XFormSerializingVisitor(markCompleted);
             payload = (ByteArrayPayload) serializer.createSerializedPayload(datamodel);
 
             // write out xml
