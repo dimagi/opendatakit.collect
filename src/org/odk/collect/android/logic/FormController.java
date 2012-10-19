@@ -328,11 +328,15 @@ public class FormController {
      * @return the next event that should be handled by a view.
      */
     public int stepToNextEvent(boolean stepOverGroup) {
-        if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP
-                && indexIsInFieldList() && stepOverGroup) {
+        if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP && indexIsInFieldList() && stepOverGroup) {
             return stepOverGroup();
         } else {
-            return mFormEntryController.stepToNextEvent();
+            int event =  mFormEntryController.stepToNextEvent();
+            if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
+            		this.mReadOnly) {
+            	return stepToNextEvent(stepOverGroup);
+            }
+            return event;
         }
     }
 
@@ -375,7 +379,13 @@ public class FormController {
          * 'field-list', this method will have to be updated.
          */
 
-        mFormEntryController.stepToPreviousEvent();
+        int event = mFormEntryController.stepToPreviousEvent();
+        
+        if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
+        		this.mReadOnly) {
+        	return stepToPreviousEvent();
+        }
+
 
         // If after we've stepped, we're in a field-list, jump back to the beginning of the group
         //
