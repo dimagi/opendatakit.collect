@@ -63,6 +63,12 @@ public class MediaLayout extends RelativeLayout {
             new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams videoParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        
+        RelativeLayout.LayoutParams topPaneParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+        RelativeLayout topPane = new RelativeLayout(this.getContext());
+        topPane.setId(2342134);
+        
+        this.addView(topPane, topPaneParams);
 
         // First set up the audio button
         if (audioURI != null) {
@@ -123,29 +129,45 @@ public class MediaLayout extends RelativeLayout {
         if (mAudioButton != null && mVideoButton == null) {
             audioParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             textParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-            addView(mAudioButton, audioParams);
+            topPane.addView(mAudioButton, audioParams);
         } else if (mAudioButton == null && mVideoButton != null) {
             videoParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             textParams.addRule(RelativeLayout.LEFT_OF, mVideoButton.getId());
-            addView(mVideoButton, videoParams);
+            topPane.addView(mVideoButton, videoParams);
         } else if (mAudioButton != null && mVideoButton != null) {
             audioParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             textParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
             videoParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             videoParams.addRule(RelativeLayout.BELOW, mAudioButton.getId());
-            addView(mAudioButton, audioParams);
-            addView(mVideoButton, videoParams);
+            topPane.addView(mAudioButton, audioParams);
+            topPane.addView(mVideoButton, videoParams);
         }
         boolean textVisible = (text.getVisibility() != GONE);
         if (textVisible) {
             textParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            addView(text, textParams);
+            topPane.addView(text, textParams);
         }
 
         // Now set up the image view
         String errorMsg = null;
         if (imageURI != null) {
             try {
+                RelativeLayout parent = this;
+                imageParams.addRule(RelativeLayout.BELOW, topPane.getId());
+                if (mAudioButton != null) {
+                    if (!textVisible) {
+                    	imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
+                        parent = topPane;
+                    }
+                }
+                if (mVideoButton != null) {
+                    if (!textVisible) {
+                        imageParams.addRule(RelativeLayout.LEFT_OF, mVideoButton.getId());
+                        parent = topPane;
+                    }
+                }
+
+
                 String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
                 final File imageFile = new File(imageFilename);
                 if (imageFile.exists()) {
@@ -169,21 +191,6 @@ public class MediaLayout extends RelativeLayout {
                         mImageView.setAdjustViewBounds(true);
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
-                        imageParams.addRule(RelativeLayout.BELOW, text.getId());
-                        if (mAudioButton != null) {
-                            if (textVisible) {
-                                imageParams.addRule(RelativeLayout.BELOW, mAudioButton.getId());
-                            } else {
-                                imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-                            }
-                        }
-                        if (mVideoButton != null) {
-                            if (textVisible) {
-                                imageParams.addRule(RelativeLayout.BELOW, mVideoButton.getId());
-                            } else {
-                                imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-                            }
-                        }
                         if (bigImageURI != null) {
                             mImageView.setOnClickListener(new OnClickListener() {
                                 String bigImageFilename = ReferenceManager._()
@@ -206,7 +213,7 @@ public class MediaLayout extends RelativeLayout {
                                 }
                             });
                         }
-                        addView(mImageView, imageParams);
+                        parent.addView(mImageView, imageParams);
                     } else if (errorMsg == null) {
                         // An error hasn't been logged and loading the image failed, so it's likely
                         // a bad file.
@@ -224,14 +231,9 @@ public class MediaLayout extends RelativeLayout {
                     Log.e(t, errorMsg);
                     mMissingImage = new TextView(getContext());
                     mMissingImage.setText(errorMsg);
-                    imageParams.addRule(RelativeLayout.BELOW, text.getId());
-                    if (mAudioButton != null)
-                        imageParams.addRule(RelativeLayout.BELOW, mAudioButton.getId());
-                    if (mVideoButton != null)
-                        imageParams.addRule(RelativeLayout.BELOW, mVideoButton.getId());
                     mMissingImage.setPadding(10, 10, 10, 10);
                     mMissingImage.setId(234873453);
-                    addView(mMissingImage, imageParams);
+                    parent.addView(mMissingImage, imageParams);
                 }
             } catch (InvalidReferenceException e) {
                 Log.e(t, "image invalid reference exception");
