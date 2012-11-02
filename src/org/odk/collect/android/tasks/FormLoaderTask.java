@@ -38,6 +38,7 @@ import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.jr.extensions.CalendaredDateFormatHandler;
 import org.odk.collect.android.jr.extensions.IntentExtensionParser;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
@@ -169,6 +170,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
             return null;
         }
 
+        fd.exprEvalContext.addFunctionHandler(new CalendaredDateFormatHandler(context));
         // create FormEntryController from formdef
         FormEntryModel fem = new FormEntryModel(fd);
         fec = new FormEntryController(fem);
