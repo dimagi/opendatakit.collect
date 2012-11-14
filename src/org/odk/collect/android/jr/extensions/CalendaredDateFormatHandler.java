@@ -9,6 +9,7 @@ import java.util.Vector;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.xpath.XPathUnsupportedException;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.odk.collect.android.utilities.EthiopianDateHelper;
 
 import android.content.Context;
@@ -48,7 +49,8 @@ public class CalendaredDateFormatHandler implements IFunctionHandler {
 
 		@Override
 		public Object eval(Object[] args, EvaluationContext ec) {
-			Date d = (Date)args[0];
+			if("".equals(args[0])) { return "";}
+			Date d = (Date)XPathFuncExpr.toDate(args[0]);
 			String calendar = (String)args[1];
 			if("ethiopian".equals(calendar)) {
 				return EthiopianDateHelper.ConvertToEthiopian(context, d);
