@@ -14,12 +14,15 @@
 
 package org.odk.collect.android.widgets;
 
+import java.io.File;
+
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.StringUtils;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -37,8 +40,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.Toast;
-
-import java.io.File;
 
 /**
  * Widget that allows user to take pictures, sounds or video and add them to the form.
@@ -74,7 +75,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         params.setMargins(7, 5, 7, 5);
         // setup capture button
         mCaptureButton = new Button(getContext());
-        mCaptureButton.setText(getContext().getString(R.string.capture_video));
+        mCaptureButton.setText(StringUtils.getStringRobust(getContext(), R.string.capture_video));
         mCaptureButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mCaptureButton.setPadding(20, 20, 20, 20);
         mCaptureButton.setEnabled(!prompt.isReadOnly());
@@ -93,7 +94,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
                     mWaitingForData = true;
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                        getContext().getString(R.string.activity_not_found, "capture video"),
+                        StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "capture video"),
                         Toast.LENGTH_SHORT);
                 }
 
@@ -102,7 +103,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
 
         // setup capture button
         mChooseButton = new Button(getContext());
-        mChooseButton.setText(getContext().getString(R.string.choose_video));
+        mChooseButton.setText(StringUtils.getStringRobust(getContext(), R.string.choose_video));
         mChooseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mChooseButton.setPadding(20, 20, 20, 20);
         mChooseButton.setEnabled(!prompt.isReadOnly());
@@ -123,7 +124,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
                         FormEntryActivity.VIDEO_CHOOSER);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                        getContext().getString(R.string.activity_not_found, "choose video "),
+                        StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "choose video "),
                         Toast.LENGTH_SHORT);
                 }
 
@@ -132,7 +133,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
 
         // setup play button
         mPlayButton = new Button(getContext());
-        mPlayButton.setText(getContext().getString(R.string.play_video));
+        mPlayButton.setText(StringUtils.getStringRobust(getContext(), R.string.play_video));
         mPlayButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mPlayButton.setPadding(20, 20, 20, 20);
         mPlayButton.setLayoutParams(params);
@@ -148,7 +149,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
                     ((Activity) getContext()).startActivity(i);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                        getContext().getString(R.string.activity_not_found, "video video"),
+                        StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "video video"),
                         Toast.LENGTH_SHORT);
                 }
             }
