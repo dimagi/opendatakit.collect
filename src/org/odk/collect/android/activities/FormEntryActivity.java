@@ -146,6 +146,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final String KEY_HEADER_STRING = "form_header";
     
     public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
+    
+    public static final String KEY_HAS_SAVED = "org.odk.collect.form.has.saved";
 
     // Identifies whether this is a new form, or reloading a form after a screen
     // rotation (or similar)
@@ -193,6 +195,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     private Uri instanceProviderContentURI = InstanceColumns.CONTENT_URI;
     
     private static String mHeaderString;
+    
+    public boolean hasSaved = false;
 
     enum AnimationType {
         LEFT, RIGHT, FADE
@@ -264,6 +268,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             }
             if(savedInstanceState.containsKey(KEY_HEADER_STRING)) {
             	mHeaderString = savedInstanceState.getString(KEY_HEADER_STRING);
+            }
+            
+            if(savedInstanceState.containsKey(KEY_HAS_SAVED)) {
+            	hasSaved = savedInstanceState.getBoolean(KEY_HAS_SAVED);
             }
            
         }
@@ -419,6 +427,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
         outState.putBoolean(KEY_FORM_MANAGEMENT, mFormManagementEnabled);
+        outState.putBoolean(KEY_HAS_SAVED, hasSaved);
         
         if(symetricKey != null) {
         	try {
@@ -1439,7 +1448,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             }
         }
 
-        finishReturnInstance();
+        finishReturnInstance(false);
     }
 
 
@@ -1803,9 +1812,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         switch (saveStatus) {
             case SaveToDiskTask.SAVED:
                 Toast.makeText(this, StringUtils.getStringRobust(this, R.string.data_saved_ok), Toast.LENGTH_SHORT).show();
+                hasSaved = true;
                 break;
             case SaveToDiskTask.SAVED_AND_EXIT:
                 Toast.makeText(this, StringUtils.getStringRobust(this, R.string.data_saved_ok), Toast.LENGTH_SHORT).show();
+                hasSaved = true;
                 finishReturnInstance();
                 break;
             case SaveToDiskTask.SAVE_ERROR:
@@ -1894,11 +1905,15 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
     }
 
+    
+    private void finishReturnInstance() {
+    	finishReturnInstance(true);
+    }
 
     /**
      * Returns the instance that was just filled out to the calling activity, if requested.
      */
-    private void finishReturnInstance() {
+    private void finishReturnInstance(boolean reportSaved) {
         String action = getIntent().getAction();
         if (Intent.ACTION_PICK.equals(action) || Intent.ACTION_EDIT.equals(action)) {
             // caller is waiting on a picked form
@@ -1913,7 +1928,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 c.moveToFirst();
                 String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
                 Uri instance = Uri.withAppendedPath(instanceProviderContentURI, id);
-                setResult(RESULT_OK, new Intent().setData(instance));
+                if(reportSaved || hasSaved) {
+                	setResult(RESULT_OK, new Intent().setData(instance));
+                } else {
+                	setResult(RESULT_CANCELED, new Intent().setData(instance));
+                }
             }
         }
         finish();
