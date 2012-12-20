@@ -124,6 +124,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final int AUDIO_CHOOSER = 8;
     public static final int VIDEO_CHOOSER = 9;
 	public static final int INTENT_CALLOUT = 10;
+	public static final int HIERARCHY_ACTIVITY_FIRST_START = 11;
 
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
@@ -445,6 +446,12 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (resultCode == RESULT_CANCELED) {
+        	if(requestCode == HIERARCHY_ACTIVITY_FIRST_START) {
+        		//they pressed 'back' on the first heirarchy screen. we should assume they want to
+        		//back out of form entry all together
+        		finishReturnInstance(false);
+        	}
+        	
             // request was canceled, so do nothing
             return;
         }
@@ -1655,7 +1662,6 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -1758,7 +1764,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         } else {
             // we've just loaded a saved form, so start in the hierarchy view
             Intent i = new Intent(this, FormHierarchyActivity.class);
-            startActivity(i);
+            startActivityForResult(i, HIERARCHY_ACTIVITY_FIRST_START);
             return; // so we don't show the intro screen before jumping to the hierarchy
         }
 
