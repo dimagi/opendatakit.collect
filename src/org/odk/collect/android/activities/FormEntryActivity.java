@@ -123,6 +123,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final int AUDIO_CHOOSER = 8;
     public static final int VIDEO_CHOOSER = 9;
 	public static final int INTENT_CALLOUT = 10;
+	public static final int HIERARCHY_ACTIVITY_FIRST_START = 11;
 
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
@@ -145,6 +146,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public static final String KEY_HEADER_STRING = "form_header";
     
     public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
+    
+    public static final String KEY_HAS_SAVED = "org.odk.collect.form.has.saved";
 
     // Identifies whether this is a new form, or reloading a form after a screen
     // rotation (or similar)
@@ -192,6 +195,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     private Uri instanceProviderContentURI = InstanceColumns.CONTENT_URI;
     
     private static String mHeaderString;
+    
+    public boolean hasSaved = false;
 
     enum AnimationType {
         LEFT, RIGHT, FADE
@@ -263,6 +268,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             }
             if(savedInstanceState.containsKey(KEY_HEADER_STRING)) {
             	mHeaderString = savedInstanceState.getString(KEY_HEADER_STRING);
+            }
+            
+            if(savedInstanceState.containsKey(KEY_HAS_SAVED)) {
+            	hasSaved = savedInstanceState.getBoolean(KEY_HAS_SAVED);
             }
            
         }
@@ -418,6 +427,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
         outState.putBoolean(KEY_FORM_MANAGEMENT, mFormManagementEnabled);
+        outState.putBoolean(KEY_HAS_SAVED, hasSaved);
         
         if(symetricKey != null) {
         	try {
@@ -435,6 +445,12 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (resultCode == RESULT_CANCELED) {
+        	if(requestCode == HIERARCHY_ACTIVITY_FIRST_START) {
+        		//they pressed 'back' on the first heirarchy screen. we should assume they want to
+        		//back out of form entry all together
+        		finishReturnInstance(false);
+        	}
+        	
             // request was canceled, so do nothing
             return;
         }
@@ -1438,7 +1454,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             }
         }
 
-        finishReturnInstance();
+        finishReturnInstance(false);
     }
 
 
@@ -1645,7 +1661,6 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -1748,7 +1763,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         } else {
             // we've just loaded a saved form, so start in the hierarchy view
             Intent i = new Intent(this, FormHierarchyActivity.class);
-            startActivity(i);
+            startActivityForResult(i, HIERARCHY_ACTIVITY_FIRST_START);
             return; // so we don't show the intro screen before jumping to the hierarchy
         }
 
@@ -1802,9 +1817,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         switch (saveStatus) {
             case SaveToDiskTask.SAVED:
                 Toast.makeText(this, getString(R.string.data_saved_ok), Toast.LENGTH_SHORT).show();
+                hasSaved = true;
                 break;
             case SaveToDiskTask.SAVED_AND_EXIT:
                 Toast.makeText(this, getString(R.string.data_saved_ok), Toast.LENGTH_SHORT).show();
+                hasSaved = true;
                 finishReturnInstance();
                 break;
             case SaveToDiskTask.SAVE_ERROR:
@@ -1893,11 +1910,15 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
     }
 
+    
+    private void finishReturnInstance() {
+    	finishReturnInstance(true);
+    }
 
     /**
      * Returns the instance that was just filled out to the calling activity, if requested.
      */
-    private void finishReturnInstance() {
+    private void finishReturnInstance(boolean reportSaved) {
         String action = getIntent().getAction();
         if (Intent.ACTION_PICK.equals(action) || Intent.ACTION_EDIT.equals(action)) {
             // caller is waiting on a picked form
@@ -1912,7 +1933,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 c.moveToFirst();
                 String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
                 Uri instance = Uri.withAppendedPath(instanceProviderContentURI, id);
-                setResult(RESULT_OK, new Intent().setData(instance));
+                if(reportSaved || hasSaved) {
+                	setResult(RESULT_OK, new Intent().setData(instance));
+                } else {
+                	setResult(RESULT_CANCELED, new Intent().setData(instance));
+                }
             }
         }
         finish();
