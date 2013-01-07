@@ -14,7 +14,6 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.StringUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -308,11 +307,11 @@ public class GridMultiWidget extends QuestionWidget {
 
                         } else {
                             // Loading the image failed, so it's likely a bad file.
-                            errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_invalid, imageFile.toString());
+                            errorMsg = getContext().getString(R.string.file_invalid, imageFile);
                         }
                     } else {
                         // We should have an image, but the file doesn't exist.
-                        errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_missing, imageFile.toString());
+                        errorMsg = getContext().getString(R.string.file_missing, imageFile);
                     }
 
                     if (errorMsg != null) {

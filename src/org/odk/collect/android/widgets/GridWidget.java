@@ -1,9 +1,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.Vector;
-
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -15,7 +12,6 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
 import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.StringUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -33,6 +29,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.Vector;
 
 /**
  * GridWidget handles select-one fields using a grid of icons. The user clicks the desired icon and
@@ -304,11 +303,11 @@ public class GridWidget extends QuestionWidget {
 
                         } else {
                             // Loading the image failed, so it's likely a bad file.
-                            errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_invalid, imageFile.toString());
+                            errorMsg = getContext().getString(R.string.file_invalid, imageFile);
                         }
                     } else {
                         // We should have an image, but the file doesn't exist.
-                        errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_missing, imageFile.toString());
+                        errorMsg = getContext().getString(R.string.file_missing, imageFile);
                     }
 
                     if (errorMsg != null) {

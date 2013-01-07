@@ -14,15 +14,12 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.StringUtils;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -40,6 +37,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.Toast;
+
+import java.io.File;
 
 /**
  * Widget that allows user to take pictures, sounds or video and add them to the form.
@@ -76,7 +75,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
         
         // setup capture button
         mCaptureButton = new Button(getContext());
-        mCaptureButton.setText(StringUtils.getStringRobust(getContext(), R.string.capture_audio));
+        mCaptureButton.setText(getContext().getString(R.string.capture_audio));
         mCaptureButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mCaptureButton.setPadding(20, 20, 20, 20);
         mCaptureButton.setEnabled(!prompt.isReadOnly());
@@ -95,7 +94,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
                         .startActivityForResult(i, FormEntryActivity.AUDIO_CAPTURE);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                        StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "audio capture"),
+                        getContext().getString(R.string.activity_not_found, "audio capture"),
                         Toast.LENGTH_SHORT);
                 }
 
@@ -104,7 +103,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
 
         // setup capture button
         mChooseButton = new Button(getContext());
-        mChooseButton.setText(StringUtils.getStringRobust(getContext(), R.string.choose_sound));
+        mChooseButton.setText(getContext().getString(R.string.choose_sound));
         mChooseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mChooseButton.setPadding(20, 20, 20, 20);
         mChooseButton.setEnabled(!prompt.isReadOnly());
@@ -122,7 +121,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
                         .startActivityForResult(i, FormEntryActivity.AUDIO_CHOOSER);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                        StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "choose audio"),
+                        getContext().getString(R.string.activity_not_found, "choose audio"),
                         Toast.LENGTH_SHORT);
                 }
 
@@ -131,7 +130,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
 
         // setup play button
         mPlayButton = new Button(getContext());
-        mPlayButton.setText(StringUtils.getStringRobust(getContext(), R.string.play_audio));
+        mPlayButton.setText(getContext().getString(R.string.play_audio));
         mPlayButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mPlayButton.setPadding(20, 20, 20, 20);
         mPlayButton.setLayoutParams(params);
@@ -147,7 +146,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
                 ((Activity) getContext()).startActivity(i);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                        StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "play audio"),
+                        getContext().getString(R.string.activity_not_found, "play audio"),
                         Toast.LENGTH_SHORT);
                 }
 
