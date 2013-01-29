@@ -109,7 +109,7 @@
 <string name="main_menu_details">Data collection made easier...</string>
 <string name="main_menu_message">ODK Collect v1.1.7</string>
 <string name="manage_files">Delete Saved Form</string>
-<string name="mark_finished">Mark form as finalized</string>
+<string name="mark_finished">This Form is Completed</string>
 <string name="no">No</string>
 <string name="noselect_error">Sorry, you have not selected any forms!</string>
 <string name="no_capture">Nothing recorded yet.</string>
