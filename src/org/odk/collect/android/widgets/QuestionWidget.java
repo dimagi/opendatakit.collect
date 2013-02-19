@@ -1,6 +1,8 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.regex.Matcher;
+
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -13,12 +15,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import android.text.Spannable;
+import android.text.TextPaint;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
+import android.text.util.Linkify.TransformFilter;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 public abstract class QuestionWidget extends LinearLayout {
@@ -79,6 +84,30 @@ public abstract class QuestionWidget extends LinearLayout {
 
 
     public abstract void setOnLongClickListener(OnLongClickListener l);
+    
+    
+    private class URLSpanNoUnderline extends URLSpan {
+        public URLSpanNoUnderline(String url) {
+            super(url);
+        }
+        @Override public void updateDrawState(TextPaint ds) {
+            super.updateDrawState(ds);
+            ds.setUnderlineText(false);
+        }
+    }
+    
+    private void stripUnderlines(TextView textView) {
+        Spannable s = (Spannable)textView.getText();
+        URLSpan[] spans = s.getSpans(0, s.length(), URLSpan.class);
+        for (URLSpan span: spans) {
+            int start = s.getSpanStart(span);
+            int end = s.getSpanEnd(span);
+            s.removeSpan(span);
+            span = new URLSpanNoUnderline(span.getURL());
+            s.setSpan(span, start, end, 0);
+        }
+        textView.setText(s);
+    }    
 
 
     /**
@@ -101,7 +130,13 @@ public abstract class QuestionWidget extends LinearLayout {
         mQuestionText.setTypeface(null, Typeface.BOLD);
         mQuestionText.setPadding(0, 0, 0, 7);
         mQuestionText.setId(38475483); // assign random id
-
+        
+        /* phone markup removed for now, waiting for feedback
+        if(Linkify.addLinks(mQuestionText,Linkify.PHONE_NUMBERS)){
+        	stripUnderlines(mQuestionText);
+        }
+        */
+        
         // Wrap to the size of the parent view
         mQuestionText.setHorizontallyScrolling(false);
 
