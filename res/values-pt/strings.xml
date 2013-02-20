@@ -216,4 +216,8 @@
 <string name="google_account">Selecionar Uma Conta Google</string>
 <string name="selected_google_account_text">Conta Google</string>
 <string name="google_submission_id_text">Esforço de coleta Google</string>
+<string name="exit">Exit</string>
+<string name="no_gps_title">Location Data Disabled</string>
+<string name="no_gps_message">The location providers on this device are currently disabled. Do you want to change those settings?</string>
+<string name="change_settings">Change Settings</string>
 </resources>
