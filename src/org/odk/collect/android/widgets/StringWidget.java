@@ -25,9 +25,11 @@ import android.text.method.TextKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TableLayout;
+import android.view.View.OnClickListener;
 
 /**
  * The most basic widget that allows for entry of any text.
@@ -35,18 +37,20 @@ import android.widget.TableLayout;
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
-public class StringWidget extends QuestionWidget {
+public class StringWidget extends QuestionWidget implements OnClickListener {
 
     boolean mReadOnly = false;
     protected EditText mAnswer;
     protected boolean secret = false;
+    Context cntx;
 
     public StringWidget(Context context, FormEntryPrompt prompt, boolean secret) {
         super(context, prompt);
+        cntx = context;
         mAnswer = new EditText(context);
-
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-
+        mAnswer.setImeOptions(0x10000000);
+        mAnswer.setOnClickListener(this);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
         mAnswer.setLayoutParams(params);
@@ -152,5 +156,11 @@ public class StringWidget extends QuestionWidget {
         super.cancelLongPress();
         mAnswer.cancelLongPress();
     }
+
+	@Override
+	public void onClick(View v) {
+		setFocus(cntx);
+        mAnswer.setImeOptions(0x00000000);
+	}
 
 }

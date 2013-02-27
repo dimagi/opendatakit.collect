@@ -61,8 +61,8 @@ public class ODKView extends ScrollView implements OnLongClickListener {
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory) {
         super(context);
         
-        SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences settings = 
+        	 PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
         String question_font =
                 settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);

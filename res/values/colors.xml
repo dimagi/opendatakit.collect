@@ -29,5 +29,8 @@ the License.
     <color name="solid_blue">#0000ff</color>
     <color name="solid_green">#f0f0</color>
     <color name="solid_yellow">#ffffff00</color>
+   <color name="border_grey">#20959699</color>
+   <color name="blue_grad_end">#903867AD</color>
+   <color name="blue_grad_start">#806884AD</color>
 
 </resources>

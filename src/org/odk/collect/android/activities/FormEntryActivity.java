@@ -1317,6 +1317,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                             }
                         }
                     }).create();
+        mAlertDialog.getListView().setSelector(R.drawable.selector);
         mAlertDialog.show();
     }
     
