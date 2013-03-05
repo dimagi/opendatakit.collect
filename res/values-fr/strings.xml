@@ -212,4 +212,9 @@ License.
 <string name="save_as_error">Le nom ne peut pas être vide!</string> 
 <string name="form_name">Nom du Formulaire :</string> 
 <string name="edit_prompt">Ligne d\'Edition</string> 
-<string name="cannot_edit_completed_form">This form cannot be edited once it has been marked as complete.</string><string name="google_account">Select Google Account</string><string name="selected_google_account_text">Google Account</string><string name="google_submission_id_text">Google Collection Effort</string></resources>
+<string name="cannot_edit_completed_form">This form cannot be edited once it has been marked as complete.</string><string name="google_account">Select Google Account</string><string name="selected_google_account_text">Google Account</string><string name="google_submission_id_text">Google Collection Effort</string>
+<string name="exit">Exit</string>
+<string name="no_gps_title">Location Data Disabled</string>
+<string name="no_gps_message">The location providers on this device are currently disabled. Do you want to change those settings?</string>
+<string name="change_settings">Change Settings</string>
+</resources>
