@@ -1,6 +1,9 @@
 
 package org.odk.collect.android.widgets;
 
+import java.io.File;
+import java.util.Vector;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -11,6 +14,7 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
@@ -29,9 +33,6 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.io.File;
-import java.util.Vector;
 
 /**
  * GridWidget handles select-one fields using a grid of icons. The user clicks the desired icon and
@@ -156,6 +157,138 @@ public class GridWidget extends QuestionWidget {
                 if (quickAdvance) {
                     listener.advance();
                 }
+            }
+        });
+
+        // Read the screen dimensions and fit the grid view to them. It is important that the grid
+        // view
+        // knows how far out it can stretch.
+        Display display =
+            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                    .getDefaultDisplay();
+        int screenWidth = display.getWidth();
+        int screenHeight = display.getHeight();
+        GridView.LayoutParams params = new GridView.LayoutParams(screenWidth - 5, screenHeight - 5);
+        gridview.setLayoutParams(params);
+
+        // Use the user's choice for num columns, otherwise automatically decide.
+        if (numColumns > 0) {
+            gridview.setNumColumns(numColumns);
+        } else {
+            gridview.setNumColumns(GridView.AUTO_FIT);
+        }
+
+        gridview.setColumnWidth(maxColumnWidth);
+        gridview.setHorizontalSpacing(2);
+        gridview.setVerticalSpacing(2);
+        gridview.setGravity(Gravity.LEFT);
+        gridview.setStretchMode(GridView.NO_STRETCH);
+
+        // Fill in answer
+        String s = null;
+        if (prompt.getAnswerValue() != null) {
+            s = ((Selection) prompt.getAnswerValue().getValue()).getValue();
+        }
+
+        for (int i = 0; i < mItems.size(); ++i) {
+            String sMatch = mItems.get(i).getValue();
+
+            selected[i] = sMatch.equals(s);
+            if (selected[i]) {
+                imageViews[i].setBackgroundColor(Color.rgb(orangeRedVal, orangeGreenVal,
+                    orangeBlueVal));
+            } else {
+                imageViews[i].setBackgroundColor(Color.WHITE);
+            }
+        }
+
+        addView(gridview);
+    }
+    
+    public GridWidget(Context context, FormEntryPrompt prompt, int numColumns,
+            final boolean quickAdvance, final WidgetChangedListener wcl) {
+        super(context, prompt);
+        mItems = prompt.getSelectChoices();
+        mPrompt = prompt;
+        listener = (AdvanceToNextListener) context;
+
+        selected = new boolean[mItems.size()];
+        choices = new String[mItems.size()];
+        gridview = new GridView(context);
+        imageViews = new ImageView[mItems.size()];
+        maxColumnWidth = -1;
+        this.numColumns = numColumns;
+        for (int i = 0; i < mItems.size(); i++) {
+            imageViews[i] = new ImageView(getContext());
+        }
+        this.quickAdvance = quickAdvance;
+
+        // Build view
+        for (int i = 0; i < mItems.size(); i++) {
+            SelectChoice sc = mItems.get(i);
+            // Read the image sizes and set maxColumnWidth. This allows us to make sure all of our
+            // columns are going to fit
+            String imageURI =
+                prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE);
+
+            if (imageURI != null) {
+                choices[i] = imageURI;
+
+                String imageFilename;
+                try {
+                    imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                    final File imageFile = new File(imageFilename);
+                    if (imageFile.exists()) {
+                        Display display =
+                            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                                    .getDefaultDisplay();
+                        int screenWidth = display.getWidth();
+                        int screenHeight = display.getHeight();
+                        Bitmap b =
+                            FileUtils
+                                    .getBitmapScaledToDisplay(imageFile, screenHeight, screenWidth);
+                        if (b != null) {
+
+                            if (b.getWidth() > maxColumnWidth) {
+                                maxColumnWidth = b.getWidth();
+                            }
+
+                        }
+                    }
+                } catch (InvalidReferenceException e) {
+                    Log.e("GridWidget", "image invalid reference exception");
+                    e.printStackTrace();
+                }
+
+            } else {
+                // choices[i] = prompt.getSelectChoiceText(sc);
+            }
+
+        }
+
+        // Use the custom image adapter and initialize the grid view
+        ImageAdapter ia = new ImageAdapter(getContext(), choices);
+        gridview.setAdapter(ia);
+        gridview.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
+                // Imitate the behavior of a radio button. Clear all buttons
+                // and then check the one clicked by the user. Update the
+                // background color accordingly
+                for (int i = 0; i < selected.length; i++) {
+                    selected[i] = false;
+                    if (imageViews[i] != null) {
+                        imageViews[i].setBackgroundColor(Color.WHITE);
+                    }
+                }
+                selected[position] = true;
+                imageViews[position].setBackgroundColor(Color.rgb(orangeRedVal, orangeGreenVal,
+                    orangeBlueVal));
+                if (quickAdvance) {
+                    listener.advance();
+                }
+                
+                wcl.widgetEntryChanged();
             }
         });
 

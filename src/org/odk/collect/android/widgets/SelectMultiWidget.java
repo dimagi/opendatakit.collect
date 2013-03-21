@@ -14,12 +14,15 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.views.MediaLayout;
 
 import android.content.Context;
@@ -29,8 +32,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import java.util.Vector;
 
 /**
  * SelctMultiWidget handles multiple selection fields using checkboxes.
@@ -76,6 +77,89 @@ public class SelectMultiWidget extends QuestionWidget {
                                 buttonView.setChecked(true);
                             }
                         }
+                    }
+                });
+
+                c.setId(CHECKBOX_ID + i);
+                c.setText(prompt.getSelectChoiceText(mItems.get(i)));
+                c.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+                c.setFocusable(!prompt.isReadOnly());
+                c.setEnabled(!prompt.isReadOnly());
+                for (int vi = 0; vi < ve.size(); vi++) {
+                    // match based on value, not key
+                    if (mItems.get(i).getValue().equals(ve.elementAt(vi).getValue())) {
+                        c.setChecked(true);
+                        break;
+                    }
+
+                }
+                mCheckboxes.add(c);
+
+                String audioURI = null;
+                audioURI =
+                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
+                        FormEntryCaption.TEXT_FORM_AUDIO);
+
+                String imageURI = null;
+                imageURI =
+                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
+                        FormEntryCaption.TEXT_FORM_IMAGE);
+
+                String videoURI = null;
+                videoURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "video");
+
+                String bigImageURI = null;
+                bigImageURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "big-image");
+
+                MediaLayout mediaLayout = new MediaLayout(getContext());
+                mediaLayout.setAVT(c, audioURI, imageURI, videoURI, bigImageURI);
+                addView(mediaLayout);
+
+                // Last, add the dividing line between elements (except for the last element)
+                ImageView divider = new ImageView(getContext());
+                divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
+                if (i != mItems.size() - 1) {
+                    addView(divider);
+                }
+
+            }
+        }
+
+        mCheckboxInit = false;
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    public SelectMultiWidget(Context context, FormEntryPrompt prompt, final WidgetChangedListener wcl) {
+        super(context, prompt);
+        mPrompt = prompt;
+        mCheckboxes = new Vector<CheckBox>();
+        mItems = prompt.getSelectChoices();
+
+        setOrientation(LinearLayout.VERTICAL);
+
+        Vector<Selection> ve = new Vector<Selection>();
+        if (prompt.getAnswerValue() != null) {
+            ve = (Vector<Selection>) getCurrentAnswer().getValue();
+        }
+
+        if (prompt.getSelectChoices() != null) {
+            for (int i = 0; i < mItems.size(); i++) {
+                // no checkbox group so id by answer + offset
+                CheckBox c = new CheckBox(getContext());
+
+                // when clicked, check for readonly before toggling
+                c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (!mCheckboxInit && mPrompt.isReadOnly()) {
+                            if (buttonView.isChecked()) {
+                                buttonView.setChecked(false);
+                            } else {
+                                buttonView.setChecked(true);
+                            }
+                        }
+                        wcl.widgetEntryChanged();
                     }
                 });
 

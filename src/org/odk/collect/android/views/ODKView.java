@@ -6,6 +6,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
@@ -34,7 +35,7 @@ import java.util.Iterator;
  * 
  * @author carlhartung
  */
-public class ODKView extends ScrollView implements OnLongClickListener {
+public class ODKView extends ScrollView implements OnLongClickListener, WidgetChangedListener {
 
     // starter random number for view IDs
     private final static int VIEW_ID = 12345;  
@@ -45,10 +46,19 @@ public class ODKView extends ScrollView implements OnLongClickListener {
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
     private ArrayList<QuestionWidget> widgets;
+    private ArrayList<View> dividers;
     
     private int mQuestionFontsize;
 
     public final static String FIELD_LIST = "field-list";
+    
+    private boolean inCompoundMode = false;
+    
+    private WidgetChangedListener wcListener;
+    private boolean hasListener = false;
+    
+    private int widgetIdCount = 0;
+    private int mViewBannerCount = 0;
 
 
     public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory) {
@@ -56,10 +66,29 @@ public class ODKView extends ScrollView implements OnLongClickListener {
             questionPrompt
         }, groups, factory);
     }
-
-
+    
+    public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl) {
+        this(context, new FormEntryPrompt[] {
+            questionPrompt
+        }, groups, factory, wcl);
+    }
+    
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory) {
+    	this(context, questionPrompts, groups, factory, null);
+    }
+
+
+    public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl) {
         super(context);
+        
+        if(questionPrompts.length > 1){
+        	inCompoundMode = true;
+        }
+        
+        if(wcl !=null){
+        	hasListener = true;
+        	wcListener = wcl;
+        }
         
         SharedPreferences settings = 
         	 PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
@@ -72,6 +101,7 @@ public class ODKView extends ScrollView implements OnLongClickListener {
 
 
         widgets = new ArrayList<QuestionWidget>();
+        dividers = new ArrayList<View>();
 
         mView = new LinearLayout(getContext());
         mView.setOrientation(LinearLayout.VERTICAL);
@@ -106,24 +136,29 @@ public class ODKView extends ScrollView implements OnLongClickListener {
         addHintText(hintText);
         
         boolean first = true;
-        int id = 0;
         
         for (FormEntryPrompt p : questionPrompts) {
+        	
             if (!first) {
                 View divider = new View(getContext());
                 divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
                 divider.setMinimumHeight(3);
+                dividers.add(divider);
                 mView.addView(divider);
             } else {
                 first = false;
             }
-
-            // if question or answer type is not supported, use text widget
-            QuestionWidget qw =
-                factory.createWidgetFromPrompt(p, getContext());
+            QuestionWidget qw;
+  //          if(inCompoundMode){
+ //           	qw = factory.createWidgetFromPrompt(p, getContext(), this);
+ //           }
+//            else{
+                // if question or answer type is not supported, use text widget
+            	qw = factory.createWidgetFromPrompt(p, getContext());
+ //           }
             qw.setLongClickable(true);
             qw.setOnLongClickListener(this);
-            qw.setId(VIEW_ID + id++);
+            qw.setId(VIEW_ID + widgetIdCount++);
             
             //Suppress the hint text if we bubbled it
             if(hintText != null) {
@@ -132,12 +167,55 @@ public class ODKView extends ScrollView implements OnLongClickListener {
 
             widgets.add(qw);
             mView.addView((View) qw, mLayout);
+            
+            qw.setChangedListener(this);
 
 
         }
 
         addView(mView);
 
+    }
+    
+    public void removeQuestionFromIndex(int i){
+    	mView.removeView((View) widgets.get(i));
+    	if(i == 0){
+    		mView.removeView(dividers.get(0));
+    	}
+    	else{
+    		mView.removeView(dividers.get(i-1));
+    	}
+    	widgets.remove(i);
+    	dividers.remove(i-1);
+    }
+    
+    public void removeQuestionsFromIndex(ArrayList<Integer> indexes){
+    	for(int i=0; i< indexes.size(); i++){
+    		removeQuestionFromIndex(indexes.get(i).intValue());
+    	}
+    }
+    
+    public void addQuestionToIndex(QuestionWidget newQuestionWidget, int i){
+
+        View divider = new View(getContext());
+        divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
+        divider.setMinimumHeight(3);
+        mView.addView(divider,2 * i - 1 + mViewBannerCount);
+        dividers.add(i-1, divider);
+        
+        QuestionWidget qw = newQuestionWidget;
+        qw.setLongClickable(true);
+        qw.setOnLongClickListener(this);
+        qw.setId(VIEW_ID + widgetIdCount++);
+        
+        //Suppress the hint text if we bubbled it
+//        if(hintText != null) { //TODO figure this out
+//        	qw.hideHintText();
+//        }
+
+        widgets.add(i, qw);
+        mView.addView((View) qw, 2 * i + mViewBannerCount, mLayout);
+    	
     }
 
 
@@ -186,6 +264,12 @@ public class ODKView extends ScrollView implements OnLongClickListener {
 //			}
 //		}
 	}
+	
+	private void updateConstraintRelevancies(){
+		if(hasListener){
+			wcListener.widgetEntryChanged();
+		}
+	}
 
 
     /**
@@ -215,6 +299,7 @@ public class ODKView extends ScrollView implements OnLongClickListener {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, TEXTSIZE - 4);
             tv.setPadding(0, 0, 0, 5);
             mView.addView(tv, mLayout);
+            mViewBannerCount ++;
         }
     }
     
@@ -229,6 +314,7 @@ public class ODKView extends ScrollView implements OnLongClickListener {
             mHelpText.setText(hintText);
             mHelpText.setTypeface(null, Typeface.ITALIC);
 
+            mViewBannerCount++;
             mView.addView(mHelpText, mLayout);
         }
     }
@@ -309,4 +395,24 @@ public class ODKView extends ScrollView implements OnLongClickListener {
         }
     }
 
+    public boolean inCompoundMode(){
+    	return inCompoundMode;
+    }
+
+
+	@Override
+	public void widgetEntryChanged() {
+
+		updateConstraintRelevancies();
+		
+	}
+	
+	public void removeWidget(int i){
+		mView.removeViewAt(i);
+	}
+	
+	public void removeWidget(View v){
+		mView.removeView(v);
+	}
+    
 }

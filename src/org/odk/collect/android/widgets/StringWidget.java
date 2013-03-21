@@ -17,6 +17,7 @@ package org.odk.collect.android.widgets;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.content.Context;
 import android.text.InputType;
@@ -26,10 +27,10 @@ import android.text.method.TextKeyListener.Capitalize;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TableLayout;
-import android.view.View.OnClickListener;
 
 /**
  * The most basic widget that allows for entry of any text.
@@ -46,6 +47,51 @@ public class StringWidget extends QuestionWidget implements OnClickListener {
 
     public StringWidget(Context context, FormEntryPrompt prompt, boolean secret) {
         super(context, prompt);
+        cntx = context;
+        mAnswer = new EditText(context);
+        mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+        mAnswer.setImeOptions(0x10000000);
+        mAnswer.setOnClickListener(this);
+        TableLayout.LayoutParams params = new TableLayout.LayoutParams();
+        params.setMargins(7, 5, 7, 5);
+        mAnswer.setLayoutParams(params);
+        
+        this.secret = secret;
+        
+        if(!secret) {
+        	// capitalize the first letter of the sentence
+        	mAnswer.setKeyListener(new TextKeyListener(Capitalize.SENTENCES, false));
+        }
+        setTextInputType(mAnswer);
+
+        // needed to make long read only text scroll
+        mAnswer.setHorizontallyScrolling(false);
+        if(!secret) {
+        	mAnswer.setSingleLine(false);
+        }
+
+        if (prompt != null) {
+            mReadOnly = prompt.isReadOnly();
+            String s = prompt.getAnswerText();
+            if (s != null) {
+                mAnswer.setText(s);
+            }
+
+            if (mReadOnly) {
+                if (s == null) {
+                    mAnswer.setText("---");
+                }
+                mAnswer.setBackgroundDrawable(null);
+                mAnswer.setFocusable(false);
+                mAnswer.setClickable(false);
+            }
+        }
+
+        addView(mAnswer);
+    }
+    
+    public StringWidget(Context context, FormEntryPrompt prompt, boolean secret, WidgetChangedListener wcl) {
+        super(context, prompt, wcl);
         cntx = context;
         mAnswer = new EditText(context);
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
@@ -140,6 +186,9 @@ public class StringWidget extends QuestionWidget implements OnClickListener {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.isAltPressed() == true) {
             return false;
+        }
+        if(hasListener){
+        	widgetChangedListener.widgetEntryChanged();
         }
         return super.onKeyDown(keyCode, event);
     }

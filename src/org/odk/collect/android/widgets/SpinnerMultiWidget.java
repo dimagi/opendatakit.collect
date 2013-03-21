@@ -1,12 +1,15 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,8 +19,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.Vector;
 
 /**
  * SpinnerMultiWidget, like SelectMultiWidget handles multiple selection fields using checkboxes,
@@ -112,6 +113,114 @@ public class SpinnerMultiWidget extends QuestionWidget {
                     });
                 AlertDialog alert = alert_builder.create();
                 alert.show();
+            }
+        });
+
+        // Fill in previous answers
+        Vector<Selection> ve = new Vector<Selection>();
+        if (prompt.getAnswerValue() != null) {
+            ve = (Vector<Selection>) prompt.getAnswerValue().getValue();
+        }
+
+        if (ve != null) {
+            boolean first = true;
+            for (int i = 0; i < selections.length; ++i) {
+
+                String value = prompt.getSelectChoices().get(i).getValue();
+                boolean found = false;
+                for (Selection s : ve) {
+                    if (value.equals(s.getValue())) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                selections[i] = found;
+
+                if (found) {
+                    if (first) {
+                        first = false;
+                        selectionText.setText(context.getString(R.string.selected)
+                                + answer_items[i].toString());
+                        selectionText.setVisibility(View.VISIBLE);
+                    } else {
+                        selectionText.setText(selectionText.getText() + ", "
+                                + answer_items[i].toString());
+                    }
+                }
+
+            }
+        }
+
+        addView(button);
+        addView(selectionText);
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    public SpinnerMultiWidget(final Context context, FormEntryPrompt prompt, final WidgetChangedListener wcl) {
+        super(context, prompt);
+        mItems = prompt.getSelectChoices();
+        mPrompt = prompt;
+
+        selections = new boolean[mItems.size()];
+        answer_items = new CharSequence[mItems.size()];
+        alert_builder = new AlertDialog.Builder(context);
+        button = new Button(context);
+        selectionText = new TextView(getContext());
+
+        // Build View
+        for (int i = 0; i < mItems.size(); i++) {
+            answer_items[i] = prompt.getSelectChoiceText(mItems.get(i));
+        }
+
+        selectionText.setText(context.getString(R.string.selected));
+        selectionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+        selectionText.setVisibility(View.GONE);
+
+        button.setText(context.getString(R.string.select_answer));
+        button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+        button.setPadding(0, 0, 0, 7);
+
+        // Give the button a click listener. This defines the alert as well. All the
+        // click and selection behavior is defined here.
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                alert_builder.setTitle(mPrompt.getQuestionText()).setPositiveButton(R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            boolean first = true;
+                            selectionText.setText("");
+                            for (int i = 0; i < selections.length; i++) {
+                                if (selections[i]) {
+
+                                    if (first) {
+                                        first = false;
+                                        selectionText.setText(context.getString(R.string.selected)
+                                                + answer_items[i].toString());
+                                        selectionText.setVisibility(View.VISIBLE);
+                                    } else {
+                                        selectionText.setText(selectionText.getText() + ", "
+                                                + answer_items[i].toString());
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                alert_builder.setMultiChoiceItems(answer_items, selections,
+                    new DialogInterface.OnMultiChoiceClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                            selections[which] = isChecked;
+                        }
+                    });
+                AlertDialog alert = alert_builder.create();
+                alert.show();
+                
+                wcl.widgetEntryChanged();
             }
         });
 

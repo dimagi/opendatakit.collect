@@ -24,6 +24,7 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.views.MediaLayout;
 
 import android.content.Context;
@@ -132,6 +133,10 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
             }
         }
     }
+    
+    public SelectOneAutoAdvanceWidget(Context context, FormEntryPrompt prompt, WidgetChangedListener wcl) {
+        super(context, prompt, wcl);
+    }
 
 
     @Override
@@ -192,6 +197,9 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
             }
         }
         listener.advance();
+        if(hasListener){
+        	widgetChangedListener.widgetEntryChanged();
+        }
     }
 
 

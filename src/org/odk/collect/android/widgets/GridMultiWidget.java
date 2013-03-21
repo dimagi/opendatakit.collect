@@ -13,6 +13,7 @@ import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
@@ -142,6 +143,141 @@ public class GridMultiWidget extends QuestionWidget {
                     imageViews[position].setBackgroundColor(Color.rgb(orangeRedVal, orangeGreenVal,
                         orangeBlueVal));
                 }
+
+            }
+        });
+
+        // Read the screen dimensions and fit the grid view to them. It is important that the grid
+        // view
+        // knows how far out it can stretch.
+        Display display =
+            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                    .getDefaultDisplay();
+        int screenWidth = display.getWidth();
+        int screenHeight = display.getHeight();
+        GridView.LayoutParams params = new GridView.LayoutParams(screenWidth - 5, screenHeight - 5);
+        gridview.setLayoutParams(params);
+
+        // Use the user's choice for num columns, otherwise automatically decide.
+        if (numColumns > 0) {
+            gridview.setNumColumns(numColumns);
+        } else {
+            gridview.setNumColumns(GridView.AUTO_FIT);
+        }
+
+        gridview.setColumnWidth(maxColumnWidth);
+        gridview.setHorizontalSpacing(2);
+        gridview.setVerticalSpacing(2);
+        gridview.setGravity(Gravity.LEFT);
+        gridview.setStretchMode(GridView.NO_STRETCH);
+
+        // Fill in answer
+        IAnswerData answer = prompt.getAnswerValue();
+        Vector<Selection> ve;
+        if ((answer == null) || (answer.getValue() == null)) {
+            ve = new Vector<Selection>();
+        } else {
+            ve = (Vector<Selection>) answer.getValue();
+        }
+
+        for (int i = 0; i < choices.length; ++i) {
+
+            String value = mItems.get(i).getValue();
+            boolean found = false;
+            for (Selection s : ve) {
+                if (value.equals(s.getValue())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            selected[i] = found;
+            if (selected[i]) {
+                imageViews[i].setBackgroundColor(Color.rgb(orangeRedVal, orangeGreenVal,
+                    orangeBlueVal));
+            } else {
+                imageViews[i].setBackgroundColor(Color.WHITE);
+            }
+        }
+
+        addView(gridview);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public GridMultiWidget(Context context, FormEntryPrompt prompt, int numColumns, final WidgetChangedListener wcl) {
+        super(context, prompt);
+        mItems = prompt.getSelectChoices();
+        mPrompt = prompt;
+
+        selected = new boolean[mItems.size()];
+        choices = new String[mItems.size()];
+        gridview = new GridView(context);
+        imageViews = new ImageView[mItems.size()];
+        maxColumnWidth = -1;
+        this.numColumns = numColumns;
+        for (int i = 0; i < mItems.size(); i++) {
+            imageViews[i] = new ImageView(getContext());
+        }
+
+        // Build view
+        for (int i = 0; i < mItems.size(); i++) {
+            SelectChoice sc = mItems.get(i);
+            // Read the image sizes and set maxColumnWidth. This allows us to make sure all of our
+            // columns are going to fit
+            String imageURI =
+                prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE);
+
+            if (imageURI != null) {
+                choices[i] = imageURI;
+
+                String imageFilename;
+                try {
+                    imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                    final File imageFile = new File(imageFilename);
+                    if (imageFile.exists()) {
+                        Display display =
+                            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                                    .getDefaultDisplay();
+                        int screenWidth = display.getWidth();
+                        int screenHeight = display.getHeight();
+                        Bitmap b =
+                            FileUtils
+                                    .getBitmapScaledToDisplay(imageFile, screenHeight, screenWidth);
+                        if (b != null) {
+
+                            if (b.getWidth() > maxColumnWidth) {
+                                maxColumnWidth = b.getWidth();
+                            }
+
+                        }
+                    }
+                } catch (InvalidReferenceException e) {
+                    Log.e("GridWidget", "image invalid reference exception");
+                    e.printStackTrace();
+                }
+
+            } else {
+                choices[i] = prompt.getSelectChoiceText(sc);
+            }
+
+        }
+
+        // Use the custom image adapter and initialize the grid view
+        ImageAdapter ia = new ImageAdapter(getContext(), choices);
+        gridview.setAdapter(ia);
+        gridview.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
+                if (selected[position]) {
+                    selected[position] = false;
+                    imageViews[position].setBackgroundColor(Color.WHITE);
+                } else {
+                    selected[position] = true;
+                    imageViews[position].setBackgroundColor(Color.rgb(orangeRedVal, orangeGreenVal,
+                        orangeBlueVal));
+                }
+                
+                wcl.widgetEntryChanged();
 
             }
         });

@@ -3,10 +3,12 @@ package org.odk.collect.android.widgets;
 
 import java.util.regex.Matcher;
 
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.views.MediaLayout;
 import org.odk.collect.android.views.ShrinkingTextView;
@@ -40,31 +42,46 @@ public abstract class QuestionWidget extends LinearLayout {
 
     private TextView mQuestionText;
     private ShrinkingTextView mHelpText;
+    protected boolean hasListener;
+    
+    protected WidgetChangedListener widgetChangedListener;
 
 
     public QuestionWidget(Context context, FormEntryPrompt p) {
-        super(context);
-
+    	this(context, p, null);
+    }
+    
+    public QuestionWidget(Context context, FormEntryPrompt p, WidgetChangedListener w){
+    	super(context);
+    	
+    	if(w!=null){
+    		hasListener = false;
+    		widgetChangedListener = w;
+    	}
+    	
+    	hasListener = (w != null);
+    	
+    	
         SharedPreferences settings =
-            PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        String question_font =
-            settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
-        mQuestionFontsize = new Integer(question_font).intValue();
-        mAnswerFontsize = mQuestionFontsize + 2;
+                PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            String question_font =
+                settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
+            	mQuestionFontsize = new Integer(question_font).intValue();
+            mAnswerFontsize = mQuestionFontsize + 2;
 
-        mPrompt = p;
+            mPrompt = p;
 
-        setOrientation(LinearLayout.VERTICAL);
-        setGravity(Gravity.TOP);
-        setPadding(0, 7, 0, 0);
+            setOrientation(LinearLayout.VERTICAL);
+            setGravity(Gravity.TOP);
+            setPadding(0, 7, 0, 0);
 
-        mLayout =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-        mLayout.setMargins(10, 0, 10, 0);
+            mLayout =
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+            mLayout.setMargins(10, 0, 10, 0);
 
-        addQuestionText(p);
-        addHelpText(p);
+            addQuestionText(p);
+            addHelpText(p);
     }
 
 
@@ -130,13 +147,17 @@ public abstract class QuestionWidget extends LinearLayout {
         mQuestionText.setTypeface(null, Typeface.BOLD);
         mQuestionText.setPadding(0, 0, 0, 7);
         mQuestionText.setId(38475483); // assign random id
-        
-        /* phone markup removed for now, waiting for feedback
-        if(Linkify.addLinks(mQuestionText,Linkify.PHONE_NUMBERS)){
-        	stripUnderlines(mQuestionText);
+
+        if(p.getLongText()!= null){
+        	if(p.getLongText().contains("\u260E")){
+        		if(Linkify.addLinks(mQuestionText,Linkify.PHONE_NUMBERS)){
+        			stripUnderlines(mQuestionText);
+        		}
+        		else{
+        			System.out.println("this should be an error I'm thinking?");
+        		}
+        	}
         }
-        */
-        
         // Wrap to the size of the parent view
         mQuestionText.setHorizontallyScrolling(false);
 
@@ -209,5 +230,14 @@ public abstract class QuestionWidget extends LinearLayout {
 
 	public void hideHintText() {
 		mHelpText.setVisibility(View.GONE);
+	}
+	
+	public FormIndex getFormId(){
+		return mPrompt.getIndex();
+	}
+	
+	public void setChangedListener(WidgetChangedListener wcl){
+		widgetChangedListener = wcl;
+		hasListener = true;
 	}
 }

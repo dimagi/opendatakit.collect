@@ -14,19 +14,20 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.joda.time.DateTime;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.content.Context;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
-
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Displays a DatePicker widget. DateWidget handles leap years and does not allow dates that do not
@@ -94,6 +95,10 @@ public class DateTimeWidget extends QuestionWidget {
         addView(mTimePicker);
 
     }
+    
+    public DateTimeWidget(Context context, FormEntryPrompt prompt, WidgetChangedListener wcl) {
+        super(context, prompt, wcl);
+    }
 
 
     public void setAnswer() {
@@ -118,6 +123,10 @@ public class DateTimeWidget extends QuestionWidget {
         } else {
             // create time widget with current time as of right now
             clearAnswer();
+        }
+        
+        if(hasListener){
+        	widgetChangedListener.widgetEntryChanged();
         }
     }
 

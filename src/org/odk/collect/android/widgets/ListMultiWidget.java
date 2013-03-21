@@ -1,6 +1,9 @@
 
 package org.odk.collect.android.widgets;
 
+import java.io.File;
+import java.util.Vector;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
@@ -10,6 +13,7 @@ import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
@@ -27,9 +31,8 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.io.File;
-import java.util.Vector;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * ListMultiWidget handles multiple selection fields using check boxes. The check boxes are aligned
@@ -97,6 +100,185 @@ public class ListMultiWidget extends QuestionWidget {
                                 buttonView.setChecked(true);
                             }
                         }
+                    }
+                });
+
+                c.setId(CHECKBOX_ID + i);
+                c.setFocusable(!prompt.isReadOnly());
+                c.setEnabled(!prompt.isReadOnly());
+                for (int vi = 0; vi < ve.size(); vi++) {
+                    // match based on value, not key
+                    if (mItems.get(i).getValue().equals(ve.elementAt(vi).getValue())) {
+                        c.setChecked(true);
+                        break;
+                    }
+
+                }
+                mCheckboxes.add(c);
+
+                String imageURI = null;
+                imageURI =
+                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
+                        FormEntryCaption.TEXT_FORM_IMAGE);
+
+                // build image view (if an image is provided)
+                ImageView mImageView = null;
+                TextView mMissingImage = null;
+
+                // Now set up the image view
+                String errorMsg = null;
+                if (imageURI != null) {
+                    try {
+                        String imageFilename =
+                            ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                        final File imageFile = new File(imageFilename);
+                        if (imageFile.exists()) {
+                            Bitmap b = null;
+                            try {
+                                Display display =
+                                    ((WindowManager) getContext().getSystemService(
+                                        Context.WINDOW_SERVICE)).getDefaultDisplay();
+                                int screenWidth = display.getWidth();
+                                int screenHeight = display.getHeight();
+                                b =
+                                    FileUtils.getBitmapScaledToDisplay(imageFile, screenHeight,
+                                        screenWidth);
+                            } catch (OutOfMemoryError e) {
+                                errorMsg = "ERROR: " + e.getMessage();
+                            }
+
+                            if (b != null) {
+                                mImageView = new ImageView(getContext());
+                                mImageView.setPadding(2, 2, 2, 2);
+                                mImageView.setAdjustViewBounds(true);
+                                mImageView.setImageBitmap(b);
+                                mImageView.setId(23423534);
+                            } else if (errorMsg == null) {
+                                // An error hasn't been logged and loading the image failed, so it's
+                                // likely
+                                // a bad file.
+                                errorMsg = getContext().getString(R.string.file_invalid, imageFile);
+
+                            }
+                        } else if (errorMsg == null) {
+                            // An error hasn't been logged. We should have an image, but the file
+                            // doesn't
+                            // exist.
+                            errorMsg = getContext().getString(R.string.file_missing, imageFile);
+                        }
+
+                        if (errorMsg != null) {
+                            // errorMsg is only set when an error has occured
+                            Log.e(t, errorMsg);
+                            mMissingImage = new TextView(getContext());
+                            mMissingImage.setText(errorMsg);
+
+                            mMissingImage.setPadding(2, 2, 2, 2);
+                            mMissingImage.setId(234873453);
+                        }
+                    } catch (InvalidReferenceException e) {
+                        Log.e(t, "image invalid reference exception");
+                        e.printStackTrace();
+                    }
+                } else {
+                    // There's no imageURI listed, so just ignore it.
+                }
+
+                // build text label. Don't assign the text to the built in label to he
+                // button because it aligns horizontally, and we want the label on top
+                TextView label = new TextView(getContext());
+                label.setText(prompt.getSelectChoiceText(mItems.get(i)));
+                label.setTextSize(TypedValue.COMPLEX_UNIT_DIP, TEXTSIZE);
+                if (!displayLabel) {
+                    label.setVisibility(View.GONE);
+                }
+
+                // answer layout holds the label text/image on top and the radio button on bottom
+                LinearLayout answer = new LinearLayout(getContext());
+                answer.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams params =
+                    new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT);
+                params.gravity = Gravity.TOP;
+                answer.setLayoutParams(params);
+
+                if (mImageView != null) {
+                    if (!displayLabel) {
+                        mImageView.setVisibility(View.GONE);
+                    }
+                    answer.addView(mImageView);
+                } else if (mMissingImage != null) {
+                    answer.addView(mMissingImage);
+                } else {
+                    if (displayLabel) {
+                        answer.addView(label);
+                    }
+
+                }
+                answer.addView(c);
+                answer.setPadding(4, 0, 4, 0);
+
+                // /Each button gets equal weight
+                LinearLayout.LayoutParams answerParams =
+                    new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,
+                            LayoutParams.WRAP_CONTENT);
+                answerParams.weight = 1;
+
+                buttonLayout.addView(answer, answerParams);
+
+            }
+        }
+
+        // Align the buttons so that they appear horizonally and are right justified
+        // buttonLayout.setGravity(Gravity.RIGHT);
+        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        // LinearLayout.LayoutParams params = new
+        // LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        // buttonLayout.setLayoutParams(params);
+
+        // The buttons take up the right half of the screen
+        LinearLayout.LayoutParams buttonParams =
+            new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+        buttonParams.weight = 1;
+
+        questionLayout.addView(buttonLayout, buttonParams);
+        addView(questionLayout);
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    public ListMultiWidget(Context context, FormEntryPrompt prompt, boolean displayLabel, final WidgetChangedListener wcl) {
+        super(context, prompt);
+
+        mItems = prompt.getSelectChoices();
+        mCheckboxes = new Vector<CheckBox>();
+        mPrompt = prompt;
+
+        this.displayLabel = displayLabel;
+
+        buttonLayout = new LinearLayout(context);
+
+        Vector<Selection> ve = new Vector<Selection>();
+        if (prompt.getAnswerValue() != null) {
+            ve = (Vector<Selection>) getCurrentAnswer().getValue();
+        }
+
+        if (prompt.getSelectChoices() != null) {
+            for (int i = 0; i < mItems.size(); i++) {
+                CheckBox c = new CheckBox(getContext());
+
+                // when clicked, check for readonly before toggling
+                c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (!mCheckboxInit && mPrompt.isReadOnly()) {
+                            if (buttonView.isChecked()) {
+                                buttonView.setChecked(false);
+                            } else {
+                                buttonView.setChecked(true);
+                            }
+                        }
+                        wcl.widgetEntryChanged();
                     }
                 });
 

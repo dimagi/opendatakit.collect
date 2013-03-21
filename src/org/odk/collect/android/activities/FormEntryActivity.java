@@ -16,6 +16,7 @@ package org.odk.collect.android.activities;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.listeners.FormSavedListener;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.logic.PropertyManager;
 import org.odk.collect.android.preferences.PreferencesActivity;
@@ -103,7 +105,7 @@ import android.widget.Toast;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class FormEntryActivity extends Activity implements AnimationListener, FormLoaderListener,
-        FormSavedListener, AdvanceToNextListener, OnGestureListener {
+        FormSavedListener, AdvanceToNextListener, OnGestureListener, WidgetChangedListener {
     private static final String t = "FormEntryActivity";
 
     // Defines for FormEntryActivity
@@ -584,6 +586,63 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
         }
     }
+    
+    public void updateFormRelevencies(){
+    	
+    	saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+    	
+    	if(!(mCurrentView instanceof ODKView)){
+    		throw new RuntimeException("Tried to update form relevency not on compound view");
+    	}
+    	
+    	ODKView oldODKV = (ODKView)mCurrentView;
+    	
+    	ODKView newODKV =
+                new ODKView(this, mFormController.getQuestionPrompts(),
+                        mFormController.getGroupsForCurrentIndex(),
+                        mFormController.getWidgetFactory());
+    	
+    	ArrayList<QuestionWidget> oldWidgets = oldODKV.getWidgets();
+    	ArrayList<QuestionWidget> newWidgets = newODKV.getWidgets();
+
+    	ArrayList<Integer> removeList = new ArrayList<Integer>();
+
+   		for(int i=0;i<oldWidgets.size();i++){
+    		QuestionWidget oldWidget = oldWidgets.get(i);
+    		boolean stillRelevent = false;
+
+    		for(int j=0;j<newWidgets.size();j++){
+    			QuestionWidget newWidget = newWidgets.get(j);
+    			if(oldWidget.getFormId().equals(newWidget.getFormId())){
+    				stillRelevent = true;
+    				break;
+    			}
+    		}
+    		if(!stillRelevent){
+    			removeList.add(Integer.valueOf(i));
+    		}
+    	}
+   		// remove "atomically" to not mess up iterations
+    	oldODKV.removeQuestionsFromIndex(removeList);
+    	
+    	for(int i=0; i<newWidgets.size();i++){
+    		QuestionWidget newWidget = newWidgets.get(i);
+    		boolean alreadyPresent = false;
+    		
+    		for(int j=0; j< oldWidgets.size(); j++){
+    			QuestionWidget oldWidget = oldWidgets.get(j);
+    			if(oldWidget.getFormId().equals(newWidget.getFormId())){
+    				alreadyPresent = true;
+    				break;
+    			}
+    		}
+    		if(!alreadyPresent){
+    			//need to add this widget; unclip from old ODKView and add to new
+    			newODKV.removeWidget(newWidget);	
+    			oldODKV.addQuestionToIndex(newWidget, i);
+    		}
+    	}
+    }
 
 
     /**
@@ -709,7 +768,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 	        	}
             } else {
             	Log.w(t, "Unknown view type rendered while current event was question or group! View type: " + mCurrentView == null ? "null" : mCurrentView.getClass().toString());
-            }
+            }	
         }
         return true;
     }
@@ -924,10 +983,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 ODKView odkv = null;
                 // should only be a group here if the event_group is a field-list
                 try {
+                	System.out.println("320 trying ODKVIEW creation");
                     odkv =
                         new ODKView(this, mFormController.getQuestionPrompts(),
                                 mFormController.getGroupsForCurrentIndex(),
-                                mFormController.getWidgetFactory());
+                                mFormController.getWidgetFactory(), this);
                     Log.i(t, "created view for group");
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), EXIT);
@@ -2008,5 +2068,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     public void advance() {
         next();
     }
+
+
+	@Override
+	public void widgetEntryChanged() {
+		updateFormRelevencies();
+	}
 
 }

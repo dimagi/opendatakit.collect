@@ -14,12 +14,15 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.views.MediaLayout;
 
 import android.content.Context;
@@ -29,8 +32,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.RadioButton;
-
-import java.util.Vector;
 
 /**
  * SelectOneWidgets handles select-one fields using radio buttons.
@@ -46,9 +47,67 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
     Vector<RadioButton> buttons;
     Vector<MediaLayout> layout;
 
-
     public SelectOneWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
+
+        mItems = prompt.getSelectChoices();
+        buttons = new Vector<RadioButton>();
+        layout = new Vector<MediaLayout>();
+
+        String s = null;
+        if (prompt.getAnswerValue() != null) {
+            s = prompt.getAnswerValue().uncast().getString();
+        }
+
+        if (prompt.getSelectChoices() != null) {
+            for (int i = 0; i < mItems.size(); i++) {
+                RadioButton r = new RadioButton(getContext());
+                r.setOnCheckedChangeListener(this);
+                r.setText(prompt.getSelectChoiceText(mItems.get(i)));
+                r.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+                r.setId(i + RANDOM_BUTTON_ID);
+                r.setEnabled(!prompt.isReadOnly());
+                r.setFocusable(!prompt.isReadOnly());
+
+                buttons.add(r);
+
+                if (mItems.get(i).getValue().equals(s)) {
+                    r.setChecked(true);
+                }
+
+                String audioURI = null;
+                audioURI =
+                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
+                        FormEntryCaption.TEXT_FORM_AUDIO);
+
+                String imageURI = null;
+                imageURI =
+                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
+                        FormEntryCaption.TEXT_FORM_IMAGE);
+
+                String videoURI = null;
+                videoURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "video");
+
+                String bigImageURI = null;
+                bigImageURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "big-image");
+
+                MediaLayout mediaLayout = new MediaLayout(getContext());
+                mediaLayout.setAVT(r, audioURI, imageURI, videoURI, bigImageURI);
+                addView(mediaLayout);
+                layout.add(mediaLayout);
+
+                // Last, add the dividing line (except for the last element)
+                ImageView divider = new ImageView(getContext());
+                divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
+                if (i != mItems.size() - 1) {
+                    mediaLayout.addDivider(divider);
+                }
+            }
+        }
+    }
+    
+    public SelectOneWidget(Context context, FormEntryPrompt prompt, WidgetChangedListener wcl) {
+        super(context, prompt, wcl);
 
         mItems = prompt.getSelectChoices();
         buttons = new Vector<RadioButton>();
@@ -155,12 +214,18 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
             // If it got unchecked, we don't care.
             return;
         }
+        
+        System.out.println("321 on checkedChanged");
 
         for (RadioButton button : this.buttons) {
             if (button.isChecked() && !(buttonView == button)) {
                 button.setChecked(false);
             }
         }
+        
+    	if(hasListener){
+    		widgetChangedListener.widgetEntryChanged();
+    	}
     }
 
 

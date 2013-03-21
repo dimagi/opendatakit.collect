@@ -10,6 +10,7 @@ import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
@@ -219,8 +220,10 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         addView(questionLayout);
 
     }
-
-
+    
+    public ListWidget(Context context, FormEntryPrompt prompt, boolean displayLabel, WidgetChangedListener wcl) {
+        super(context, prompt, wcl);
+    }
     @Override
     public void clearAnswer() {
         for (RadioButton button : this.buttons) {
@@ -274,6 +277,10 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
             if (button.isChecked() && !(buttonView == button)) {
                 button.setChecked(false);
             }
+        }
+        
+        if(hasListener){
+        	widgetChangedListener.widgetEntryChanged();
         }
     }
 
