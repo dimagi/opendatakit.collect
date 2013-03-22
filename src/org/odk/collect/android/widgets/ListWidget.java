@@ -279,9 +279,8 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
             }
         }
         
-        if(hasListener){
-        	widgetChangedListener.widgetEntryChanged();
-        }
+        widgetEntryChanged();
+        
     }
 
 

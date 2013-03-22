@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.content.Context;
 import android.text.InputFilter;
@@ -77,6 +78,11 @@ public class DecimalWidget extends StringWidget {
             setFocusable(false);
             setClickable(false);
         }
+    }
+    
+    public DecimalWidget(Context context, FormEntryPrompt prompt, boolean secret, WidgetChangedListener wcl){
+    	this(context, prompt, secret);
+    	setChangedListener(wcl);
     }
     
     @Override

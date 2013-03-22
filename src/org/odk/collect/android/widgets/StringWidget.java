@@ -20,7 +20,9 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.content.Context;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TextKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
@@ -28,6 +30,7 @@ import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -38,23 +41,23 @@ import android.widget.TableLayout;
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
-public class StringWidget extends QuestionWidget implements OnClickListener {
+public class StringWidget extends QuestionWidget implements OnClickListener, TextWatcher {
 
     boolean mReadOnly = false;
     protected EditText mAnswer;
     protected boolean secret = false;
-    Context cntx;
 
     public StringWidget(Context context, FormEntryPrompt prompt, boolean secret) {
         super(context, prompt);
-        cntx = context;
         mAnswer = new EditText(context);
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setImeOptions(0x10000000);
+        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         mAnswer.setOnClickListener(this);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
         mAnswer.setLayoutParams(params);
+        
+        mAnswer.addTextChangedListener(this);
         
         this.secret = secret;
         
@@ -91,48 +94,8 @@ public class StringWidget extends QuestionWidget implements OnClickListener {
     }
     
     public StringWidget(Context context, FormEntryPrompt prompt, boolean secret, WidgetChangedListener wcl) {
-        super(context, prompt, wcl);
-        cntx = context;
-        mAnswer = new EditText(context);
-        mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setImeOptions(0x10000000);
-        mAnswer.setOnClickListener(this);
-        TableLayout.LayoutParams params = new TableLayout.LayoutParams();
-        params.setMargins(7, 5, 7, 5);
-        mAnswer.setLayoutParams(params);
-        
-        this.secret = secret;
-        
-        if(!secret) {
-        	// capitalize the first letter of the sentence
-        	mAnswer.setKeyListener(new TextKeyListener(Capitalize.SENTENCES, false));
-        }
-        setTextInputType(mAnswer);
-
-        // needed to make long read only text scroll
-        mAnswer.setHorizontallyScrolling(false);
-        if(!secret) {
-        	mAnswer.setSingleLine(false);
-        }
-
-        if (prompt != null) {
-            mReadOnly = prompt.isReadOnly();
-            String s = prompt.getAnswerText();
-            if (s != null) {
-                mAnswer.setText(s);
-            }
-
-            if (mReadOnly) {
-                if (s == null) {
-                    mAnswer.setText("---");
-                }
-                mAnswer.setBackgroundDrawable(null);
-                mAnswer.setFocusable(false);
-                mAnswer.setClickable(false);
-            }
-        }
-
-        addView(mAnswer);
+        this(context,prompt,secret);
+        this.setChangedListener(wcl);
     }
     
     protected void setTextInputType(EditText mAnswer) {
@@ -181,7 +144,6 @@ public class StringWidget extends QuestionWidget implements OnClickListener {
         }
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.isAltPressed() == true) {
@@ -208,8 +170,27 @@ public class StringWidget extends QuestionWidget implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		setFocus(cntx);
-        mAnswer.setImeOptions(0x00000000);
+		//revert to default editor behavior
+		setFocus(getContext());
+        mAnswer.setImeOptions(EditorInfo.IME_ACTION_UNSPECIFIED);
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+		widgetEntryChanged();
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

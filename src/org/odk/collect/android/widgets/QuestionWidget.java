@@ -240,4 +240,10 @@ public abstract class QuestionWidget extends LinearLayout {
 		widgetChangedListener = wcl;
 		hasListener = true;
 	}
+	
+	public void widgetEntryChanged(){
+		if(hasListener){
+			widgetChangedListener.widgetEntryChanged();
+		}
+	}
 }

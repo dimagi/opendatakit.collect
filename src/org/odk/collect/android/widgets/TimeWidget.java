@@ -14,24 +14,26 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.Date;
+
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.joda.time.DateTime;
+import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.content.Context;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TimePicker;
-
-import java.util.Date;
+import android.widget.TimePicker.OnTimeChangedListener;
 
 /**
  * Displays a TimePicker widget.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  */
-public class TimeWidget extends QuestionWidget {
+public class TimeWidget extends QuestionWidget implements OnTimeChangedListener {
 
     private TimePicker mTimePicker;
 
@@ -43,6 +45,8 @@ public class TimeWidget extends QuestionWidget {
         mTimePicker.setFocusable(!prompt.isReadOnly());
         mTimePicker.setEnabled(!prompt.isReadOnly());
 
+        mTimePicker.setOnTimeChangedListener(this);
+        
         String clockType =
             android.provider.Settings.System.getString(context.getContentResolver(),
                 android.provider.Settings.System.TIME_12_24);
@@ -57,6 +61,12 @@ public class TimeWidget extends QuestionWidget {
         addView(mTimePicker);
 
     }
+    
+    public TimeWidget(Context context, final FormEntryPrompt prompt, WidgetChangedListener wcl) {
+        super(context, prompt);
+        this.setChangedListener(wcl);
+    }
+    
     
     public void setAnswer() {
         // If there's an answer, use it.
@@ -128,5 +138,10 @@ public class TimeWidget extends QuestionWidget {
         super.cancelLongPress();
         mTimePicker.cancelLongPress();
     }
+
+	@Override
+	public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+		this.widgetEntryChanged();
+	}
 
 }

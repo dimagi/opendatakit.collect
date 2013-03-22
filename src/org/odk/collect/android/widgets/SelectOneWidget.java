@@ -215,8 +215,6 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
             return;
         }
         
-        System.out.println("321 on checkedChanged");
-
         for (RadioButton button : this.buttons) {
             if (button.isChecked() && !(buttonView == button)) {
                 button.setChecked(false);

@@ -197,9 +197,8 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
             }
         }
         listener.advance();
-        if(hasListener){
-        	widgetChangedListener.widgetEntryChanged();
-        }
+
+        widgetEntryChanged();
     }
 
 

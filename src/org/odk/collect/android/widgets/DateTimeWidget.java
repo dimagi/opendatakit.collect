@@ -28,6 +28,7 @@ import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
+import android.widget.TimePicker.OnTimeChangedListener;
 
 /**
  * Displays a DatePicker widget. DateWidget handles leap years and does not allow dates that do not
@@ -36,7 +37,7 @@ import android.widget.TimePicker;
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
-public class DateTimeWidget extends QuestionWidget {
+public class DateTimeWidget extends QuestionWidget implements OnTimeChangedListener {
 
     private DatePicker mDatePicker;
     private TimePicker mTimePicker;
@@ -54,6 +55,7 @@ public class DateTimeWidget extends QuestionWidget {
         mTimePicker.setFocusable(!prompt.isReadOnly());
         mTimePicker.setEnabled(!prompt.isReadOnly());
         mTimePicker.setPadding(0, 20, 0, 0);
+        mTimePicker.setOnTimeChangedListener(this);
 
         String clockType =
             android.provider.Settings.System.getString(context.getContentResolver(),
@@ -84,6 +86,7 @@ public class DateTimeWidget extends QuestionWidget {
                         }
                     }
                 }
+                widgetEntryChanged();
             }
         };
 
@@ -179,5 +182,11 @@ public class DateTimeWidget extends QuestionWidget {
         mDatePicker.cancelLongPress();
         mTimePicker.cancelLongPress();
     }
+
+	@Override
+	public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+		widgetEntryChanged();
+		
+	}
 
 }

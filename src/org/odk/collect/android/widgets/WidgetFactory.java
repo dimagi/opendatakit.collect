@@ -217,17 +217,17 @@ public class WidgetFactory {
                     	if(appearance != null && appearance.toLowerCase().equals("ethiopian")){
                     		questionWidget = new EthiopianDateWidget(context, fep);
                     	} else {
-                    		questionWidget = new DateWidget(context, fep);
+                    		questionWidget = new DateWidget(context, fep, wcl);
                     	}
                         break;
                     case Constants.DATATYPE_TIME:
-                        questionWidget = new TimeWidget(context, fep);
+                        questionWidget = new TimeWidget(context, fep, wcl);
                         break;
                     case Constants.DATATYPE_LONG:
                     	questionWidget = new IntegerWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, 2, wcl);
                     	break;
                     case Constants.DATATYPE_DECIMAL:
-                        questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET);
+                        questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, wcl);
                         break;
                     case Constants.DATATYPE_INTEGER:
                         questionWidget = new IntegerWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET, 1, wcl);
