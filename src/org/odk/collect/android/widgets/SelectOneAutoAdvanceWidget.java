@@ -48,7 +48,6 @@ import android.widget.RelativeLayout;
  */
 public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnCheckedChangeListener {
 
-    private static final int RANDOM_BUTTON_ID = 4853487;
     Vector<SelectChoice> mItems;
 
     Vector<RadioButton> buttons;
@@ -56,6 +55,8 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
     Vector<RelativeLayout> parentLayout;
 
     AdvanceToNextListener listener;
+    
+    private int buttonIdBase;
 
 
     public SelectOneAutoAdvanceWidget(Context context, FormEntryPrompt prompt) {
@@ -73,6 +74,8 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
         if (prompt.getAnswerValue() != null) {
             s = ((Selection) prompt.getAnswerValue().getValue()).getValue();
         }
+        
+        buttonIdBase = prompt.getIndex().toString().hashCode();
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
@@ -88,7 +91,7 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
                 r.setOnCheckedChangeListener(this);
                 r.setText(prompt.getSelectChoiceText(mItems.get(i)));
                 r.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-                r.setId(i + RANDOM_BUTTON_ID);
+                r.setId(i + buttonIdBase);
                 r.setEnabled(!prompt.isReadOnly());
                 r.setFocusable(!prompt.isReadOnly());
 
@@ -156,7 +159,7 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
         if (i == -1) {
             return null;
         } else {
-            SelectChoice sc = mItems.elementAt(i - RANDOM_BUTTON_ID);
+            SelectChoice sc = mItems.elementAt(i - buttonIdBase);
             return new SelectOneData(new Selection(sc));
         }
     }

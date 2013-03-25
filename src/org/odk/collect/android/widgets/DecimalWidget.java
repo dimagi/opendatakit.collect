@@ -80,11 +80,6 @@ public class DecimalWidget extends StringWidget {
         }
     }
     
-    public DecimalWidget(Context context, FormEntryPrompt prompt, boolean secret, WidgetChangedListener wcl){
-    	this(context, prompt, secret);
-    	setChangedListener(wcl);
-    }
-    
     @Override
     protected void setTextInputType(EditText mAnswer) {
     	if(secret) {

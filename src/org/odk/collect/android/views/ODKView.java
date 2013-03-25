@@ -27,6 +27,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -190,6 +191,11 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
     
     public void removeQuestionsFromIndex(ArrayList<Integer> indexes){
+    	//Always gotta move backwards when removing, ensure that this list
+    	//goes backwards
+    	Collections.sort(indexes);
+    	Collections.reverse(indexes);
+    	
     	for(int i=0; i< indexes.size(); i++){
     		removeQuestionFromIndex(indexes.get(i).intValue());
     	}
@@ -216,6 +222,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         widgets.add(i, qw);
         mView.addView((View) qw, 2 * i + mViewBannerCount, mLayout);
     	
+        newQuestionWidget.setChangedListener(this);
     }
 
 

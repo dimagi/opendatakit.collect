@@ -87,11 +87,6 @@ public class IntegerWidget extends StringWidget {
         }
     }
     
-    public IntegerWidget(Context context, FormEntryPrompt prompt, boolean secret, int num_type, WidgetChangedListener wcl) {
-        this(context, prompt, secret, num_type);
-        setChangedListener(wcl);
-    }
-    
     @Override
     protected void setTextInputType(EditText mAnswer) {
     	if(secret) {

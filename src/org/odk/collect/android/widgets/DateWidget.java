@@ -82,12 +82,6 @@ public class DateWidget extends QuestionWidget {
         setGravity(Gravity.LEFT);
         addView(mDatePicker);
     }
-    
-    public DateWidget(Context context, FormEntryPrompt prompt, WidgetChangedListener wcl) {
-        super(context, prompt);
-        setChangedListener(wcl);
-    }
-
 
     private void setAnswer() {
         if (getCurrentAnswer() != null) {

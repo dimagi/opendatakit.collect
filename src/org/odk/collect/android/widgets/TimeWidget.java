@@ -62,12 +62,6 @@ public class TimeWidget extends QuestionWidget implements OnTimeChangedListener 
 
     }
     
-    public TimeWidget(Context context, final FormEntryPrompt prompt, WidgetChangedListener wcl) {
-        super(context, prompt);
-        this.setChangedListener(wcl);
-    }
-    
-    
     public void setAnswer() {
         // If there's an answer, use it.
         if (mPrompt.getAnswerValue() != null) {

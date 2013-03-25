@@ -93,11 +93,6 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         addView(mAnswer);
     }
     
-    public StringWidget(Context context, FormEntryPrompt prompt, boolean secret, WidgetChangedListener wcl) {
-        this(context,prompt,secret);
-        this.setChangedListener(wcl);
-    }
-    
     protected void setTextInputType(EditText mAnswer) {
     	if(secret) {
         	mAnswer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);

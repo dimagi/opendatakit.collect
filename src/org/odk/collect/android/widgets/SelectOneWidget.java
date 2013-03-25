@@ -41,8 +41,8 @@ import android.widget.RadioButton;
  */
 public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeListener {
 
-    private static final int RANDOM_BUTTON_ID = 4853487;
     Vector<SelectChoice> mItems;
+    int buttonIdBase;
 
     Vector<RadioButton> buttons;
     Vector<MediaLayout> layout;
@@ -58,6 +58,8 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
         if (prompt.getAnswerValue() != null) {
             s = prompt.getAnswerValue().uncast().getString();
         }
+        
+        buttonIdBase = prompt.getIndex().toString().hashCode();
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
@@ -65,7 +67,7 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
                 r.setOnCheckedChangeListener(this);
                 r.setText(prompt.getSelectChoiceText(mItems.get(i)));
                 r.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-                r.setId(i + RANDOM_BUTTON_ID);
+                r.setId(i + buttonIdBase);
                 r.setEnabled(!prompt.isReadOnly());
                 r.setFocusable(!prompt.isReadOnly());
 
@@ -105,66 +107,6 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
             }
         }
     }
-    
-    public SelectOneWidget(Context context, FormEntryPrompt prompt, WidgetChangedListener wcl) {
-        super(context, prompt, wcl);
-
-        mItems = prompt.getSelectChoices();
-        buttons = new Vector<RadioButton>();
-        layout = new Vector<MediaLayout>();
-
-        String s = null;
-        if (prompt.getAnswerValue() != null) {
-            s = prompt.getAnswerValue().uncast().getString();
-        }
-
-        if (prompt.getSelectChoices() != null) {
-            for (int i = 0; i < mItems.size(); i++) {
-                RadioButton r = new RadioButton(getContext());
-                r.setOnCheckedChangeListener(this);
-                r.setText(prompt.getSelectChoiceText(mItems.get(i)));
-                r.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-                r.setId(i + RANDOM_BUTTON_ID);
-                r.setEnabled(!prompt.isReadOnly());
-                r.setFocusable(!prompt.isReadOnly());
-
-                buttons.add(r);
-
-                if (mItems.get(i).getValue().equals(s)) {
-                    r.setChecked(true);
-                }
-
-                String audioURI = null;
-                audioURI =
-                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
-                        FormEntryCaption.TEXT_FORM_AUDIO);
-
-                String imageURI = null;
-                imageURI =
-                    prompt.getSpecialFormSelectChoiceText(mItems.get(i),
-                        FormEntryCaption.TEXT_FORM_IMAGE);
-
-                String videoURI = null;
-                videoURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "video");
-
-                String bigImageURI = null;
-                bigImageURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "big-image");
-
-                MediaLayout mediaLayout = new MediaLayout(getContext());
-                mediaLayout.setAVT(r, audioURI, imageURI, videoURI, bigImageURI);
-                addView(mediaLayout);
-                layout.add(mediaLayout);
-
-                // Last, add the dividing line (except for the last element)
-                ImageView divider = new ImageView(getContext());
-                divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
-                if (i != mItems.size() - 1) {
-                    mediaLayout.addDivider(divider);
-                }
-            }
-        }
-    }
-
 
     @Override
     public void clearAnswer() {
@@ -183,7 +125,7 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
         if (i == -1) {
             return null;
         } else {
-            SelectChoice sc = mItems.elementAt(i - RANDOM_BUTTON_ID);
+            SelectChoice sc = mItems.elementAt(i - buttonIdBase);
             return new SelectOneData(new Selection(sc));
         }
     }

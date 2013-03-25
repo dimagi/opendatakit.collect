@@ -211,26 +211,26 @@ public class WidgetFactory {
             case Constants.CONTROL_SECRET:
                 switch (fep.getDataType()) {
                     case Constants.DATATYPE_DATE_TIME:
-                        questionWidget = new DateTimeWidget(context, fep, wcl);
+                        questionWidget = new DateTimeWidget(context, fep);
                         break;
                     case Constants.DATATYPE_DATE:
                     	if(appearance != null && appearance.toLowerCase().equals("ethiopian")){
                     		questionWidget = new EthiopianDateWidget(context, fep);
                     	} else {
-                    		questionWidget = new DateWidget(context, fep, wcl);
+                    		questionWidget = new DateWidget(context, fep);
                     	}
                         break;
                     case Constants.DATATYPE_TIME:
-                        questionWidget = new TimeWidget(context, fep, wcl);
+                        questionWidget = new TimeWidget(context, fep);
                         break;
                     case Constants.DATATYPE_LONG:
-                    	questionWidget = new IntegerWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, 2, wcl);
+                    	questionWidget = new IntegerWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, 2);
                     	break;
                     case Constants.DATATYPE_DECIMAL:
-                        questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, wcl);
+                        questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
                     case Constants.DATATYPE_INTEGER:
-                        questionWidget = new IntegerWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET, 1, wcl);
+                        questionWidget = new IntegerWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET, 1);
                         break;
                     case Constants.DATATYPE_GEOPOINT:
                         questionWidget = new GeoPointWidget(context, fep);
@@ -242,11 +242,11 @@ public class WidgetFactory {
                         if (appearance != null && (appearance.equalsIgnoreCase("numbers") || appearance.equalsIgnoreCase("numeric"))) {
                             questionWidget = new StringNumberWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         } else {
-                            questionWidget = new StringWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET, wcl);
+                            questionWidget = new StringWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         }
                         break;
                     default:
-                        questionWidget = new StringWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET, wcl);
+                        questionWidget = new StringWidget(context, fep,  fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
                 }
                 break;
@@ -271,9 +271,9 @@ public class WidgetFactory {
                     }
 
                     if (appearance.contains("quick")) {
-                        questionWidget = new GridWidget(context, fep, numColumns, true, wcl);
+                        questionWidget = new GridWidget(context, fep, numColumns, true);
                     } else {
-                        questionWidget = new GridWidget(context, fep, numColumns, false, wcl);
+                        questionWidget = new GridWidget(context, fep, numColumns, false);
                     }
                 } else if (appearance != null && appearance.equals("minimal")) {
                     questionWidget = new SpinnerWidget(context, fep);
@@ -290,15 +290,15 @@ public class WidgetFactory {
                 //
                 // }
                 else if (appearance != null && appearance.equals("quick")) {
-                    questionWidget = new SelectOneAutoAdvanceWidget(context, fep, wcl);
+                    questionWidget = new SelectOneAutoAdvanceWidget(context, fep);
                 } else if (appearance != null && appearance.equals("list")) {
-                    questionWidget = new ListWidget(context, fep, true, wcl);
+                    questionWidget = new ListWidget(context, fep, true);
                 } else if (appearance != null && appearance.equals("list-nolabel")) {
-                    questionWidget = new ListWidget(context, fep, false, wcl);
+                    questionWidget = new ListWidget(context, fep, false);
                 } else if (appearance != null && appearance.equals("label")) {
                     questionWidget = new LabelWidget(context, fep);
                 } else {
-                    questionWidget = new SelectOneWidget(context, fep, wcl);
+                    questionWidget = new SelectOneWidget(context, fep);
                 }
                 break;
             case Constants.CONTROL_SELECT_MULTI:
@@ -314,17 +314,17 @@ public class WidgetFactory {
                         Log.e("WidgetFactory", "Exception parsing numColumns");
                     }
 
-                    questionWidget = new GridMultiWidget(context, fep, numColumns, wcl);
+                    questionWidget = new GridMultiWidget(context, fep, numColumns);
                 } else if (appearance != null && appearance.equals("minimal")) {
-                    questionWidget = new SpinnerMultiWidget(context, fep, wcl);
+                    questionWidget = new SpinnerMultiWidget(context, fep);
                 } else if (appearance != null && appearance.equals("list")) {
-                    questionWidget = new ListMultiWidget(context, fep, true, wcl);
+                    questionWidget = new ListMultiWidget(context, fep, true);
                 } else if (appearance != null && appearance.equals("list-nolabel")) {
-                    questionWidget = new ListMultiWidget(context, fep, false, wcl);
+                    questionWidget = new ListMultiWidget(context, fep, false);
                 } else if (appearance != null && appearance.equals("label")) {
                     questionWidget = new LabelWidget(context, fep);
                 } else {
-                    questionWidget = new SelectMultiWidget(context, fep, wcl);
+                    questionWidget = new SelectMultiWidget(context, fep);
                 }
                 break;
             case Constants.CONTROL_TRIGGER:
@@ -332,8 +332,13 @@ public class WidgetFactory {
                 questionWidget = new TriggerWidget(context, fep, mInteractive);
                 break;
             default:
-                questionWidget = new StringWidget(context, fep, false, wcl);
+                questionWidget = new StringWidget(context, fep, false);
                 break;
+        }
+        
+        if(questionWidget !=null && wcl != null) { 
+        	//this check is super silly
+        	questionWidget.setChangedListener(wcl);
         }
         return questionWidget;
     }

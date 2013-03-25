@@ -204,12 +204,6 @@ public class GridMultiWidget extends QuestionWidget {
 
         addView(gridview);
     }
-    
-    @SuppressWarnings("unchecked")
-    public GridMultiWidget(Context context, FormEntryPrompt prompt, int numColumns, final WidgetChangedListener wcl) {
-        super(context, prompt);
-        setChangedListener(wcl);
-    }
 
     @Override
     public IAnswerData getAnswer() {

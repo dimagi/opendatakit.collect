@@ -159,13 +159,6 @@ public class SpinnerMultiWidget extends QuestionWidget {
 
     }
     
-    @SuppressWarnings("unchecked")
-    public SpinnerMultiWidget(final Context context, FormEntryPrompt prompt, final WidgetChangedListener wcl) {
-        super(context, prompt);
-        setChangedListener(wcl);
-    }
-
-
     @Override
     public IAnswerData getAnswer() {
         Vector<Selection> vc = new Vector<Selection>();

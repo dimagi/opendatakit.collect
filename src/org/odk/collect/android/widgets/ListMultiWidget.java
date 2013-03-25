@@ -247,12 +247,6 @@ public class ListMultiWidget extends QuestionWidget {
 
     }
     
-    @SuppressWarnings("unchecked")
-    public ListMultiWidget(Context context, FormEntryPrompt prompt, boolean displayLabel, final WidgetChangedListener wcl) {
-        super(context, prompt);
-        this.setChangedListener(wcl);
-    }
-
     @Override
     public void clearAnswer() {
         int j = mItems.size();
