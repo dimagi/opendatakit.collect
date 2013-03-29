@@ -18,6 +18,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
+import org.odk.collect.android.utilities.StringUtils;
 
 import android.content.Context;
 import android.util.TypedValue;
@@ -56,7 +57,7 @@ public class TriggerWidget extends QuestionWidget {
         this.setOrientation(LinearLayout.VERTICAL);
 
         mTriggerButton = new CheckBox(getContext());
-        mTriggerButton.setText(getContext().getString(R.string.trigger));
+        mTriggerButton.setText(StringUtils.getStringRobust(getContext(), R.string.trigger));
         mTriggerButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         // mActionButton.setPadding(20, 20, 20, 20);
         mTriggerButton.setEnabled(!prompt.isReadOnly());

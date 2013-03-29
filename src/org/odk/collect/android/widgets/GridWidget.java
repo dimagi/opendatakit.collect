@@ -16,6 +16,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.StringUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -436,11 +437,11 @@ public class GridWidget extends QuestionWidget {
 
                         } else {
                             // Loading the image failed, so it's likely a bad file.
-                            errorMsg = getContext().getString(R.string.file_invalid, imageFile);
+                            errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_invalid, imageFile.toString());
                         }
                     } else {
                         // We should have an image, but the file doesn't exist.
-                        errorMsg = getContext().getString(R.string.file_missing, imageFile);
+                        errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_missing, imageFile.toString());
                     }
 
                     if (errorMsg != null) {
