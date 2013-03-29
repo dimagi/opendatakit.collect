@@ -1,6 +1,9 @@
 
 package org.odk.collect.android.widgets;
 
+import java.io.File;
+import java.util.Vector;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.reference.InvalidReferenceException;
@@ -9,6 +12,7 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.StringUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,9 +26,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.io.File;
-import java.util.Vector;
 
 /**
  * The Label Widget does not return an answer. The purpose of this widget is to be the top entry in
@@ -101,14 +102,14 @@ public class LabelWidget extends QuestionWidget {
                                 // An error hasn't been logged and loading the image failed, so it's
                                 // likely
                                 // a bad file.
-                                errorMsg = getContext().getString(R.string.file_invalid, imageFile);
+                                errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_invalid, imageFile.toString());
 
                             }
                         } else if (errorMsg == null) {
                             // An error hasn't been logged. We should have an image, but the file
                             // doesn't
                             // exist.
-                            errorMsg = getContext().getString(R.string.file_missing, imageFile);
+                            errorMsg = StringUtils.getStringRobust(getContext(), R.string.file_missing, imageFile.toString());
                         }
 
                         if (errorMsg != null) {
