@@ -71,6 +71,7 @@ public class DateWidget extends QuestionWidget {
                     }
                 }
                 
+                //TODO: Not here, the change isn't processed yet.
                 widgetEntryChanged();
                 
             }

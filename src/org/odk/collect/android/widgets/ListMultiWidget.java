@@ -44,8 +44,8 @@ import android.widget.TextView;
  * @author Jeff Beorse (jeff@beorse.net)
  */
 public class ListMultiWidget extends QuestionWidget {
+	int buttonIdBase;
     private final static int CHECKBOX_ID = 100;
-    private static final int RANDOM_BUTTON_ID = 4853487;
     protected final static int TEXTSIZE = 21;
     private static final String t = "ListMultiWidget";
 
@@ -82,6 +82,10 @@ public class ListMultiWidget extends QuestionWidget {
         if (prompt.getAnswerValue() != null) {
             ve = (Vector<Selection>) getCurrentAnswer().getValue();
         }
+        
+        //Is this safe enough from collisions?
+        buttonIdBase = Math.abs(prompt.getIndex().toString().hashCode());
+
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
@@ -298,7 +302,7 @@ public class ListMultiWidget extends QuestionWidget {
         questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, TEXTSIZE);
         questionText.setTypeface(null, Typeface.BOLD);
         questionText.setPadding(0, 0, 0, 7);
-        questionText.setId(RANDOM_BUTTON_ID); // assign random id
+        questionText.setId(buttonIdBase); // assign random id
 
         // Wrap to the size of the parent view
         questionText.setHorizontallyScrolling(false);

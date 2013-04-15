@@ -61,7 +61,8 @@ public class SelectMultiWidget extends QuestionWidget {
             ve = (Vector<Selection>) getCurrentAnswer().getValue();
         }
         
-        buttonIdBase = prompt.getIndex().toString().hashCode();
+        //Is this safe enough from collisions?
+        buttonIdBase = Math.abs(prompt.getIndex().toString().hashCode());
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
