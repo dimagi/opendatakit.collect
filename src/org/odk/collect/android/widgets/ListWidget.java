@@ -45,7 +45,7 @@ import android.widget.TextView;
  * @author Jeff Beorse (jeff@beorse.net)
  */
 public class ListWidget extends QuestionWidget implements OnCheckedChangeListener {
-    private static final int RANDOM_BUTTON_ID = 4853487;
+	int buttonIdBase;
     protected final static int TEXTSIZE = 21;
     private static final String t = "ListWidget";
 
@@ -76,13 +76,16 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         if (getCurrentAnswer() != null) {
             s = ((Selection) getCurrentAnswer().getValue()).getValue();
         }
+        
+        //Is this safe enough from collisions?
+        buttonIdBase = Math.abs(prompt.getIndex().toString().hashCode());
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
                 RadioButton r = new RadioButton(getContext());
 
                 r.setOnCheckedChangeListener(this);
-                r.setId(i + RANDOM_BUTTON_ID);
+                r.setId(i + buttonIdBase);
                 r.setEnabled(!prompt.isReadOnly());
                 r.setFocusable(!prompt.isReadOnly());
 
@@ -242,7 +245,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         if (i == -1) {
             return null;
         } else {
-            SelectChoice sc = mItems.elementAt(i - RANDOM_BUTTON_ID);
+            SelectChoice sc = mItems.elementAt(i - buttonIdBase);
             return new SelectOneData(new Selection(sc));
         }
     }
@@ -295,7 +298,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, TEXTSIZE);
         questionText.setTypeface(null, Typeface.BOLD);
         questionText.setPadding(0, 0, 0, 7);
-        questionText.setId(RANDOM_BUTTON_ID); // assign random id
+        questionText.setId(buttonIdBase); // assign random id
 
         // Wrap to the size of the parent view
         questionText.setHorizontallyScrolling(false);

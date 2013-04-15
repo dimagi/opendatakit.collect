@@ -169,7 +169,11 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             widgets.add(qw);
             mView.addView((View) qw, mLayout);
             
-            qw.setChangedListener(this);
+            //Only listen for changes in compound mode, 
+            //otherwise we're needlessly processing stuff
+            if(inCompoundMode) {
+            	qw.setChangedListener(this);
+            }
 
 
         }

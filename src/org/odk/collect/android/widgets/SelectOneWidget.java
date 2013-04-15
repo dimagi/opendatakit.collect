@@ -59,7 +59,8 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
             s = prompt.getAnswerValue().uncast().getString();
         }
         
-        buttonIdBase = prompt.getIndex().toString().hashCode();
+        //Is this safe enough from collisions?
+        buttonIdBase = Math.abs(prompt.getIndex().toString().hashCode());
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
