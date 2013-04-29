@@ -905,8 +905,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     R.string.save_enter_data_description, mFormController.getFormTitle()));
 
                 // checkbox for if finished or ready to send
-                final CheckBox instanceComplete =
-                    ((CheckBox) endView.findViewById(R.id.mark_finished));
+                final CheckBox instanceComplete = ((CheckBox) endView.findViewById(R.id.mark_finished));
+                instanceComplete.setText(StringUtils.getStringRobust(this, R.string.mark_finished));
                 instanceComplete.setChecked(mFormManagementEnabled || isInstanceComplete(true));
                 
                 if(mFormController.isFormReadOnly() || !mFormManagementEnabled) {
@@ -962,6 +962,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     });
 
                 } else {
+                	button.setText(StringUtils.getStringRobust(this, R.string.quit_entry));
                     button.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
