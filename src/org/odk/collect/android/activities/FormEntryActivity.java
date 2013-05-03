@@ -31,6 +31,7 @@ import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.jr.extensions.IntentCallout;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.listeners.FormSavedListener;
@@ -48,6 +49,8 @@ import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ODKView;
 import org.odk.collect.android.widgets.DateTimeWidget;
+import org.odk.collect.android.widgets.IBinaryWidget;
+import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
@@ -131,8 +134,6 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
     
-    // Generic Extra from intent callout extensions
-    public static final String INTENT_RESULT = "odk_intent_data";
 
     // Identifies the gp of the form used to launch form entry
     public static final String KEY_FORMPATH = "formpath";
@@ -467,9 +468,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
                 break;
             case INTENT_CALLOUT:
-                String result = intent.getStringExtra(INTENT_RESULT);
-                ((ODKView) mCurrentView).setBinaryData(result);
-                saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+            	processIntentResponse(intent);
                 break;
             case IMAGE_CAPTURE:
                 /*
@@ -588,7 +587,32 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
     }
     
-    public void updateFormRelevencies(){
+    private void processIntentResponse(Intent response) {
+    	//We need to go grab our intent callout object to process the results here
+        
+        //Ugh, copied from the odkview mostly, that's stupid
+    	for(QuestionWidget q : ((ODKView)mCurrentView).getWidgets()) {
+    		//Figure out if we have a pending intent widget
+            if (q instanceof IntentWidget) {
+                if (((IBinaryWidget) q).isWaitingForBinaryData()) {
+                	//Set our instance destination for binary data if needed
+                	String destination = mInstancePath.substring(0, mInstancePath.lastIndexOf("/") + 1);
+                	
+                	//get the original intent callout
+                	IntentCallout ic = ((IntentWidget)q).getIntentCallout();
+                	
+                	//And process it 
+                	ic.processResponse(response, (ODKView)mCurrentView, mFormController.getInstance(), new File(destination));
+                    break;
+                }
+            }
+    	}
+        
+        saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+	}
+
+
+	public void updateFormRelevencies(){
     	
     	saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
     	

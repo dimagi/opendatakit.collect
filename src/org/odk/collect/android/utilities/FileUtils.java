@@ -214,8 +214,20 @@ public class FileUtils {
     }
 
 
+    /**
+     * Copies from sourceFile to destFile (either a directory, or a path
+     * to the new file) 
+     * 
+     * @param sourceFile A file pointer to a file on the file system
+     * @param destFile Either a file or directory. If a directory, the
+     * file name will be taken from the source file 
+     */
     public static void copyFile(File sourceFile, File destFile) {
         if (sourceFile.exists()) {
+        	if(destFile.isDirectory()) {
+        		destFile = new File(destFile, sourceFile.getName());
+        	}
+        	
             FileChannel src;
             try {
                 src = new FileInputStream(sourceFile).getChannel();

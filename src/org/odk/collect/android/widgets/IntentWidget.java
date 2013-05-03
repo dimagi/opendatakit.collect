@@ -17,7 +17,6 @@ package org.odk.collect.android.widgets;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.jr.extensions.IntentCallout;
 
@@ -45,11 +44,13 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     private TextView mStringAnswer;
     private boolean mWaitingForData;
     private Intent intent;
+    private IntentCallout ic;
 
 
-    public IntentWidget(Context context, FormEntryPrompt prompt, Intent in) {
+    public IntentWidget(Context context, FormEntryPrompt prompt, Intent in, IntentCallout ic) {
         super(context, prompt);
         this.intent = in;
+        this.ic = ic;
         
         mWaitingForData = false;
         setOrientation(LinearLayout.VERTICAL);
@@ -74,9 +75,8 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
                 	//Set Data
                 	String data = mStringAnswer.getText().toString();
                 	if(data != null && data != "") {
-                		intent.putExtra(FormEntryActivity.INTENT_RESULT, data);
+                		intent.putExtra(IntentCallout.INTENT_RESULT_VALUE, data);
                 	}
-                	
                 	
                     ((Activity) getContext()).startActivityForResult(intent,
                         FormEntryActivity.INTENT_CALLOUT);
@@ -161,5 +161,11 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
         mGetBarcodeButton.cancelLongPress();
         mStringAnswer.cancelLongPress();
     }
-
+    
+    public IntentCallout getIntentCallout() {
+    	//TODO: This is really not great, but the alternative
+    	//is doubling up all of this code in the ODKView, which
+    	//is silly. It's not generalizable
+    	return ic;
+    }
 }

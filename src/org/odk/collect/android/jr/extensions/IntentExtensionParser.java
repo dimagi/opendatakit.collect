@@ -17,6 +17,9 @@ import org.kxml2.kdom.Element;
  *
  */
 public class IntentExtensionParser implements IElementHandler {
+	
+	private static String RESPONSE = "response";
+	private static String EXTRA = "extra";
 
 	@Override
 	public void handle(XFormParser p, Element e, Object parent) {
@@ -29,16 +32,25 @@ public class IntentExtensionParser implements IElementHandler {
 		String className = e.getAttributeValue(null, "class");
 		
 		Hashtable<String, TreeReference> extras = new Hashtable<String, TreeReference>();
+		Hashtable<String, TreeReference> response = new Hashtable<String, TreeReference>();
+
 		for(int i = 0; i < e.getChildCount(); ++i) {
 			if(e.getType(i) == Element.ELEMENT) {
 				Element child = (Element)e.getChild(i);
-				String key = child.getAttributeValue(null, "key");
-				String ref = child.getAttributeValue(null, "ref");
-				extras.put(key, (TreeReference)new XPathReference(ref).getReference());
+				if(child.getName().equals(EXTRA)) {
+					String key = child.getAttributeValue(null, "key");
+					String ref = child.getAttributeValue(null, "ref");
+					extras.put(key, (TreeReference)new XPathReference(ref).getReference());
+				} else if(child.getName().equals(RESPONSE)) {
+					String key = child.getAttributeValue(null, "key");
+					String ref = child.getAttributeValue(null, "ref");
+					response.put(key, (TreeReference)new XPathReference(ref).getReference());
+
+				}
 			}
 		}
 		
-		form.getExtension(AndroidXFormExtensions.class).registerIntent(id, new IntentCallout(className, extras));
+		form.getExtension(AndroidXFormExtensions.class).registerIntent(id, new IntentCallout(className, extras, response));
 	}
 
 }
