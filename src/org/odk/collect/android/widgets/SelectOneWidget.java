@@ -45,14 +45,12 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
     int buttonIdBase;
 
     Vector<RadioButton> buttons;
-    Vector<MediaLayout> layout;
 
     public SelectOneWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
         mItems = prompt.getSelectChoices();
         buttons = new Vector<RadioButton>();
-        layout = new Vector<MediaLayout>();
 
         String s = null;
         if (prompt.getAnswerValue() != null) {
@@ -97,13 +95,12 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
                 MediaLayout mediaLayout = new MediaLayout(getContext());
                 mediaLayout.setAVT(r, audioURI, imageURI, videoURI, bigImageURI);
                 addView(mediaLayout);
-                layout.add(mediaLayout);
 
                 // Last, add the dividing line (except for the last element)
                 ImageView divider = new ImageView(getContext());
                 divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
                 if (i != mItems.size() - 1) {
-                    mediaLayout.addDivider(divider);
+                    addView(divider);
                 }
             }
         }
