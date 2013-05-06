@@ -71,20 +71,18 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl) {
         this(context, new FormEntryPrompt[] {
             questionPrompt
-        }, groups, factory, wcl);
+        }, groups, factory, wcl, false);
     }
     
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory) {
-    	this(context, questionPrompts, groups, factory, null);
+    	this(context, questionPrompts, groups, factory, null, false);
     }
 
 
-    public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl) {
+    public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl, boolean isGroup) {
         super(context);
         
-        if(questionPrompts.length > 1){
-        	inCompoundMode = true;
-        }
+        inCompoundMode = isGroup;
         
         if(wcl !=null){
         	hasListener = true;
