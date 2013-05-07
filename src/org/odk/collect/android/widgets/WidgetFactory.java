@@ -51,7 +51,7 @@ public class WidgetFactory {
             case Constants.CONTROL_INPUT:
             	if(appearance != null && appearance.startsWith("intent:")) {
             		String intentId = appearance.substring("intent:".length());
-            		IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId);
+            		IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId, form);
             		//Hm, so what do we do if no callout is found? Error? For now, fail fast
             		if(ic == null) {
             			throw new RuntimeException("No intent callout could be found for requested id " + intentId + "!");

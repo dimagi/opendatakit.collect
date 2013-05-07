@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.XFormExtension;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -29,8 +30,13 @@ public class AndroidXFormExtensions implements XFormExtension {
 		intents.put(id, callout);
 	}
 	
-	public IntentCallout getIntent(String id) {
-		return intents.get(id);
+	public IntentCallout getIntent(String id, FormDef form) {
+		IntentCallout callout = intents.get(id);
+		if(callout == null) {
+			throw new IllegalArgumentException("No registered intent callout for id : " + id);
+		}
+		callout.attachToForm(form);
+		return callout;
 	}
 
 	@Override

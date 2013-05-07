@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.data.AnswerDataFactory;
@@ -42,6 +43,8 @@ public class IntentCallout implements Externalizable {
 	
 	private Hashtable<String, TreeReference> responses;
 	
+	private FormDef form;
+	
     // Generic Extra from intent callout extensions
     public static final String INTENT_RESULT_VALUE = "odk_intent_data";
     
@@ -57,6 +60,10 @@ public class IntentCallout implements Externalizable {
 		this.className = className;
 		this.refs = refs;
 		this.responses = responses;
+	}
+	
+	protected void attachToForm(FormDef form) {
+		this.form = form;
 	}
 	
 	public Intent generate(EvaluationContext ec) {
@@ -85,13 +92,14 @@ public class IntentCallout implements Externalizable {
 			
 			//Get our response value
 			String responseValue = response.getString(key);
+			if(key == null) { key = "";}
 			
 			//Figure out where it's going
 			TreeReference ref = responses.get(key);
 			
-			//TODO: We were going to handle this with the formDef, but that's obfuscated away.
-			//This means that we can't handle multiple or abstract instances
-			TreeElement node = instance.resolveReference(ref);
+			EvaluationContext context = new EvaluationContext(form.getEvaluationContext(), ref);
+
+			AbstractTreeElement node = context.resolveReference(ref);
 			
 			if(node == null) {
 				//continue?
@@ -106,7 +114,7 @@ public class IntentCallout implements Externalizable {
 				//We need to copy the binary data at this address into the appropriate location
 				if(responseValue == null || responseValue.equals("")) {
 					//If the response was blank, wipe out any data that was present before
-					node.setValue(null);
+					form.setValue(null, ref);
 					continue;
 				}
 				
@@ -116,7 +124,7 @@ public class IntentCallout implements Externalizable {
 					//TODO: How hard should we be failing here?
 					Log.w("FormEntryActivity-Callout", "ODK received a link to a file at " + src.toString() + " to be included in the form, but it was not present on the phone!");
 					//Wipe out any reference that exists
-					node.setValue(null);
+					form.setValue(null, ref);
 					continue;
 				}
         		
@@ -127,19 +135,19 @@ public class IntentCallout implements Externalizable {
 				
 				//That code throws no errors, so we have to manually check whether the copy worked.
 				if(newFile.exists() && newFile.length() == src.length()) {
-					node.setValue(new StringData(newFile.toString()));
+					form.setValue(new StringData(newFile.toString()), ref);
 					continue;
 				} else {
 					Log.e("FormEntryActivity-Callout", "ODK Failed to property write a file to " + newFile.toString());
-					node.setValue(null);
+					form.setValue(null, ref);
 					continue;	
 				}
 			}
 			
 			//otherwise, just load it up
-			IAnswerData val = Recalculate.wrapData(result, dataType);
+			IAnswerData val = Recalculate.wrapData(responseValue, dataType);
 			
-			node.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()));
+			form.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), ref);
 		}
 	}
 
