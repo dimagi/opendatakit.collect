@@ -1547,7 +1547,6 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     case DialogInterface.BUTTON1: // yes
                         clearAnswer(qw);
                         saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
-                        updateFormRelevencies();
                         break;
                     case DialogInterface.BUTTON2: // no
                         break;
