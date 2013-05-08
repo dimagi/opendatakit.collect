@@ -14,13 +14,15 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.condition.pivot.StringLengthRangeHint;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.listeners.WidgetChangedListener;
 
 import android.content.Context;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
@@ -58,6 +60,26 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         mAnswer.setLayoutParams(params);
         
         mAnswer.addTextChangedListener(this);
+        
+        //Let's see if we can figure out a constraint for this string
+        try {
+        	StringLengthRangeHint hint = new StringLengthRangeHint();
+			prompt.requestConstraintHint(hint);
+			if(hint.getMax() != null) {
+				//We can!
+				int length  = ((String)hint.getMax().getValue()).length();
+				
+				//Let's add a filter
+				InputFilter[] currentFilters = mAnswer.getFilters();
+				InputFilter[] newFilters = new InputFilter[currentFilters.length + 1];
+				System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
+				newFilters[currentFilters.length] = new InputFilter.LengthFilter(length);
+				
+				mAnswer.setFilters(newFilters);
+			}
+		} catch (UnpivotableExpressionException e) {
+			//expected if there isn't a constraint that does this
+		}
         
         this.secret = secret;
         
