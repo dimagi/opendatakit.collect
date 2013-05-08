@@ -14,6 +14,9 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.condition.pivot.IntegerRangeHint;
+import org.javarosa.core.model.condition.pivot.StringLengthRangeHint;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -35,6 +38,7 @@ import android.widget.EditText;
  */
 public class IntegerWidget extends StringWidget {
 	
+	//1 for int. 0 for long?
 	int number_type;
 
     public IntegerWidget(Context context, FormEntryPrompt prompt, boolean secret, int num_type) {
@@ -53,18 +57,9 @@ public class IntegerWidget extends StringWidget {
         // only allows numbers and no periods
         mAnswer.setKeyListener(new DigitsKeyListener(true, false));
 
-        // ints can only hold 2,147,483,648. we allow 999,999,999
-        InputFilter[] fa = new InputFilter[1];
-        if(number_type==1){
-        	fa[0] = new InputFilter.LengthFilter(9);
-        }
-        else{
-        	fa[0] = new InputFilter.LengthFilter(15);
-        }
         
+        //We might have 
         
-        mAnswer.setFilters(fa);
-
         if (prompt.isReadOnly()) {
             setBackgroundDrawable(null);
             setFocusable(false);
@@ -84,6 +79,50 @@ public class IntegerWidget extends StringWidget {
                     mAnswer.setText(i.toString());
                 }
         	}
+        }
+    }
+    
+    
+    @Override
+    protected int guessMaxStringLength(FormEntryPrompt prompt) throws UnpivotableExpressionException{
+    	int existingGuess = Integer.MAX_VALUE;
+    	try {
+    		existingGuess = super.guessMaxStringLength(prompt);
+    	} catch (UnpivotableExpressionException e) {
+    		
+    	}
+    	try {
+			//Awful. Need factory for this
+			IntegerRangeHint hint = new IntegerRangeHint();
+			prompt.requestConstraintHint(hint);
+			
+			IntegerData maxexample = hint.getMax();
+			IntegerData minexample = hint.getMin();
+			
+			if(minexample != null) {
+				//If we didn't constrain the input to be 0 or more, don't bother
+				if(((Integer)minexample.getValue()).intValue() < 0) {
+					throw new UnpivotableExpressionException(); 
+				}
+			} else {
+				//could be negative. Not worth it
+				throw new UnpivotableExpressionException();
+			}
+			
+			if(maxexample != null) {
+				int max = ((Integer)maxexample.getValue()).intValue();
+				if(!hint.isMaxInclusive()) {
+					max -= 1;
+				}
+				return Math.min(existingGuess, String.valueOf(max).length());
+			}					
+		} catch(Exception e) {
+
+		}
+        if(number_type==1){
+        	return Math.min(existingGuess, 9);
+        } else {
+        	return Math.min(existingGuess, 15);
         }
     }
     

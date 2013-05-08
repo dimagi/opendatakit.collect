@@ -23,6 +23,7 @@ import org.javarosa.form.api.FormEntryPrompt;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputFilter.LengthFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
@@ -63,23 +64,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         
         //Let's see if we can figure out a constraint for this string
         try {
-        	StringLengthRangeHint hint = new StringLengthRangeHint();
-			prompt.requestConstraintHint(hint);
-			if(hint.getMax() != null) {
-				//We can!
-				int length  = ((String)hint.getMax().getValue()).length();
-				if(!hint.isMaxInclusive()) {
-					length -= 1;
-				}
-				
-				//Let's add a filter
-				InputFilter[] currentFilters = mAnswer.getFilters();
-				InputFilter[] newFilters = new InputFilter[currentFilters.length + 1];
-				System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
-				newFilters[currentFilters.length] = new InputFilter.LengthFilter(length);
-				
-				mAnswer.setFilters(newFilters);
-			}
+        	addAnswerFilter(new InputFilter.LengthFilter(guessMaxStringLength(prompt)));
 		} catch (UnpivotableExpressionException e) {
 			//expected if there isn't a constraint that does this
 		}
@@ -118,7 +103,40 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         addView(mAnswer);
     }
     
-    protected void setTextInputType(EditText mAnswer) {
+    /**
+     * Guess the max string length based on the datatypes.
+     * 
+     * @param prompt
+     * @return
+     * @throws UnpivotableExpressionException
+     */
+    protected int guessMaxStringLength(FormEntryPrompt prompt) throws UnpivotableExpressionException{
+    	StringLengthRangeHint hint = new StringLengthRangeHint();
+		prompt.requestConstraintHint(hint);
+		if(hint.getMax() != null) {
+			//We can!
+			int length  = ((String)hint.getMax().getValue()).length();
+			if(!hint.isMaxInclusive()) {
+				length -= 1;
+			}
+			
+			return length;
+		}
+		throw new UnpivotableExpressionException();
+    }
+    
+    
+    protected void addAnswerFilter(LengthFilter lengthFilter) {
+		//Let's add a filter
+		InputFilter[] currentFilters = mAnswer.getFilters();
+		InputFilter[] newFilters = new InputFilter[currentFilters.length + 1];
+		System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
+		newFilters[currentFilters.length] = lengthFilter;
+		
+		mAnswer.setFilters(newFilters);
+	}
+
+	protected void setTextInputType(EditText mAnswer) {
     	if(secret) {
         	mAnswer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
