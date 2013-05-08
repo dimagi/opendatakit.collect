@@ -67,7 +67,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
 			prompt.requestConstraintHint(hint);
 			if(hint.getMax() != null) {
 				//We can!
-				int length  = ((String)hint.getMax().getValue()).length();
+				int length  = ((String)hint.getMax().getValue()).length() -1;
 				
 				//Let's add a filter
 				InputFilter[] currentFilters = mAnswer.getFilters();
