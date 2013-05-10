@@ -60,7 +60,7 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
         
         // set button formatting
         mGetBarcodeButton = new Button(getContext());
-        mGetBarcodeButton.setText("Get Data");
+        mGetBarcodeButton.setText(StringUtils.getStringRobust(getContext(), R.string.intent_callout_button));
         mGetBarcodeButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mGetBarcodeButton.setPadding(20, 20, 20, 20);
         mGetBarcodeButton.setEnabled(!prompt.isReadOnly());
