@@ -590,22 +590,27 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     private void processIntentResponse(Intent response) {
     	//We need to go grab our intent callout object to process the results here
         
+    	IntentWidget bestMatch = null;
+    	
         //Ugh, copied from the odkview mostly, that's stupid
     	for(QuestionWidget q : ((ODKView)mCurrentView).getWidgets()) {
     		//Figure out if we have a pending intent widget
             if (q instanceof IntentWidget) {
-                if (((IBinaryWidget) q).isWaitingForBinaryData()) {
-                	//Set our instance destination for binary data if needed
-                	String destination = mInstancePath.substring(0, mInstancePath.lastIndexOf("/") + 1);
-                	
-                	//get the original intent callout
-                	IntentCallout ic = ((IntentWidget)q).getIntentCallout();
-                	
-                	//And process it 
-                	ic.processResponse(response, (ODKView)mCurrentView, mFormController.getInstance(), new File(destination));
-                    break;
-                }
+            	if(((IntentWidget) q).isWaitingForBinaryData() || bestMatch == null) {
+            		bestMatch = (IntentWidget)q;
+            	}
             }
+    	}
+    	
+    	if(bestMatch != null) {
+        	//Set our instance destination for binary data if needed
+        	String destination = mInstancePath.substring(0, mInstancePath.lastIndexOf("/") + 1);
+        	
+        	//get the original intent callout
+        	IntentCallout ic = bestMatch.getIntentCallout();
+        	
+        	//And process it 
+        	ic.processResponse(response, (ODKView)mCurrentView, mFormController.getInstance(), new File(destination));
     	}
         
         saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
