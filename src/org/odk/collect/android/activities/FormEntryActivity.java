@@ -1949,7 +1949,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 	        }
     	} catch(XPathException e) {
 			//this is where runtime exceptions get triggered after the form has loaded
-	        createErrorDialog("There is a bug in one of your form's XPath Expressions " + e.getMessage(), EXIT);
+	        createErrorDialog("There is a bug in one of your form's XPath Expressions \n" + e.getMessage(), EXIT);
 	        //We're exiting anyway
 	        return FormEntryController.ANSWER_OK;
     	}
