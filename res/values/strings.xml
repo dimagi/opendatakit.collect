@@ -177,7 +177,7 @@
 <string name="change_splash_path">Change Image</string>
 <string name="show_location">Show Location</string>
 <string name="app_url">http://opendatakit.org</string>
-<string name="keep_changes">Save Changes</string>
+<string name="keep_changes">Save Changes to Incomplete Form</string>
 <string name="go_to_location">Go to Location</string>
 <string name="change_formlist_url">Form List Path (appended to Server URL)</string>
 <string name="protocol">Protocol</string>
