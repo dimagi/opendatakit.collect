@@ -221,7 +221,6 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
 
         setContentView(R.layout.form_entry);
-        setTitle(StringUtils.getStringRobust(this, R.string.app_name) + " > " + StringUtils.getStringRobust(this, R.string.loading_form));
 
         mRelativeLayout = (RelativeLayout) findViewById(R.id.rl);
 
@@ -279,6 +278,13 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             }
            
         }
+        
+        if(mHeaderString != null) {
+        	setTitle(mHeaderString);
+        } else {
+        	setTitle(StringUtils.getStringRobust(this, R.string.app_name) + " > " + StringUtils.getStringRobust(this, R.string.loading_form));
+        }
+
 
         // If a parse error message is showing then nothing else is loaded
         // Dialogs mid form just disappear on rotation.
@@ -715,11 +721,14 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
         menu.add(0, MENU_HIERARCHY_VIEW, 0, StringUtils.getStringRobust(this, R.string.view_hierarchy)).setIcon(
             R.drawable.ic_menu_goto);
+        
         menu.add(0, MENU_LANGUAGES, 0, StringUtils.getStringRobust(this, R.string.change_language))
                 .setIcon(R.drawable.ic_menu_start_conversation)
                 .setEnabled(
-                    (mFormController.getLanguages() == null || mFormController.getLanguages().length == 1) ? false
+                    (mFormController == null || mFormController.getLanguages() == null || mFormController.getLanguages().length == 1) ? false
                             : true);
+        
+        
         menu.add(0, MENU_PREFERENCES, 0, StringUtils.getStringRobust(this, R.string.general_preferences)).setIcon(
             android.R.drawable.ic_menu_preferences);
         return true;
