@@ -879,6 +879,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      * @return newly created View
      */
     private View createView(int event) {
+    	boolean isGroup = false;
     	setTitle(getHeaderString());
         switch (event) {
             case FormEntryController.EVENT_BEGINNING_OF_FORM:
@@ -1009,16 +1010,17 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 }
 
                 return endView;
-            case FormEntryController.EVENT_QUESTION:
             case FormEntryController.EVENT_GROUP:
+            	isGroup = true;
+            case FormEntryController.EVENT_QUESTION:
+            
                 ODKView odkv = null;
                 // should only be a group here if the event_group is a field-list
                 try {
-                	System.out.println("320 trying ODKVIEW creation");
                     odkv =
                         new ODKView(this, mFormController.getQuestionPrompts(),
                                 mFormController.getGroupsForCurrentIndex(),
-                                mFormController.getWidgetFactory(), this);
+                                mFormController.getWidgetFactory(), this, isGroup);
                     Log.i(t, "created view for group");
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), EXIT);
