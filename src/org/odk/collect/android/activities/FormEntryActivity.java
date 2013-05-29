@@ -49,12 +49,12 @@ import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ODKView;
 import org.odk.collect.android.widgets.DateTimeWidget;
-import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -69,10 +69,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -108,7 +112,7 @@ import android.widget.Toast;
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  */
-public class FormEntryActivity extends Activity implements AnimationListener, FormLoaderListener,
+public class FormEntryActivity extends FragmentActivity implements AnimationListener, FormLoaderListener,
         FormSavedListener, AdvanceToNextListener, OnGestureListener, WidgetChangedListener {
     private static final String t = "FormEntryActivity";
 
@@ -209,8 +213,31 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
     /** Called when the activity is first created. */
     @Override
+    @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);        
+        
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	    	String fragmentClass = this.getIntent().getStringExtra("odk_title_fragment");
+	    	if(fragmentClass != null) {
+			    FragmentManager fm = this.getSupportFragmentManager();
+
+			    //Add breadcrumb bar			    
+			    Fragment bar = (Fragment) fm.findFragmentByTag(TITLE_FRAGMENT_TAG);
+			    // If the state holder is null, create a new one for this activity
+			    if (bar == null) {
+			    	try {
+			    		bar = ((Class<Fragment>)Class.forName(fragmentClass)).newInstance();
+				    	getActionBar().setDisplayShowCustomEnabled(true);
+				    	fm.beginTransaction().add(bar, "TITLE_FRAGMENT_TAG").commit();
+			    	} catch(Exception e) {
+			    		Log.w("odk-collect", "couldn't instantiate fragment: " + fragmentClass);
+			    	}
+			    } else {
+			    	getActionBar().setDisplayShowCustomEnabled(true);
+			    }
+	    	}
+	    }
 
         // must be at the beginning of any activity that can be called from an external intent
         try {
@@ -294,7 +321,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
 
         // Check to see if this is a screen flip or a new form load.
-        Object data = getLastNonConfigurationInstance();
+        Object data = this.getLastCustomNonConfigurationInstance();
         if (data instanceof FormLoaderTask) {
             mFormLoaderTask = (FormLoaderTask) data;
         } else if (data instanceof SaveToDiskTask) {
@@ -426,6 +453,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         }
     }
 
+    public static final String TITLE_FRAGMENT_TAG = "odk_title_fragment";
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -855,7 +883,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      * If we're loading, then we pass the loading thread to our next instance.
      */
     @Override
-    public Object onRetainNonConfigurationInstance() {
+    public Object onRetainCustomNonConfigurationInstance() {
         // if a form is loading, pass the loader task
         if (mFormLoaderTask != null && mFormLoaderTask.getStatus() != AsyncTask.Status.FINISHED)
             return mFormLoaderTask;
@@ -880,6 +908,16 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     	}
 
     }
+    
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public void setTitle(CharSequence title) {
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	    	if(this.getFragmentManager().findFragmentByTag(TITLE_FRAGMENT_TAG) != null) {
+	    		return;
+	    	}
+	    }
+	    super.setTitle(title);
+    }
 
     /**
      * Creates a view given the View type and an event
@@ -889,6 +927,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      */
     private View createView(int event) {
     	boolean isGroup = false;
+
     	setTitle(getHeaderString());
         switch (event) {
             case FormEntryController.EVENT_BEGINNING_OF_FORM:
