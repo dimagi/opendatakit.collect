@@ -313,7 +313,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
         } catch (DeserializationException e) {
             e.printStackTrace();
             fd = null;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             fd = null;
         }
