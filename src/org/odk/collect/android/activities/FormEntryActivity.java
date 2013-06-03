@@ -305,13 +305,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             }
            
         }
-        
-        if(mHeaderString != null) {
-        	setTitle(mHeaderString);
-        } else {
-        	setTitle(StringUtils.getStringRobust(this, R.string.app_name) + " > " + StringUtils.getStringRobust(this, R.string.loading_form));
-        }
-
 
         // If a parse error message is showing then nothing else is loaded
         // Dialogs mid form just disappear on rotation.
@@ -368,6 +361,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 
                 if(intent.hasExtra(KEY_FORM_MANAGEMENT)) {
                 	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_FORM_MANAGEMENT, true);
+                }
+                
+                if(mHeaderString != null) {
+                	setTitle(mHeaderString);
+                } else {
+                	setTitle(StringUtils.getStringRobust(this, R.string.app_name) + " > " + StringUtils.getStringRobust(this, R.string.loading_form));
                 }
                 
                 
