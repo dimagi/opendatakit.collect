@@ -614,7 +614,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 break;
             case HIERARCHY_ACTIVITY:
                 // We may have jumped to a new index in hierarchy activity, so refresh
-                refreshCurrentView();
+                refreshCurrentView(false);
                 break;
 
         }
@@ -708,11 +708,19 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+	/**
+     * Refreshes the current view. the controller and the displayed view can get out of sync due to
+     * dialogs and restarts caused by screen orientation changes, so they're resynchronized here.
+     */
+	public void refreshCurrentView() {
+		refreshCurrentView(true);
+	}
+	
     /**
      * Refreshes the current view. the controller and the displayed view can get out of sync due to
      * dialogs and restarts caused by screen orientation changes, so they're resynchronized here.
      */
-    public void refreshCurrentView() {
+    public void refreshCurrentView(boolean animateLastView) {
     	if(mFormController == null) { throw new RuntimeException("Form state is lost! Cannot refresh current view. This shouldn't happen, please submit a bug report."); }
         int event = mFormController.getEvent();
 
@@ -730,7 +738,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             event = mFormController.stepToPreviousEvent();
         }
         View current = createView(event);
-        showView(current, AnimationType.FADE);
+        showView(current, AnimationType.FADE, animateLastView);
 
     }
 
@@ -1194,7 +1202,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * Displays the View specified by the parameter 'next', animating both the current view and next
      * appropriately given the AnimationType. Also updates the progress bar.
      */
-    public void showView(View next, AnimationType from) {
+    public void showView(View next, AnimationType from) { showView(next, from, true); }
+    public void showView(View next, AnimationType from, boolean animateLastView) {
         switch (from) {
             case RIGHT:
                 mInAnimation = AnimationUtils.loadAnimation(this, R.anim.push_left_in);
@@ -1211,7 +1220,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         }
 
         if (mCurrentView != null) {
-            mCurrentView.startAnimation(mOutAnimation);
+        	if(animateLastView) {
+        		mCurrentView.startAnimation(mOutAnimation);
+        	}
             mRelativeLayout.removeView(mCurrentView);
         }
 
