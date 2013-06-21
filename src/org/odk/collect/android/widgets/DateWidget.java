@@ -47,6 +47,7 @@ public class DateWidget extends QuestionWidget {
         mDatePicker = new DatePicker(getContext());
         mDatePicker.setFocusable(!prompt.isReadOnly());
         mDatePicker.setEnabled(!prompt.isReadOnly());
+        mDatePicker.setCalendarViewShown(false);
         
         mDateListener = new DatePicker.OnDateChangedListener() {
             @Override
