@@ -17,13 +17,11 @@ package org.odk.collect.android.activities;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import org.javarosa.core.services.locale.Localization;
 import org.odk.collect.android.R;
+import org.odk.collect.android.application.GeoProgressDialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,13 +30,18 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 public class GeoPointActivity extends Activity implements LocationListener {
-    private ProgressDialog mLocationDialog;
+    private GeoProgressDialog mLocationDialog;
     private LocationManager mLocationManager;
     private Location mLocation;
     private boolean mGPSOn = false;
     private boolean mNetworkOn = false;
+    
+    private int acceptableThreshold = 300;
+    private int accurateThreshold = 200;
 
     // default location accuracy
     private static double LOCATION_ACCURACY = 5;
@@ -149,33 +152,38 @@ public class GeoPointActivity extends Activity implements LocationListener {
      */
     private void setupLocationDialog() {
         // dialog displayed while fetching gps location
-        mLocationDialog = new ProgressDialog(this);
-        DialogInterface.OnClickListener geopointButtonListener =
-            new DialogInterface.OnClickListener() {
+        mLocationDialog = new GeoProgressDialog(this);
+        //mLocationDialog.setContentView(R.layout.geo_progress);
+        
+        OnClickListener cancelButtonListener =
+            new OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case DialogInterface.BUTTON1:
-                            returnLocation();
-                            break;
-                        case DialogInterface.BUTTON2:
-                            mLocation = null;
-                            finish();
-                            break;
-                    }
-                }
-            };
+    	   		public void onClick(View v){
+                    mLocation = null;
+                    finish();
+    	   		}
+        	};
+        	
+        OnClickListener okButtonListener =
+    		new OnClickListener() {
+    	   		public void onClick(View v){
+                    returnLocation();
+    	   		}
+       	};
+       
+       	
 
         // back button doesn't cancel
         mLocationDialog.setCancelable(false);
-        mLocationDialog.setIndeterminate(true);
-        mLocationDialog.setIcon(android.R.drawable.ic_dialog_info);
+        //mLocationDialog.setIndeterminate(true);
+        mLocationDialog.setImage(getResources().getDrawable(R.drawable.red_x));
         mLocationDialog.setTitle(getString(R.string.getting_location));
         mLocationDialog.setMessage(getString(R.string.please_wait_long));
-        mLocationDialog.setButton(DialogInterface.BUTTON1, getString(R.string.accept_location),
-            geopointButtonListener);
-        mLocationDialog.setButton(DialogInterface.BUTTON2, getString(R.string.cancel_location),
-            geopointButtonListener);
+        mLocationDialog.setOKButton(getString(R.string.accept_location),
+            okButtonListener);
+        mLocationDialog.setCancelButton(getString(R.string.cancel_location),
+            cancelButtonListener);
+
     }
 
 
@@ -201,6 +209,12 @@ public class GeoPointActivity extends Activity implements LocationListener {
 
             if (mLocation.getAccuracy() <= LOCATION_ACCURACY) {
                 returnLocation();
+            }
+            
+            if(mLocation.getAccuracy() < 200){
+            	mLocationDialog.setImage(getResources().getDrawable(R.drawable.green_check_mark));
+            }else if(mLocation.getAccuracy() <300){
+            	mLocationDialog.setImage(getResources().getDrawable(R.drawable.yellow_circle));
             }
         }
     }
