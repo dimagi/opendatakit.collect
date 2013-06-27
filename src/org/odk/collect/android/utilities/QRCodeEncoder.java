@@ -27,6 +27,14 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
+/**
+ * 
+ * @author ZXing authors
+ * @author csims@dimagi.com
+ * 
+ * Pulled from the ZXing libraries and modified slightly (mostly just pulled out code we don't need)   
+ *
+ */
 public final class QRCodeEncoder {
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;
@@ -72,11 +80,5 @@ public final class QRCodeEncoder {
             if (contents.charAt(i) > 0xFF) { return "UTF-8"; }
         }
         return null;
-    }
-
-    private static String trim(String s) {
-        if (s == null) { return null; }
-        String result = s.trim();
-        return result.length() == 0 ? null : result;
     }
 }
