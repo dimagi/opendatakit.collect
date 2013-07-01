@@ -136,6 +136,7 @@ public abstract class QuestionWidget extends LinearLayout {
         String imageURI = p.getImageText();
         String audioURI = p.getAudioText();
         String videoURI = p.getSpecialFormQuestionText("video");
+        String qrCodeContent = p.getSpecialFormQuestionText("qrcode");
 
         // shown when image is clicked
         String bigImageURI = p.getSpecialFormQuestionText("big-image");
@@ -167,7 +168,7 @@ public abstract class QuestionWidget extends LinearLayout {
 
         // Create the layout for audio, image, text
         MediaLayout mediaLayout = new MediaLayout(getContext());
-        mediaLayout.setAVT(mQuestionText, audioURI, imageURI, videoURI, bigImageURI);
+        mediaLayout.setAVT(mQuestionText, audioURI, imageURI, videoURI, bigImageURI, qrCodeContent);
 
         addView(mediaLayout, mLayout);
     }

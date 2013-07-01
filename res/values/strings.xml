@@ -220,7 +220,7 @@
 <string name="no_gps_title">Location Data Disabled</string>
 <string name="no_gps_message">The location providers on this device are currently disabled. Do you want to change those settings?</string>
 <string name="change_settings">Change Settings</string>
-<string name="intent_callout_button">Get Data</string>
+<string name="intent_callout_button">Update Data</string>
 <string name="finding_location">Finding Location...</string>
 <string name="found_location">Location Found!</string>
 </resources>

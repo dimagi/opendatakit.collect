@@ -1,10 +1,13 @@
 
 package org.odk.collect.android.views;
 
+import java.io.File;
+
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.odk.collect.android.R;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.QRCodeEncoder;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -22,7 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
+import com.google.zxing.BarcodeFormat;
 
 /**
  * This layout is used anywhere we can have image/audio/video/text. TODO: It would probably be nice
@@ -49,9 +52,12 @@ public class MediaLayout extends RelativeLayout {
         mVideoButton = null;
     }
 
+    
+    public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI) {
+    	setAVT(text, audioURI, imageURI, videoURI, bigImageURI, null);
+    }
 
-    public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI,
-            final String bigImageURI) {
+    public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI, final String qrCodeContent) {
         mView_Text = text;
 
         // Layout configurations for our elements in the relative layout
@@ -150,32 +156,56 @@ public class MediaLayout extends RelativeLayout {
 
         // Now set up the image view
         String errorMsg = null;
-        if (imageURI != null) {
-            try {
-                RelativeLayout parent = this;
-                imageParams.addRule(RelativeLayout.BELOW, topPane.getId());
-                if (mAudioButton != null) {
-                    if (!textVisible) {
-                    	imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-                        parent = topPane;
-                    }
-                }
-                if (mVideoButton != null) {
-                    if (!textVisible) {
-                        imageParams.addRule(RelativeLayout.LEFT_OF, mVideoButton.getId());
-                        parent = topPane;
-                    }
-                }
+        
+        View imageView= null;
+        if(qrCodeContent != null ) {
+            Bitmap image;
+            Display display =
+                    ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                            .getDefaultDisplay();
 
+            
+            //see if we're doing a new QR code display
+            if(qrCodeContent != null) {
+                int screenWidth = display.getWidth();
+                int screenHeight = display.getHeight();
+                
+                int minimumDim = Math.min(screenWidth,  screenHeight);
+
+            	try {
+            		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(qrCodeContent,minimumDim);
+                
+            		image = qrCodeEncoder.encodeAsBitmap();
+            		
+            		mImageView = new ImageView(getContext());
+            		mImageView.setPadding(10, 10, 10, 10);
+            		mImageView.setAdjustViewBounds(true);
+            		mImageView.setImageBitmap(image);
+            		mImageView.setId(23423534);
+            		
+            		imageView = mImageView;
+            	} catch(Exception e) {
+            		e.printStackTrace();
+            	}
+            }
+        	
+    	} else if (imageURI != null) {
+            try {
+
+                
+                //If we didn't get an image yet, try for a norm
 
                 String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
                 final File imageFile = new File(imageFilename);
+                
                 if (imageFile.exists()) {
                     Bitmap b = null;
                     try {
                         Display display =
-                            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
-                                    .getDefaultDisplay();
+                                ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                                        .getDefaultDisplay();
+
+
                         int screenWidth = display.getWidth();
                         int screenHeight = display.getHeight();
                         b =
@@ -213,7 +243,7 @@ public class MediaLayout extends RelativeLayout {
                                 }
                             });
                         }
-                        parent.addView(mImageView, imageParams);
+                        imageView = mImageView;
                     } else if (errorMsg == null) {
                         // An error hasn't been logged and loading the image failed, so it's likely
                         // a bad file.
@@ -233,15 +263,33 @@ public class MediaLayout extends RelativeLayout {
                     mMissingImage.setText(errorMsg);
                     mMissingImage.setPadding(10, 10, 10, 10);
                     mMissingImage.setId(234873453);
-                    parent.addView(mMissingImage, imageParams);
+                    imageView = mMissingImage;
                 }
             } catch (InvalidReferenceException e) {
                 Log.e(t, "image invalid reference exception");
                 e.printStackTrace();
             }
-        } else {
-            // There's no imageURI listed, so just ignore it.
         }
+        
+        if(imageView != null) {
+        	RelativeLayout parent = this;
+            imageParams.addRule(RelativeLayout.BELOW, topPane.getId());
+            if (mAudioButton != null) {
+                if (!textVisible) {
+                	imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
+                    parent = topPane;
+                }
+            }
+            if (mVideoButton != null) {
+                if (!textVisible) {
+                    imageParams.addRule(RelativeLayout.LEFT_OF, mVideoButton.getId());
+                    parent = topPane;
+                }
+            }
+            parent.addView(imageView, imageParams);
+        }
+        
+        
     }
 
 
