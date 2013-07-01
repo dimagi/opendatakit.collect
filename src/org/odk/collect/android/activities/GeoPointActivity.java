@@ -151,7 +151,6 @@ public class GeoPointActivity extends Activity implements LocationListener {
      */
     private void setupLocationDialog() {
         // dialog displayed while fetching gps location
-        //mLocationDialog.setContentView(R.layout.geo_progress);
         
         OnClickListener cancelButtonListener =
             new OnClickListener() {
@@ -174,7 +173,6 @@ public class GeoPointActivity extends Activity implements LocationListener {
 
         // back button doesn't cancel
         mLocationDialog.setCancelable(false);
-        //mLocationDialog.setIndeterminate(true);
         mLocationDialog.setImage(getResources().getDrawable(R.drawable.green_check_mark));
         mLocationDialog.setMessage(getString(R.string.please_wait_long));
         mLocationDialog.setOKButton(getString(R.string.accept_location),
