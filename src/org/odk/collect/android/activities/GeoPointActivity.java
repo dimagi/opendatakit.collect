@@ -40,8 +40,7 @@ public class GeoPointActivity extends Activity implements LocationListener {
     private boolean mGPSOn = false;
     private boolean mNetworkOn = false;
     
-    private int acceptableThreshold = 300;
-    private int accurateThreshold = 200;
+    private int acceptableThreshold = 1600;
 
     // default location accuracy
     private static double LOCATION_ACCURACY = 5;
@@ -152,7 +151,6 @@ public class GeoPointActivity extends Activity implements LocationListener {
      */
     private void setupLocationDialog() {
         // dialog displayed while fetching gps location
-        mLocationDialog = new GeoProgressDialog(this);
         //mLocationDialog.setContentView(R.layout.geo_progress);
         
         OnClickListener cancelButtonListener =
@@ -170,20 +168,19 @@ public class GeoPointActivity extends Activity implements LocationListener {
                     returnLocation();
     	   		}
        	};
-       
+       	
+       	mLocationDialog = new GeoProgressDialog(this, getString(R.string.finding_location), getString(R.string.found_location));
        	
 
         // back button doesn't cancel
         mLocationDialog.setCancelable(false);
         //mLocationDialog.setIndeterminate(true);
-        mLocationDialog.setImage(getResources().getDrawable(R.drawable.red_x));
-        mLocationDialog.setTitle(getString(R.string.getting_location));
+        mLocationDialog.setImage(getResources().getDrawable(R.drawable.green_check_mark));
         mLocationDialog.setMessage(getString(R.string.please_wait_long));
         mLocationDialog.setOKButton(getString(R.string.accept_location),
             okButtonListener);
         mLocationDialog.setCancelButton(getString(R.string.cancel_location),
             cancelButtonListener);
-
     }
 
 
@@ -211,10 +208,10 @@ public class GeoPointActivity extends Activity implements LocationListener {
                 returnLocation();
             }
             
-            if(mLocation.getAccuracy() < 200){
-            	mLocationDialog.setImage(getResources().getDrawable(R.drawable.green_check_mark));
-            }else if(mLocation.getAccuracy() <300){
-            	mLocationDialog.setImage(getResources().getDrawable(R.drawable.yellow_circle));
+            if(mLocation.getAccuracy() < acceptableThreshold){
+            	mLocationDialog.setLocationFound(true);
+            } else{
+            	mLocationDialog.setLocationFound(false);
             }
         }
     }

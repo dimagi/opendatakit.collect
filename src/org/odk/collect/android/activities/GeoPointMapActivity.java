@@ -1,6 +1,9 @@
 
 package org.odk.collect.android.activities;
 
+import java.text.DecimalFormat;
+import java.util.List;
+
 import org.odk.collect.android.R;
 import org.odk.collect.android.widgets.GeoPointWidget;
 
@@ -17,11 +20,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.text.DecimalFormat;
-import java.util.List;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
