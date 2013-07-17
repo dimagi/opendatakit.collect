@@ -23,7 +23,9 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.joda.time.DateTime;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
@@ -41,13 +43,16 @@ public class DateWidget extends QuestionWidget {
     private DatePicker.OnDateChangedListener mDateListener;
 
 
+    @SuppressLint("NewApi")
     public DateWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
         mDatePicker = new DatePicker(getContext());
         mDatePicker.setFocusable(!prompt.isReadOnly());
         mDatePicker.setEnabled(!prompt.isReadOnly());
-        mDatePicker.setCalendarViewShown(false);
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	    	mDatePicker.setCalendarViewShown(false);
+	    }
         
         mDateListener = new DatePicker.OnDateChangedListener() {
             @Override
