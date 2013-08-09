@@ -43,7 +43,7 @@ public class StringNumberWidget extends StringWidget {
         	mAnswer.setSingleLine(false);
         }
 
-        mAnswer.setKeyListener(new DigitsKeyListener() {
+        mAnswer.setKeyListener(new DigitsKeyListener(true, true) {
             @Override
             protected char[] getAcceptedChars() {
                 char[] accepted = {
@@ -62,7 +62,6 @@ public class StringNumberWidget extends StringWidget {
         if (prompt.getAnswerValue() != null) {
 	        String curAnswer = getCurrentAnswer().getValue().toString().trim();
 	        try {
-	        	Long.parseLong(curAnswer);
 	        	mAnswer.setText(curAnswer);
 	        } catch (Exception NumberFormatException) {
 	            
@@ -86,7 +85,6 @@ public class StringNumberWidget extends StringWidget {
             return null;
         } else {
             try {
-            	//Long.parseLong(s);
                 return new StringData(s);
             } catch (Exception NumberFormatException) {
                 return null;
