@@ -59,6 +59,8 @@ public class StringNumberWidget extends StringWidget {
             setClickable(false);
         }
 
+        //This might be redundant, but I assume that it's about there being a difference
+        //between a display value somewhere. We should double check
         if (prompt.getAnswerValue() != null) {
 	        String curAnswer = getCurrentAnswer().getValue().toString().trim();
 	        try {
