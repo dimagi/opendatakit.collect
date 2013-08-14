@@ -464,30 +464,41 @@ public class FormController {
      */
     public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
 
+    	//List of indices referred to by the current question
         ArrayList<FormIndex> indicies = new ArrayList<FormIndex>();
         FormIndex currentIndex = mFormEntryController.getModel().getFormIndex();
 
-        // For questions, there is only one.
-        // For groups, there could be many, but we set that below
-        FormEntryPrompt[] questions = new FormEntryPrompt[1];
-
+        //If we're in a group, we will collect of the questions in this group
         if (mFormEntryController.getModel().getForm().getChild(currentIndex) instanceof GroupDef) {
-            GroupDef gd =
-                (GroupDef) mFormEntryController.getModel().getForm().getChild(currentIndex);
-            // descend into group
+        	
+        	//Get the group at this index
+            GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(currentIndex);
+            
+            // descend into group (get the index of the first child element in the group)
+            //TODO: What happens if the group is empty, do we step out?
             FormIndex idxChild = mFormEntryController.getModel().incrementIndex(currentIndex, true);
 
+            //Go through each child and collect their indices
+            //NOTE: The part of the code that is iterating the loop is actually unrelated
+            //to the part that is incrementing the index (relying on the correctness of the 
+            //assumption that the list of children and the indicdes should be the same length)
+            //this might cause problems if those two things get out of sync for any reason.
             for (int i = 0; i < gd.getChildren().size(); i++) {
+            	//Add index of current child (starting at the first)
                 indicies.add(idxChild);
-                // don't descend
+                
+                // Get the next index (but don't descend)
                 idxChild = mFormEntryController.getModel().incrementIndex(idxChild, false);
             }
 
-            // we only display relevant questions
+            // we only display relevant questions, so create a new list of only relevant questions
             ArrayList<FormEntryPrompt> questionList = new ArrayList<FormEntryPrompt>();
+            
+            //Step through all of the indices we've collected
             for (int i = 0; i < indicies.size(); i++) {
                 FormIndex index = indicies.get(i);
 
+                //Ensure that the index represents a question, and fail fast if so. We don't support nested lists
                 if (mFormEntryController.getModel().getEvent(index) != FormEntryController.EVENT_QUESTION) {
                     String errorMsg =
                         "Only questions are allowed in 'field-list'.  Bad node is: "
@@ -497,19 +508,21 @@ public class FormController {
                     throw e;
                 }
 
-                // we only display relevant questions
+                // Otherwise check whether the index refers to a currently relevant node
                 if (mFormEntryController.getModel().isIndexRelevant(index)) {
+                	//And if so, add it to the list of questions that we'll return
                     questionList.add(mFormEntryController.getModel().getQuestionPrompt(index));
                 }
-                questions = new FormEntryPrompt[questionList.size()];
-                questionList.toArray(questions);
             }
+            //Create a new array with all of the questions we collected.
+            FormEntryPrompt[] questions = new FormEntryPrompt[questionList.size()];
+            //Populate the array with the collected questions
+            questionList.toArray(questions);
+            return questions;
         } else {
             // We have a quesion, so just get the one prompt
-            questions[0] = mFormEntryController.getModel().getQuestionPrompt();
-        }
-
-        return questions;
+            return new FormEntryPrompt[] { mFormEntryController.getModel().getQuestionPrompt()};
+        }   
     }
 
     
