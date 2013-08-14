@@ -373,6 +373,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 //csims@dimagi.com - Jan 24, 2012
                 //Since these are parceled across the content resolver, there's no guarantee of reference equality.
                 //We need to manually check value equality on the type 
+                
                 String contentType = getContentResolver().getType(uri);
                 
                 Uri formUri = null;;
@@ -1127,6 +1128,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
         if (mFormController.getEvent() != FormEntryController.EVENT_END_OF_FORM) {
             int event;
+            
+            try{
+            
             group_skip: do {
                 event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
                 switch (event) {
@@ -1162,6 +1166,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         break;
                 }
             } while (event != FormEntryController.EVENT_END_OF_FORM);
+            }catch(XPathTypeMismatchException e){
+            	FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
+            }
 
         } else {
             mBeenSwiped = false;
