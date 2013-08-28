@@ -1102,8 +1102,22 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     public boolean dispatchTouchEvent(MotionEvent mv) {
+    	//We need to ignore this even if it's processed by the action
+    	//bar (if one exists)
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	    	View customView = getActionBar().getCustomView();
+	    	if(customView != null) {
+	    		if(customView.dispatchTouchEvent(mv)) {
+	    			return true;
+	    		}
+	    	}
+	    }
+
+    	
+    	
         boolean handled = mGestureDetector.onTouchEvent(mv);
         if (!handled) {
             return super.dispatchTouchEvent(mv);
