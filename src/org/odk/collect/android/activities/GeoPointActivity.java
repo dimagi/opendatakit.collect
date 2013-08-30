@@ -168,7 +168,7 @@ public class GeoPointActivity extends Activity implements LocationListener {
     	   		}
        	};
        	
-       	mLocationDialog = new GeoProgressDialog(this, getString(R.string.finding_location), getString(R.string.found_location));
+       	mLocationDialog = new GeoProgressDialog(this, getString(R.string.found_location), getString(R.string.finding_location));
        	
 
         // back button doesn't cancel
