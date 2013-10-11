@@ -32,5 +32,8 @@ the License.
    <color name="border_grey">#20959699</color>
    <color name="blue_grad_end">#903867AD</color>
    <color name="blue_grad_start">#806884AD</color>
+   
+   <color name="light_red">#F5A6A6</color>
+   <color name="dark_red">#20959699</color>
 
 </resources>

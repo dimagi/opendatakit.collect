@@ -832,7 +832,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	                    int saveStatus = saveAnswer(answers.get(index), index, evaluateConstraints);
 	                    if (evaluateConstraints && (saveStatus != FormEntryController.ANSWER_OK &&
 	                    							(failOnRequired || saveStatus != FormEntryController.ANSWER_REQUIRED_BUT_EMPTY))) {
-	                        createConstraintToast(mFormController.getQuestionPrompt(index) .getConstraintText(), saveStatus);
+	                        createConstraintToast(index, mFormController.getQuestionPrompt(index) .getConstraintText(), saveStatus);
 	                        return false;
 	                    }
 	                } else {
@@ -1279,7 +1279,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     /**
      * Creates and displays a dialog displaying the violated constraint.
      */
-    private void createConstraintToast(String constraintText, int saveStatus) {
+    private void createConstraintToast(FormIndex index, String constraintText, int saveStatus) {
         switch (saveStatus) {
             case FormEntryController.ANSWER_CONSTRAINT_VIOLATED:
                 if (constraintText == null) {
@@ -1290,8 +1290,20 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 constraintText = StringUtils.getStringRobust(this, R.string.required_answer_error);
                 break;
         }
+        
+        boolean displayed = false;
+        //We need to see if question in violation is on the screen, so we can show this cleanly.
+    	for(QuestionWidget q : ((ODKView)mCurrentView).getWidgets()) {
+    		if(index.equals(q.getFormId())) {
+    			q.notifyInvalid(constraintText);
+    			displayed = true;
+    			break;
+    		}
+    	}
 
-        showCustomToast(constraintText, Toast.LENGTH_SHORT);
+    	if(!displayed) {
+    		showCustomToast(constraintText, Toast.LENGTH_SHORT);
+    	}
         mBeenSwiped = false;
     }
 

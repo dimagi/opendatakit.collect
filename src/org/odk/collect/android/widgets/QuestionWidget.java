@@ -7,6 +7,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
@@ -15,6 +16,7 @@ import org.odk.collect.android.views.ShrinkingTextView;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
@@ -43,6 +45,9 @@ public abstract class QuestionWidget extends LinearLayout {
     private TextView mQuestionText;
     private ShrinkingTextView mHelpText;
     protected boolean hasListener;
+    private View toastView;
+    
+    protected boolean focusPending = false;
     
     protected WidgetChangedListener widgetChangedListener;
 
@@ -112,6 +117,48 @@ public abstract class QuestionWidget extends LinearLayout {
             ds.setUnderlineText(false);
         }
     }
+    
+    public void notifyInvalid(String text) {
+    	this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
+    	
+    	if(this.toastView == null) {
+    		this.toastView = View.inflate(this.getContext(), R.layout.toast_view, this).findViewById(R.id.toast_view_root);
+    		focusPending = true;
+    	} else {
+    		if(this.toastView.getVisibility() != View.VISIBLE) {
+    			this.toastView.setVisibility(View.VISIBLE);
+    			focusPending = true;
+    		}
+    	}
+    	TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
+    	messageView.setText(text);
+    	
+    	//If the toastView already exists, we can just scroll to it right now
+    	//if not, we actually have to do it later, when we lay this all back out
+    	if(!focusPending) {
+	    	Rect toShow = new Rect();
+	    	messageView.getDrawingRect(toShow);
+	    	messageView.requestRectangleOnScreen(toShow);
+    	}
+    }
+    
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		
+		//If we're coming back in after we just laid out adding a new element that needs
+		//focus, we can now scroll to it, since it's actually had its spacing declared.
+		if(changed && focusPending) {
+			focusPending = false;
+			if(this.toastView == null) {
+				//Bizarre, this shouldn't happen?
+			} else {
+				TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
+		    	Rect toShow = new Rect();
+		    	messageView.getDrawingRect(toShow);
+		    	messageView.requestRectangleOnScreen(toShow);
+			}
+		}
+	}
     
     private void stripUnderlines(TextView textView) {
         Spannable s = (Spannable)textView.getText();
@@ -243,6 +290,10 @@ public abstract class QuestionWidget extends LinearLayout {
 	}
 	
 	public void widgetEntryChanged(){
+		if(this.toastView != null) {
+			this.toastView.setVisibility(View.GONE);
+	    	this.setBackgroundDrawable(null);
+		}
 		if(hasListener){
 			widgetChangedListener.widgetEntryChanged();
 		}
