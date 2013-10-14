@@ -67,6 +67,8 @@ public class PreferencesActivity extends PreferenceActivity implements
     public static String KEY_SUBMISSION_URL = "submission_url";
 
     public static String KEY_COMPLETED_DEFAULT = "default_completed";
+    
+    public static String KEY_SHOW_START_SCREEN = "odk_show_entry_screen";
 
     public static String KEY_AUTH = "auth";
     public static String KEY_ACCOUNT = "account";
@@ -117,6 +119,7 @@ public class PreferencesActivity extends PreferenceActivity implements
         	this.getPreferenceScreen().removePreference(this.findPreference(KEY_SERVER_PREFS));
         }
         updateFontSize();
+        updateShowStart();
     }
 
 
@@ -217,6 +220,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 	        updateGoogleCollectionEffort();
         }
         updateFontSize();
+        updateShowStart();
     }
 
 
@@ -288,6 +292,8 @@ public class PreferencesActivity extends PreferenceActivity implements
             updateSplashPath();
         } else if (key.equals(KEY_FONT_SIZE)) {
             updateFontSize();
+        } else if(key.equals(KEY_SHOW_START_SCREEN)) {
+        	updateShowStart();
         }
     }
 
@@ -382,6 +388,11 @@ public class PreferencesActivity extends PreferenceActivity implements
     private void updateFontSize() {
         ListPreference lp = (ListPreference) findPreference(KEY_FONT_SIZE);
         lp.setSummary(lp.getEntry());
+    }
+    
+    private void updateShowStart() {
+//        ListPreference lp = (ListPreference) findPreference(KEY_SHOW_START_SCREEN);
+//        lp.setSummary(lp.getEntry());
     }
 
 

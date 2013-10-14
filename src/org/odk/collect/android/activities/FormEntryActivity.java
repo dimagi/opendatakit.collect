@@ -738,8 +738,16 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 || (mFormController.indexIsInFieldList() && !(event == FormEntryController.EVENT_GROUP))) {
             event = mFormController.stepToPreviousEvent();
         }
-        View current = createView(event);
-        showView(current, AnimationType.FADE, animateLastView);
+        
+        //If we're at the beginning of form event, but don't show the screen for that, we need 
+        //to get the next valid screen
+        if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
+        		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, true)) {
+        	this.showNextView(true);
+        } else {
+        	View current = createView(event);
+        	showView(current, AnimationType.FADE, animateLastView);
+        }
 
     }
 
@@ -1132,7 +1140,21 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * repeat dialog, or the submit screen. Also saves answers to the data model after checking
      * constraints.
      */
-    private void showNextView() {
+    private void showNextView() { showNextView(false); }
+    private void showNextView(boolean resuming) {
+    	if(!resuming && mFormController.getEvent() == FormEntryController.EVENT_BEGINNING_OF_FORM) {
+    		//See if we should stop displaying the start screen
+    		CheckBox stopShowingIntroScreen = (CheckBox)mCurrentView.findViewById(R.id.screen_form_entry_start_cbx_dismiss);
+    		//Not sure why it would, but maybe timing issues?
+    		if(stopShowingIntroScreen != null) {
+    			if(stopShowingIntroScreen.isChecked()) {
+    				//set it!
+    	            SharedPreferences sharedPreferences =  PreferenceManager.getDefaultSharedPreferences(this);
+    	            sharedPreferences.edit().putBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, false).commit();
+    			}
+    		}
+    	}
+    	
         if (currentPromptIsQuestion()) {
             if (!saveAnswersForCurrentScreen(EVALUATE_CONSTRAINTS)) {
                 // A constraint was violated so a dialog should be showing.
@@ -1151,7 +1173,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     case FormEntryController.EVENT_QUESTION:
                     case FormEntryController.EVENT_END_OF_FORM:
                         View next = createView(event);
-                        showView(next, AnimationType.RIGHT);
+                        if(!resuming) {
+                        	showView(next, AnimationType.RIGHT);
+                        } else {
+                        	showView(next, AnimationType.FADE, false);
+                        }
                         break group_skip;
                     case FormEntryController.EVENT_PROMPT_NEW_REPEAT:
                         createRepeatDialog();
@@ -1160,7 +1186,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         if (mFormController.indexIsInFieldList()
                                 && mFormController.getQuestionPrompts().length != 0) {
                             View nextGroupView = createView(event);
-                            showView(nextGroupView, AnimationType.RIGHT);
+                            if(!resuming) {
+                            	showView(nextGroupView, AnimationType.RIGHT);
+                            } else {
+                            	showView(nextGroupView, AnimationType.FADE, false);
+                            }
                             break group_skip;
                         }
                         // otherwise it's not a field-list group, so just skip it
@@ -1199,6 +1229,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         if (currentPromptIsQuestion()) {
             saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
         }
+        
+        FormIndex startIndex = mFormController.getFormIndex();
+        FormIndex lastValidIndex = startIndex;
 
         if (mFormController.getEvent() != FormEntryController.EVENT_BEGINNING_OF_FORM) {
             int event = mFormController.stepToPreviousEvent();
@@ -1209,11 +1242,32 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                             && mFormController.indexIsInFieldList() && mFormController
                             .getQuestionPrompts().length != 0)) {
                 event = mFormController.stepToPreviousEvent();
+                lastValidIndex = mFormController.getFormIndex();
+            }
+            
+            //check if we're at the beginning and not doing the whole "First screen" thing
+            if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
+            		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, true)) {
+            	//If so, we can't go all the way back here, so we've gotta hit the last index that was valid
+            	mFormController.jumpToIndex(lastValidIndex);
+            	
+            	//Did we jump at all? (not sure how we could have, but there might be a mismatch)
+            	if(lastValidIndex.equals(startIndex)) {
+            		//If not, don't even bother changing the view. 
+            		//NOTE: This needs to be the same as the
+            		//exit condition below, in case either changes
+            		mBeenSwiped = false;
+            		return;
+            	}
+            	
+            	//If we did (and I'm not sure how?) catch up.
             }
             View next = createView(event);
             showView(next, AnimationType.LEFT);
 
         } else {
+        	//NOTE: this needs to match the exist condition above
+        	//when there is no start screen
             mBeenSwiped = false;
         }
     }

@@ -95,10 +95,18 @@
             </LinearLayout>
         </LinearLayout>
 
+        <CheckBox
+            android:id="@+id/screen_form_entry_start_cbx_dismiss"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="@string/form_entry_start_hide" />
+
         <View
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.0" />
+
     </LinearLayout>
 
 </ScrollView>
