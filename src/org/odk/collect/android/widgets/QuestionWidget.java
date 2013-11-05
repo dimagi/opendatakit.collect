@@ -1,4 +1,3 @@
-
 package org.odk.collect.android.widgets;
 
 import java.util.regex.Matcher;
@@ -47,6 +46,9 @@ public abstract class QuestionWidget extends LinearLayout {
     protected boolean hasListener;
     private View toastView;
     
+    //Whether this question widget needs to request focus on
+    //its next draw, due to a new element having been added (which couldn't have
+    //requested focus yet due to having not been layed out)
     protected boolean focusPending = false;
     
     protected WidgetChangedListener widgetChangedListener;
@@ -136,10 +138,14 @@ public abstract class QuestionWidget extends LinearLayout {
     	//If the toastView already exists, we can just scroll to it right now
     	//if not, we actually have to do it later, when we lay this all back out
     	if(!focusPending) {
-	    	Rect toShow = new Rect();
-	    	messageView.getDrawingRect(toShow);
-	    	messageView.requestRectangleOnScreen(toShow);
+            requestViewOnScreen(messageView);
     	}
+    }
+    
+    private void requestViewOnScreen(View view) {
+        Rect toShow = new Rect();
+	    view.getDrawingRect(toShow);
+	    view.requestRectangleOnScreen(toShow);
     }
     
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -150,12 +156,12 @@ public abstract class QuestionWidget extends LinearLayout {
 		if(changed && focusPending) {
 			focusPending = false;
 			if(this.toastView == null) {
-				//Bizarre, this shouldn't happen?
+				//NOTE: This shouldn't be possible, but if it doesn't happen
+                //we don't wanna crash. Look here if focus isn't getting grabbed
+                //for some reason (there's no other negative consequence)
 			} else {
 				TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
-		    	Rect toShow = new Rect();
-		    	messageView.getDrawingRect(toShow);
-		    	messageView.requestRectangleOnScreen(toShow);
+		    	requestViewOnScreen(messageView);
 			}
 		}
 	}
@@ -292,7 +298,7 @@ public abstract class QuestionWidget extends LinearLayout {
 	public void widgetEntryChanged(){
 		if(this.toastView != null) {
 			this.toastView.setVisibility(View.GONE);
-	    	this.setBackgroundDrawable(null);
+			this.setBackgroundDrawable(null);
 		}
 		if(hasListener){
 			widgetChangedListener.widgetEntryChanged();
