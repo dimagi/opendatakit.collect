@@ -30,6 +30,8 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
@@ -239,6 +241,9 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
         formPath = null;
 
         FormController fc = new FormController(fec, mReadOnly);
+        
+        fc.setLanguage(Localization.getGlobalLocalizerAdvanced().getLocale());
+        
         data = new FECWrapper(fc);
         return data;
 

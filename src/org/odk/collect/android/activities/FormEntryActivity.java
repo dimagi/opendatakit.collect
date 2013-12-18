@@ -1144,6 +1144,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     private void showNextView() { showNextView(false); }
     private void showNextView(boolean resuming) {
+    	
     	if(!resuming && mFormController.getEvent() == FormEntryController.EVENT_BEGINNING_OF_FORM) {
     		//See if we should stop displaying the start screen
     		CheckBox stopShowingIntroScreen = (CheckBox)mCurrentView.findViewById(R.id.screen_form_entry_start_cbx_dismiss);
@@ -2007,29 +2008,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             startActivityForResult(i, HIERARCHY_ACTIVITY_FIRST_START);
             return; // so we don't show the intro screen before jumping to the hierarchy
         }
-
-        // Set the language if one has already been set in the past
-        String[] languageTest = mFormController.getLanguages();
-        if (languageTest != null) {
-            String defaultLanguage = mFormController.getLanguage();
-            String newLanguage = "";
-            String selection = FormsColumns.FORM_FILE_PATH + "=?";
-            String selectArgs[] = {
-                mFormPath
-            };
-            Cursor c = managedQuery(formProviderContentURI, null, selection, selectArgs, null);
-            if (c.getCount() == 1) {
-                c.moveToFirst();
-                newLanguage = c.getString(c.getColumnIndex(FormsColumns.LANGUAGE));
-            }
-
-            // if somehow we end up with a bad language, set it to the default
-            try {
-                mFormController.setLanguage(newLanguage);
-            } catch (Exception e) {
-                mFormController.setLanguage(defaultLanguage);
-            }
-        }
+        
+        mFormController.setLanguage(mFormController.getLanguage());
+        
+        /* here was code that loaded cached language preferences fin the
+         * collect code. we've overridden that to use our language
+         * from the shared preferences
+         */
 
         refreshCurrentView();
     }
