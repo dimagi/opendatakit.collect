@@ -25,8 +25,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.BarcodeFormat;
-
 /**
  * This layout is used anywhere we can have image/audio/video/text. TODO: It would probably be nice
  * to put this in a layout.xml file of some sort at some point.
@@ -195,7 +193,7 @@ public class MediaLayout extends RelativeLayout {
                 
                 //If we didn't get an image yet, try for a norm
 
-                String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                final String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
                 final File imageFile = new File(imageFilename);
                 
                 if (imageFile.exists()) {
@@ -242,6 +240,22 @@ public class MediaLayout extends RelativeLayout {
                                     }
                                 }
                             });
+                        }
+                        else{
+                        	/* don't override ODK default behavior, but in else case make image onClick 
+                        	/ launch full screen mode.
+                        	 * TODO: Decide if we should remove default behavior. 
+                        	 */
+                        	mImageView.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+
+                        	        Intent fullScreenIntent = new Intent(getContext(), FullScreenImage.class);
+                        	        fullScreenIntent.putExtra("image-file-name",imageFilename);
+
+                        	        getContext().startActivity(fullScreenIntent); 
+								}
+                        	});
                         }
                         imageView = mImageView;
                     } else if (errorMsg == null) {
