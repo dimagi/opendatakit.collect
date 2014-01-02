@@ -945,6 +945,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     private View createView(int event) {
     	boolean isGroup = false;
+    	
+    	System.out.println("1230 Creating view with event: " + event);
 
     	setTitle(getHeaderString());
         switch (event) {
@@ -1079,6 +1081,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             case FormEntryController.EVENT_GROUP:
             	isGroup = true;
             case FormEntryController.EVENT_QUESTION:
+            	
+            	System.out.println("1230 event question");
             
                 ODKView odkv = null;
                 // should only be a group here if the event_group is a field-list

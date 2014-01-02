@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,28 +57,23 @@ public class MediaLayout extends RelativeLayout {
     }
 
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI, final String qrCodeContent) {
+    	
         mView_Text = text;
+        
+        RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.form_media_layout);
+        addView(myLayout);
+        
+        mAudioButton = (AudioButton) findViewById(R.id.fe_audio_button);
+        mImageView = (ImageView) findViewById(R.id.fe_image_view);
+        mVideoButton = (ImageButton) findViewById(R.id.fe_image_button);
+        mView_Text = (TextView) findViewById(R.id.fe_text_view);
 
-        // Layout configurations for our elements in the relative layout
-        RelativeLayout.LayoutParams textParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-        RelativeLayout.LayoutParams audioParams =
-            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        RelativeLayout.LayoutParams imageParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-        RelativeLayout.LayoutParams videoParams =
-            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        
-        RelativeLayout.LayoutParams topPaneParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-        RelativeLayout topPane = new RelativeLayout(this.getContext());
-        topPane.setId(2342134);
-        
-        this.addView(topPane, topPaneParams);
 
         // First set up the audio button
         if (audioURI != null) {
             // An audio file is specified
-            mAudioButton = new AudioButton(getContext(), audioURI);
+        	
+        	mAudioButton.setURI(audioURI);
             mAudioButton.setId(3245345); // random ID to be used by the relative layout.
         } else {
             // No audio file specified, so ignore.
@@ -86,7 +82,7 @@ public class MediaLayout extends RelativeLayout {
         // Then set up the video button
         if (videoURI != null) {
             // An audio file is specified
-            mVideoButton = new ImageButton(getContext());
+            //mVideoButton = new ImageButton(getContext());
             mVideoButton.setImageResource(android.R.drawable.ic_media_play);
             mVideoButton.setOnClickListener(new OnClickListener() {
 
@@ -128,34 +124,10 @@ public class MediaLayout extends RelativeLayout {
             // No video file specified, so ignore.
         }
 
-        // Add the audioButton and videoButton (if applicable) and view (containing text) to the
-        // relative layout.
-        if (mAudioButton != null && mVideoButton == null) {
-            audioParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            textParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-            topPane.addView(mAudioButton, audioParams);
-        } else if (mAudioButton == null && mVideoButton != null) {
-            videoParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            textParams.addRule(RelativeLayout.LEFT_OF, mVideoButton.getId());
-            topPane.addView(mVideoButton, videoParams);
-        } else if (mAudioButton != null && mVideoButton != null) {
-            audioParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            textParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-            videoParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            videoParams.addRule(RelativeLayout.BELOW, mAudioButton.getId());
-            topPane.addView(mAudioButton, audioParams);
-            topPane.addView(mVideoButton, videoParams);
-        }
-        boolean textVisible = (text.getVisibility() != GONE);
-        if (textVisible) {
-            textParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            topPane.addView(text, textParams);
-        }
-
         // Now set up the image view
         String errorMsg = null;
         
-        View imageView= null;
+        //View imageView= null;
         if(qrCodeContent != null ) {
             Bitmap image;
             Display display =
@@ -175,13 +147,12 @@ public class MediaLayout extends RelativeLayout {
                 
             		image = qrCodeEncoder.encodeAsBitmap();
             		
-            		mImageView = new ImageView(getContext());
+            		//mImageView = new ImageView(getContext());
             		mImageView.setPadding(10, 10, 10, 10);
             		mImageView.setAdjustViewBounds(true);
             		mImageView.setImageBitmap(image);
             		mImageView.setId(23423534);
-            		
-            		imageView = mImageView;
+
             	} catch(Exception e) {
             		e.printStackTrace();
             	}
@@ -214,7 +185,7 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                        mImageView = new ImageView(getContext());
+                       // mImageView = new ImageView(getContext());
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
                         mImageView.setImageBitmap(b);
@@ -257,7 +228,7 @@ public class MediaLayout extends RelativeLayout {
 								}
                         	});
                         }
-                        imageView = mImageView;
+//                        imageView = mImageView;
                     } else if (errorMsg == null) {
                         // An error hasn't been logged and loading the image failed, so it's likely
                         // a bad file.
@@ -277,32 +248,13 @@ public class MediaLayout extends RelativeLayout {
                     mMissingImage.setText(errorMsg);
                     mMissingImage.setPadding(10, 10, 10, 10);
                     mMissingImage.setId(234873453);
-                    imageView = mMissingImage;
+//                    imageView = mMissingImage;
                 }
             } catch (InvalidReferenceException e) {
                 Log.e(t, "image invalid reference exception");
                 e.printStackTrace();
             }
         }
-        
-        if(imageView != null) {
-        	RelativeLayout parent = this;
-            imageParams.addRule(RelativeLayout.BELOW, topPane.getId());
-            if (mAudioButton != null) {
-                if (!textVisible) {
-                	imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
-                    parent = topPane;
-                }
-            }
-            if (mVideoButton != null) {
-                if (!textVisible) {
-                    imageParams.addRule(RelativeLayout.LEFT_OF, mVideoButton.getId());
-                    parent = topPane;
-                }
-            }
-            parent.addView(imageView, imageParams);
-        }
-        
         
     }
 
