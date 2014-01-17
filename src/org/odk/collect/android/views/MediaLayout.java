@@ -249,11 +249,13 @@ public class MediaLayout extends RelativeLayout {
                         	mImageView.setOnClickListener(new OnClickListener() {
 								@Override
 								public void onClick(View v) {
+	
+								    Intent intent = new Intent();
+								    //hack in file:// so that default gallery applicaiton can open
+								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
 
-                        	        Intent fullScreenIntent = new Intent(getContext(), FullScreenImage.class);
-                        	        fullScreenIntent.putExtra("image-file-name",imageFilename);
+								    ((Activity)getContext()).startActivity(intent);
 
-                        	        getContext().startActivity(fullScreenIntent); 
 								}
                         	});
                         }
