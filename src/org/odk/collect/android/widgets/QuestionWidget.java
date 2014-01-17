@@ -27,7 +27,6 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public abstract class QuestionWidget extends LinearLayout {
@@ -219,9 +218,8 @@ public abstract class QuestionWidget extends LinearLayout {
         if (p.getLongText() == null) {
             mQuestionText.setVisibility(GONE);
         }
-        
+
         // Create the layout for audio, image, text
-        
         MediaLayout mediaLayout = new MediaLayout(getContext());
         mediaLayout.setAVT(mQuestionText, audioURI, imageURI, videoURI, bigImageURI, qrCodeContent);
 

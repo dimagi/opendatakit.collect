@@ -46,9 +46,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
         currentState = ButtonState.Ready;
     }
 
-    public void setURI(String URI){
-    	this.URI = URI;
-    }
 
     @Override
     public void onClick(View v) {
