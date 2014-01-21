@@ -154,6 +154,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     public static final String KEY_HEADER_STRING = "form_header";
     
     public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
+    public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.incomplete.enabled";
+    public static final String KEY_SAVED_ENABLED = "org.odk.collect.saved.enabled";
     
     public static final String KEY_HAS_SAVED = "org.odk.collect.form.has.saved";
 
@@ -192,6 +194,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private String mErrorMessage;
     
     private boolean mFormManagementEnabled = true;
+    private boolean mIncompleteEnabled = true;
+    private boolean mSavedEnabled = true;
 
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped;
@@ -286,8 +290,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             }
             if (savedInstanceState.containsKey(KEY_INSTANCEDESTINATION)) {
             	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
-            } if(savedInstanceState.containsKey(KEY_FORM_MANAGEMENT)) {
+            } 
+            if(savedInstanceState.containsKey(KEY_FORM_MANAGEMENT)) {
             	mFormManagementEnabled = savedInstanceState.getBoolean(KEY_FORM_MANAGEMENT);
+            }
+            if(savedInstanceState.containsKey(KEY_SAVED_ENABLED)) {
+            	mSavedEnabled = savedInstanceState.getBoolean(KEY_SAVED_ENABLED);
+            }
+            if(savedInstanceState.containsKey(KEY_INCOMPLETE_ENABLED)) {
+            	mIncompleteEnabled = savedInstanceState.getBoolean(KEY_INCOMPLETE_ENABLED);
             }
             if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
 	         	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
@@ -363,6 +374,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 
                 if(intent.hasExtra(KEY_FORM_MANAGEMENT)) {
                 	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_FORM_MANAGEMENT, true);
+                }
+                
+                if(intent.hasExtra(KEY_SAVED_ENABLED)) {
+                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_SAVED_ENABLED, true);
+                }
+                
+                if(intent.hasExtra(KEY_INCOMPLETE_ENABLED)) {
+                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_INCOMPLETE_ENABLED, true);
                 }
                 
                 if(mHeaderString != null) {
@@ -467,6 +486,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
         outState.putBoolean(KEY_FORM_MANAGEMENT, mFormManagementEnabled);
+        outState.putBoolean(KEY_SAVED_ENABLED, mSavedEnabled);
+        outState.putBoolean(KEY_INCOMPLETE_ENABLED, mIncompleteEnabled);
         outState.putBoolean(KEY_HAS_SAVED, hasSaved);
         
         if(symetricKey != null) {
@@ -761,7 +782,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         menu.removeItem(MENU_SAVE);
         menu.removeItem(MENU_PREFERENCES);
 
-        if(mFormManagementEnabled) {
+        if(mFormManagementEnabled || mSavedEnabled) {
 	        menu.add(0, MENU_SAVE, 0, StringUtils.getStringRobust(this, R.string.save_all_answers)).setIcon(
 	            android.R.drawable.ic_menu_save);
         }
@@ -1005,7 +1026,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 instanceComplete.setText(StringUtils.getStringRobust(this, R.string.mark_finished));
                 instanceComplete.setChecked(mFormManagementEnabled || isInstanceComplete(true));
                 
-                if(mFormController.isFormReadOnly() || !mFormManagementEnabled) {
+                if(mFormController.isFormReadOnly() || !mFormManagementEnabled || !mSavedEnabled) {
                 	instanceComplete.setVisibility(View.GONE);
                 }
 
@@ -1520,7 +1541,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * Create a dialog with options to save and exit, save, or quit without saving
      */
     private void createQuitDialog() {
-        final String[] items = mFormManagementEnabled ?  
+        final String[] items = mIncompleteEnabled ?  
         		new String[] {StringUtils.getStringRobust(this, R.string.keep_changes), StringUtils.getStringRobust(this, R.string.do_not_save)} :
         		new String[] {StringUtils.getStringRobust(this, R.string.do_not_save)};
         
