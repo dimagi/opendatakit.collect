@@ -377,11 +377,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 
                 if(intent.hasExtra(KEY_SAVED_ENABLED)) {
-                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_SAVED_ENABLED, true);
+                	this.mSavedEnabled = intent.getBooleanExtra(KEY_SAVED_ENABLED, true);
                 }
                 
                 if(intent.hasExtra(KEY_INCOMPLETE_ENABLED)) {
-                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_INCOMPLETE_ENABLED, true);
+                	this.mIncompleteEnabled = intent.getBooleanExtra(KEY_INCOMPLETE_ENABLED, true);
                 }
                 
                 if(mHeaderString != null) {
@@ -782,7 +782,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         menu.removeItem(MENU_SAVE);
         menu.removeItem(MENU_PREFERENCES);
 
-        if(mFormManagementEnabled || mSavedEnabled) {
+        if(mIncompleteEnabled) {
 	        menu.add(0, MENU_SAVE, 0, StringUtils.getStringRobust(this, R.string.save_all_answers)).setIcon(
 	            android.R.drawable.ic_menu_save);
         }
@@ -1024,9 +1024,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // checkbox for if finished or ready to send
                 final CheckBox instanceComplete = ((CheckBox) endView.findViewById(R.id.mark_finished));
                 instanceComplete.setText(StringUtils.getStringRobust(this, R.string.mark_finished));
-                instanceComplete.setChecked(mFormManagementEnabled || isInstanceComplete(true));
+                instanceComplete.setChecked(mIncompleteEnabled || isInstanceComplete(true));
                 
-                if(mFormController.isFormReadOnly() || !mFormManagementEnabled || !mSavedEnabled) {
+                if(mFormController.isFormReadOnly() || !mIncompleteEnabled) {
                 	instanceComplete.setVisibility(View.GONE);
                 }
 
