@@ -193,7 +193,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private ProgressDialog mProgressDialog;
     private String mErrorMessage;
     
-    private boolean mFormManagementEnabled = true;
     private boolean mIncompleteEnabled = true;
     private boolean mSavedEnabled = true;
 
@@ -291,9 +290,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             if (savedInstanceState.containsKey(KEY_INSTANCEDESTINATION)) {
             	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
             } 
-            if(savedInstanceState.containsKey(KEY_FORM_MANAGEMENT)) {
-            	mFormManagementEnabled = savedInstanceState.getBoolean(KEY_FORM_MANAGEMENT);
-            }
             if(savedInstanceState.containsKey(KEY_SAVED_ENABLED)) {
             	mSavedEnabled = savedInstanceState.getBoolean(KEY_SAVED_ENABLED);
             }
@@ -370,10 +366,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 if(intent.hasExtra(KEY_HEADER_STRING)) {
                 	this.mHeaderString = intent.getStringExtra(KEY_HEADER_STRING);
-                }
-                
-                if(intent.hasExtra(KEY_FORM_MANAGEMENT)) {
-                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_FORM_MANAGEMENT, true);
                 }
                 
                 if(intent.hasExtra(KEY_SAVED_ENABLED)) {
@@ -485,7 +477,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         outState.putString(KEY_FORM_CONTENT_URI, formProviderContentURI.toString());
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
-        outState.putBoolean(KEY_FORM_MANAGEMENT, mFormManagementEnabled);
         outState.putBoolean(KEY_SAVED_ENABLED, mSavedEnabled);
         outState.putBoolean(KEY_INCOMPLETE_ENABLED, mIncompleteEnabled);
         outState.putBoolean(KEY_HAS_SAVED, hasSaved);
