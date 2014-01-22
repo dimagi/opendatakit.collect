@@ -48,36 +48,13 @@ public class MediaLayout extends RelativeLayout {
 
     public MediaLayout(Context c) {
         super(c);
-        
-        
-        
+
         mView_Text = null;
         mAudioButton = null;
         mImageView = null;
         mMissingImage = null;
         mVideoButton = null;
-        
-        DisplayMetrics metrics=new DisplayMetrics();
-        
-        ((Activity)c).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        
-        final int width = metrics.widthPixels;
-        final int height = metrics.heightPixels;  
-        /*
-        this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            public void onGlobalLayout() {
-            	
-            	minimumHeight = height/3;
-            	maximumHeight = 2*height/3;
-            	
-            	if(mImageView != null){
-            	
-            		mImageView.resizeMaxMin(minimumHeight, maximumHeight);
-            	}
-           }
-      });*/
     }
-
     
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI) {
     	setAVT(text, audioURI, imageURI, videoURI, bigImageURI, null);
@@ -88,15 +65,16 @@ public class MediaLayout extends RelativeLayout {
 
         // Layout configurations for our elements in the relative layout
         RelativeLayout.LayoutParams textParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams audioParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams imageParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        imageParams.addRule(CENTER_IN_PARENT);
         RelativeLayout.LayoutParams videoParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         
-        RelativeLayout.LayoutParams topPaneParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams topPaneParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout topPane = new RelativeLayout(this.getContext());
         topPane.setId(2342134);
         
@@ -110,7 +88,7 @@ public class MediaLayout extends RelativeLayout {
         } else {
             // No audio file specified, so ignore.
         }
-
+        
         // Then set up the video button
         if (videoURI != null) {
             // An audio file is specified
@@ -224,6 +202,20 @@ public class MediaLayout extends RelativeLayout {
             	int maxWidth = metrics.widthPixels;
             	int maxHeight = metrics.heightPixels;
             	
+            	// subtract height for textviewa and buttons, if present
+            	
+            	if(mView_Text != null){
+            		maxHeight = maxHeight - mView_Text.getHeight();
+            	} if(mVideoButton != null){
+            		maxHeight = maxHeight - mVideoButton.getHeight();
+            	} else if(mAudioButton != null){
+            		maxHeight = maxHeight - mAudioButton.getHeight();
+            	}
+            	
+            	// reduce by third for safety
+            	
+            	maxHeight = (2 * maxHeight)/3;
+            	
                 
                 //If we didn't get an image yet, try for a norm
 
@@ -255,7 +247,7 @@ public class MediaLayout extends RelativeLayout {
                         mImageView.setMaxWidth(maxWidth);
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
-                        //mImageView.resizeMaxMin(minimumHeight, maximumHeight);
+                        
                         if (bigImageURI != null) {
                             mImageView.setOnClickListener(new OnClickListener() {
                                 String bigImageFilename = ReferenceManager._()
@@ -353,7 +345,7 @@ public class MediaLayout extends RelativeLayout {
      */
     public void addDivider(ImageView v) {
         RelativeLayout.LayoutParams dividerParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         if (mImageView != null) {
             dividerParams.addRule(RelativeLayout.BELOW, mImageView.getId());
         } else if (mMissingImage != null) {

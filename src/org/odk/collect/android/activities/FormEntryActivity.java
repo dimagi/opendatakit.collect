@@ -157,6 +157,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.incomplete.enabled";
     public static final String KEY_SAVED_ENABLED = "org.odk.collect.saved.enabled";
     
+    public static final String KEY_RESIZING_ENABLED = "org.odk.collect.saved.enabled";
+    
     public static final String KEY_HAS_SAVED = "org.odk.collect.form.has.saved";
 
     // Identifies whether this is a new form, or reloading a form after a screen
@@ -195,6 +197,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     private boolean mIncompleteEnabled = true;
     private boolean mSavedEnabled = true;
+    
+    public static enum Resizing{
+    	NONE,
+    	WIDTH,
+    	FULL
+    };
+    
+    private Resizing mResizing = Resizing.NONE;
 
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped;
@@ -374,6 +384,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 
                 if(intent.hasExtra(KEY_INCOMPLETE_ENABLED)) {
                 	this.mIncompleteEnabled = intent.getBooleanExtra(KEY_INCOMPLETE_ENABLED, true);
+                }
+                
+                if(intent.hasExtra(KEY_RESIZING_ENABLED)) {
+                	String resizing = intent.getStringExtra(KEY_RESIZING_ENABLED);
+                	if(resizing.equals("full")){
+                		this.mResizing = Resizing.FULL;
+                	}else if(resizing.equals("width")){
+                		this.mResizing = Resizing.WIDTH;
+                	}
                 }
                 
                 if(mHeaderString != null) {

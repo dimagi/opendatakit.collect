@@ -1,12 +1,17 @@
 package org.odk.collect.android.views;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.view.View.MeasureSpec;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.widget.ImageView;
 
-
 public class ResizingImageView extends ImageView {
+
+    private int mMaxWidth;
+    private int mMaxHeight;
+
     public ResizingImageView(Context context) {
         super(context);
     }
@@ -20,117 +25,64 @@ public class ResizingImageView extends ImageView {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    	
-   	
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height2 = MeasureSpec.getSize(heightMeasureSpec);
-        
-        final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-        final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-        
-        System.out.println("1515  wms: "  + MeasureSpec.toString(widthMeasureSpec));
-        System.out.println("1515  hms: " + MeasureSpec.toString(heightMeasureSpec));
-        
-        boolean resizeWidth = widthSpecMode != MeasureSpec.EXACTLY;
-        boolean resizeHeight = heightSpecMode != MeasureSpec.EXACTLY;
-        
-        System.out.println("1515 resizing width : " + resizeWidth);
-        System.out.println("1515 resizing height : " + resizeHeight);
-    	
-        System.out.println("1515 resizing width : " + width + " , height: " + height2);
-        
-        int height = width * getDrawable().getIntrinsicHeight() / getDrawable().getIntrinsicWidth();
-        setMeasuredDimension(width, height);
+    public void setMaxWidth(int maxWidth) {
+        super.setMaxWidth(maxWidth);
+        mMaxWidth = maxWidth;
     }
-    public void resizeMaxMin(int min, int max){
-    	
-    	System.out.println("1515 resizing min : " + min + " , max: " + max);
-    	
-    	if(min < 0 || max < 0) return;
-    	
-    	int currentHeight = this.getMeasuredHeight();
-    	if(currentHeight < min){
-    		int multiplier = min/currentHeight;
-    		setMeasuredDimension(currentHeight * multiplier, this.getMeasuredWidth()*multiplier);
-    	}
-    	if(currentHeight > max){
-    		int multiplier = max/currentHeight;
-    		setMeasuredDimension(currentHeight * multiplier, this.getMeasuredWidth()*multiplier);
-    	}
+
+    @Override
+    public void setMaxHeight(int maxHeight) {
+        super.setMaxHeight(maxHeight);
+        mMaxHeight = maxHeight;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        Drawable drawable = getDrawable();
+        if (drawable != null) {
+
+            int wMode = MeasureSpec.getMode(widthMeasureSpec);
+            int hMode = MeasureSpec.getMode(heightMeasureSpec);
+            if (wMode == MeasureSpec.EXACTLY || hMode == MeasureSpec.EXACTLY) {
+            	if(wMode == MeasureSpec.EXACTLY){System.out.println("15156 width IS EXACT");}
+            	if(hMode == MeasureSpec.EXACTLY){System.out.println("1515 height is EXACT");}
+                //return;
+            }
+
+            // Calculate the most appropriate size for the view. Take into
+            // account minWidth, minHeight, maxWith, maxHeigh and allowed size
+            // for the view.
+
+            int maxWidth = wMode == MeasureSpec.AT_MOST
+                    ? Math.min(MeasureSpec.getSize(widthMeasureSpec), mMaxWidth)
+                    : mMaxWidth;
+            int maxHeight = hMode == MeasureSpec.AT_MOST
+                    ? Math.min(MeasureSpec.getSize(heightMeasureSpec), mMaxHeight)
+                    : mMaxHeight;
+
+            float dWidth = dipToPixels(getContext(), drawable.getIntrinsicWidth());
+            float dHeight = dipToPixels(getContext(), drawable.getIntrinsicHeight());
+            float ratio = (dWidth) / dHeight;
+            
+            int width = (int) Math.min(Math.max(dWidth, getSuggestedMinimumWidth()), maxWidth);
+            int height = (int) (width / ratio);
+
+            height = Math.min(Math.max(height, getSuggestedMinimumHeight()), maxHeight);
+            width = (int) (height * ratio);
+
+            if (width > maxWidth) {
+                width = maxWidth;
+                height = (int) (width / ratio);
+            }
+
+            setMeasuredDimension(width, height);
+        }
     }
     
-/*    
-    public void onMeasure2(int widthMeasureSpec, int heightMeasureSpec) {
-    	
-        float screenWidth = MeasureSpec.getSize(widthMeasureSpec);
-        
-        float screenHeight = MeasureSpec.getSize(heightMeasureSpec);
-        
-        float imageWidth = getDrawable().getIntrinsicWidth();
-        		
-        float imageHeight = getDrawable().getIntrinsicHeight();
-        
-        System.out.println("1514 SCREEN height: " + screenHeight + ", width: " + screenWidth);
-        System.out.println("1514 IMAGE height: " + imageHeight + ", width: " + imageWidth);
-        
-        if(screenHeight == 0 || screenWidth == 0){
-        	setMeasuredDimension((int)imageWidth, (int)imageHeight);
-        	super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        	return;
-        }
-        
-        float widthMultiplier = imageWidth/screenWidth;
-        
-        float heightMultiplier = imageHeight/screenHeight;
-
-        
-        System.out.println("1514 multiplier height: " + heightMultiplier + ", width: " + widthMultiplier);
-        
-        //image larger than screen
-        if(widthMultiplier > 1 && heightMultiplier > 1){
-        	if(widthMultiplier > heightMultiplier){
-        		float width = imageWidth/widthMultiplier;
-        		float height = imageHeight/widthMultiplier;
-        		System.out.println("1515 multiplier height: " + height + ", width: " + width);
-        		setMeasuredDimension((int)width, (int)height);
-        	}else{
-        		float width = imageWidth/heightMultiplier;
-        		float height = imageHeight/heightMultiplier;
-        		System.out.println("1515 multiplier height: " + height + ", width: " + width);
-        		setMeasuredDimension((int)width, (int)height);
-        	}
-        	return;
-        }
-        
-        // screen larger than image
-        if(widthMultiplier < 1 && heightMultiplier < 1){
-        	if(widthMultiplier > heightMultiplier){
-        		float width = imageWidth/widthMultiplier;
-        		float height = imageHeight/widthMultiplier;
-        		System.out.println("1515 multiplier height: " + height + ", width: " + width);
-        		setMeasuredDimension((int)width, (int)height);
-        	}else{
-        		float width = imageWidth/heightMultiplier;
-        		float height = imageHeight/heightMultiplier;
-        		System.out.println("1515 multiplier height: " + height + ", width: " + width);
-        		setMeasuredDimension((int)width, (int)height);
-        	}
-        	return;
-        }
-        
-        if(widthMultiplier > 1){
-    		float width = imageWidth/widthMultiplier;
-    		float height = imageHeight/widthMultiplier;
-    		System.out.println("1515 multiplier height: " + height + ", width: " + width);
-    		setMeasuredDimension((int)width, (int)height);
-        }
-        else{
-    		float width = imageWidth/heightMultiplier;
-    		float height = imageHeight/heightMultiplier;
-    		System.out.println("1515 multiplier height: " + height + ", width: " + width);
-    		setMeasuredDimension((int)width, (int)height);
-    	}
+    public static float dipToPixels(Context context, float dipValue) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
-*/
 }
