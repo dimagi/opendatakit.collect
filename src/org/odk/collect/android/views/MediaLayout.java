@@ -6,6 +6,7 @@ import java.io.File;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.odk.collect.android.R;
+import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.QRCodeEncoder;
 
@@ -13,8 +14,10 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -243,8 +246,16 @@ public class MediaLayout extends RelativeLayout {
                         mImageView = new ResizingImageView(getContext());
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
-                        mImageView.setMaxHeight(maxHeight);
-                        mImageView.setMaxWidth(maxWidth);
+                        
+                		SharedPreferences settings =
+                				PreferenceManager.getDefaultSharedPreferences(getContext());
+                		String resizeMethod = settings.getString(PreferencesActivity.KEY_RESIZE, "none");
+                		
+                		if(resizeMethod.equals("full")){
+                            mImageView.setMaxHeight(maxHeight);
+                            mImageView.setMaxWidth(maxWidth);
+                		}
+                       
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
                         

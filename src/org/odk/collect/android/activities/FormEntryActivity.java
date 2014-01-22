@@ -53,6 +53,7 @@ import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
+import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -157,7 +158,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.incomplete.enabled";
     public static final String KEY_SAVED_ENABLED = "org.odk.collect.saved.enabled";
     
-    public static final String KEY_RESIZING_ENABLED = "org.odk.collect.saved.enabled";
+    public static final String KEY_RESIZING_ENABLED = "org.odk.collect.resizing.enabled";
     
     public static final String KEY_HAS_SAVED = "org.odk.collect.form.has.saved";
 
@@ -198,13 +199,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private boolean mIncompleteEnabled = true;
     private boolean mSavedEnabled = true;
     
-    public static enum Resizing{
-    	NONE,
-    	WIDTH,
-    	FULL
-    };
-    
-    private Resizing mResizing = Resizing.NONE;
+    private String mResizeMethod = "none";
 
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped;
@@ -306,6 +301,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             if(savedInstanceState.containsKey(KEY_INCOMPLETE_ENABLED)) {
             	mIncompleteEnabled = savedInstanceState.getBoolean(KEY_INCOMPLETE_ENABLED);
             }
+            if(savedInstanceState.containsKey(KEY_RESIZING_ENABLED)) {
+            	mResizeMethod = savedInstanceState.getString(KEY_RESIZING_ENABLED);
+            }
             if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
 	         	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
 	         	try {
@@ -387,12 +385,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 
                 if(intent.hasExtra(KEY_RESIZING_ENABLED)) {
-                	String resizing = intent.getStringExtra(KEY_RESIZING_ENABLED);
-                	if(resizing.equals("full")){
-                		this.mResizing = Resizing.FULL;
-                	}else if(resizing.equals("width")){
-                		this.mResizing = Resizing.WIDTH;
-                	}
+                	this.mResizeMethod = intent.getStringExtra(KEY_RESIZING_ENABLED);
+                	
+                    SharedPreferences settings =
+                        PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                    SharedPreferences.Editor editor = settings.edit();
+
+                    editor.putString(PreferencesActivity.KEY_RESIZE, resizing);
+                    editor.commit();
+                	
                 }
                 
                 if(mHeaderString != null) {
@@ -499,6 +500,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         outState.putBoolean(KEY_SAVED_ENABLED, mSavedEnabled);
         outState.putBoolean(KEY_INCOMPLETE_ENABLED, mIncompleteEnabled);
         outState.putBoolean(KEY_HAS_SAVED, hasSaved);
+        outState.putString(KEY_RESIZING_ENABLED, mResizeMethod);
         
         if(symetricKey != null) {
         	try {
