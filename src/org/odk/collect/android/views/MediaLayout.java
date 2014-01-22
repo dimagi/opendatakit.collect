@@ -15,9 +15,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -37,17 +39,43 @@ public class MediaLayout extends RelativeLayout {
     private TextView mView_Text;
     private AudioButton mAudioButton;
     private ImageButton mVideoButton;
-    private ImageView mImageView;
+    private ResizingImageView mImageView;
     private TextView mMissingImage;
+    
+    private int minimumHeight =-1;
+    private int maximumHeight =-1;
 
 
     public MediaLayout(Context c) {
         super(c);
+        
+        
+        
         mView_Text = null;
         mAudioButton = null;
         mImageView = null;
         mMissingImage = null;
         mVideoButton = null;
+        
+        DisplayMetrics metrics=new DisplayMetrics();
+        
+        ((Activity)c).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        
+        final int width = metrics.widthPixels;
+        final int height = metrics.heightPixels;  
+        /*
+        this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            public void onGlobalLayout() {
+            	
+            	minimumHeight = height/3;
+            	maximumHeight = 2*height/3;
+            	
+            	if(mImageView != null){
+            	
+            		mImageView.resizeMaxMin(minimumHeight, maximumHeight);
+            	}
+           }
+      });*/
     }
 
     
@@ -64,7 +92,7 @@ public class MediaLayout extends RelativeLayout {
         RelativeLayout.LayoutParams audioParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams imageParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams videoParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         
@@ -175,11 +203,13 @@ public class MediaLayout extends RelativeLayout {
                 
             		image = qrCodeEncoder.encodeAsBitmap();
             		
-            		mImageView = new ImageView(getContext());
+            		mImageView = new ResizingImageView(getContext());
             		mImageView.setPadding(10, 10, 10, 10);
             		mImageView.setAdjustViewBounds(true);
+            		mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             		mImageView.setImageBitmap(image);
             		mImageView.setId(23423534);
+            		//mImageView.resizeMaxMin(minimumHeight, maximumHeight);
             		
             		imageView = mImageView;
             	} catch(Exception e) {
@@ -189,7 +219,11 @@ public class MediaLayout extends RelativeLayout {
         	
     	} else if (imageURI != null) {
             try {
-
+            	
+            	DisplayMetrics metrics = this.getContext().getResources().getDisplayMetrics();
+            	int maxWidth = metrics.widthPixels;
+            	int maxHeight = metrics.heightPixels;
+            	
                 
                 //If we didn't get an image yet, try for a norm
 
@@ -214,11 +248,14 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                        mImageView = new ImageView(getContext());
+                        mImageView = new ResizingImageView(getContext());
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
+                        mImageView.setMaxHeight(maxHeight);
+                        mImageView.setMaxWidth(maxWidth);
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
+                        //mImageView.resizeMaxMin(minimumHeight, maximumHeight);
                         if (bigImageURI != null) {
                             mImageView.setOnClickListener(new OnClickListener() {
                                 String bigImageFilename = ReferenceManager._()
