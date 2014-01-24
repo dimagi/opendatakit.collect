@@ -11,6 +11,14 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.widget.ImageView;
 
+/**
+ * @author wspride
+ *	Class used by MediaLayout for form images. Can be set to resize the
+ *	image using different algorithms based on the preference specified
+ *	by PreferencesActivity.KEY_RESIZE. Overrides setMaxWidth, setMaxHeight,
+ *  and onMeasure from the ImageView super class.
+ */
+
 public class ResizingImageView extends ImageView {
 
 	private int mMaxWidth;
@@ -40,6 +48,18 @@ public class ResizingImageView extends ImageView {
 		mMaxHeight = maxHeight;
 	}
 
+	/*
+	 * The meat and potatoes of the class. Determines what algorithm to use
+	 * to resize the image based on the KEY_RESIZE preference. Currently can be
+	 * "full", "width", or "none". Will always preserve aspect ratio. 
+	 * 
+	 * "full" attempts to use both the calculated height and width to scale the image. however,
+	 * 		its worth noting that the available height is dynamic and difficult to determine
+	 * "width" will always stretch/compress the image to make it the exact width of the screen while
+	 * 		maintaining the aspect ratio
+	 * "none" will leave the picture unchanged
+	 */
+	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -96,7 +116,7 @@ public class ResizingImageView extends ImageView {
 			}
 		}
 	}
-
+	// helper method for algorithm above
 	public static float dipToPixels(Context context, float dipValue) {
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
