@@ -156,7 +156,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
     public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.incomplete.enabled";
-    public static final String KEY_SAVED_ENABLED = "org.odk.collect.saved.enabled";
     
     public static final String KEY_RESIZING_ENABLED = "org.odk.collect.resizing.enabled";
     
@@ -295,9 +294,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             if (savedInstanceState.containsKey(KEY_INSTANCEDESTINATION)) {
             	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
             } 
-            if(savedInstanceState.containsKey(KEY_SAVED_ENABLED)) {
-            	mSavedEnabled = savedInstanceState.getBoolean(KEY_SAVED_ENABLED);
-            }
             if(savedInstanceState.containsKey(KEY_INCOMPLETE_ENABLED)) {
             	mIncompleteEnabled = savedInstanceState.getBoolean(KEY_INCOMPLETE_ENABLED);
             }
@@ -376,10 +372,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 	this.mHeaderString = intent.getStringExtra(KEY_HEADER_STRING);
                 }
                 
-                if(intent.hasExtra(KEY_SAVED_ENABLED)) {
-                	this.mSavedEnabled = intent.getBooleanExtra(KEY_SAVED_ENABLED, true);
-                }
-                
                 if(intent.hasExtra(KEY_INCOMPLETE_ENABLED)) {
                 	this.mIncompleteEnabled = intent.getBooleanExtra(KEY_INCOMPLETE_ENABLED, true);
                 }
@@ -391,7 +383,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                     SharedPreferences.Editor editor = settings.edit();
 
-                    editor.putString(PreferencesActivity.KEY_RESIZE, resizing);
+                    editor.putString(PreferencesActivity.KEY_RESIZE, mResizeMethod);
                     editor.commit();
                 	
                 }
@@ -497,7 +489,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         outState.putString(KEY_FORM_CONTENT_URI, formProviderContentURI.toString());
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
-        outState.putBoolean(KEY_SAVED_ENABLED, mSavedEnabled);
         outState.putBoolean(KEY_INCOMPLETE_ENABLED, mIncompleteEnabled);
         outState.putBoolean(KEY_HAS_SAVED, hasSaved);
         outState.putString(KEY_RESIZING_ENABLED, mResizeMethod);
