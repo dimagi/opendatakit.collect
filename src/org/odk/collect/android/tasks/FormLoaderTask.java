@@ -30,6 +30,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -242,7 +243,19 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
 
         FormController fc = new FormController(fec, mReadOnly);
         
-        fc.setLanguage(Localization.getGlobalLocalizerAdvanced().getLocale());
+        Localizer mLocalizer = Localization.getGlobalLocalizerAdvanced();
+        
+        if(mLocalizer != null){
+        	String mLocale = mLocalizer.getLocale();
+        	if (mLocale != null){
+        		fc.setLanguage(Localization.getGlobalLocalizerAdvanced().getLocale());
+        	}
+        	else{
+        		Logger.log("formloader", "The current locale is not set");
+        	}
+        } else{
+        	Logger.log("formloader", "Could not get the localizer");
+        }
         
         data = new FECWrapper(fc);
         return data;
