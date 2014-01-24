@@ -154,7 +154,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     public static final String KEY_HEADER_STRING = "form_header";
     
-    public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
     public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.incomplete.enabled";
     
     public static final String KEY_RESIZING_ENABLED = "org.odk.collect.resizing.enabled";
