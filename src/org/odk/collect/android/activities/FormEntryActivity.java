@@ -154,7 +154,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     public static final String KEY_HEADER_STRING = "form_header";
     
-    public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.incomplete.enabled";
+    public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.form.management";
     
     public static final String KEY_RESIZING_ENABLED = "org.odk.collect.resizing.enabled";
     
@@ -195,7 +195,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private String mErrorMessage;
     
     private boolean mIncompleteEnabled = true;
-    private boolean mSavedEnabled = true;
     
     private String mResizeMethod = "none";
 
@@ -974,7 +973,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             case FormEntryController.EVENT_BEGINNING_OF_FORM:
                 View startView = View.inflate(this, R.layout.form_entry_start, null);
                 setTitle(getHeaderString());
-                System.out.println("1214 mformController: " + mFormController.getFormTitle());
                 ((TextView) startView.findViewById(R.id.description)).setText(StringUtils.getStringRobust(this, 
                     R.string.enter_data_description, mFormController.getFormTitle()));
 
