@@ -953,6 +953,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 setTitle(getHeaderString());
                 ((TextView) startView.findViewById(R.id.description)).setText(StringUtils.getStringRobust(this, 
                     R.string.enter_data_description, mFormController.getFormTitle()));
+                
+                ((CheckBox) startView.findViewById(R.id.screen_form_entry_start_cbx_dismiss)).setText(StringUtils.getStringRobust(this, 
+                        R.string.form_entry_start_hide));
+                
 
                 Drawable image = null;
                 String[] projection = {
