@@ -1,11 +1,7 @@
 package org.odk.collect.android.views;
 
-import org.odk.collect.android.preferences.PreferencesActivity;
-
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -65,8 +61,6 @@ public class ResizingImageView extends ImageView {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-		String resizeMethod = settings.getString(PreferencesActivity.KEY_RESIZE, "none");
 		
 		if(resizeMethod.equals("full")){
 

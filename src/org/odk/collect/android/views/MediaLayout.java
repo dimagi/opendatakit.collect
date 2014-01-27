@@ -246,12 +246,8 @@ public class MediaLayout extends RelativeLayout {
                         mImageView = new ResizingImageView(getContext());
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
-                        
-                		SharedPreferences settings =
-                				PreferenceManager.getDefaultSharedPreferences(getContext());
-                		String resizeMethod = settings.getString(PreferencesActivity.KEY_RESIZE, "none");
                 		
-                		if(resizeMethod.equals("full")){
+                		if(ResizingImageView.resizeMethod.equals("full")){
                             mImageView.setMaxHeight(maxHeight);
                             mImageView.setMaxWidth(maxWidth);
                 		}

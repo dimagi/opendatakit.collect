@@ -88,21 +88,6 @@ public class FormController {
     
     public FormController(FormEntryController fec, boolean readOnly) {
         mFormEntryController = fec;
-        
-        Localizer mLocalizer = Localization.getGlobalLocalizerAdvanced();
-        
-        if(mLocalizer != null){
-        	String mLocale = mLocalizer.getLocale();
-        	if (mLocale != null && Arrays.asList(this.getLanguages()).contains(mLocale)){
-        		setLanguage(mLocale);
-        	}
-        	else{
-        		Logger.log("formloader", "The current locale is not set");
-        	}
-        } else{
-        	Logger.log("formloader", "Could not get the localizer");
-        }
-        
         mReadOnly = readOnly;
     }
     

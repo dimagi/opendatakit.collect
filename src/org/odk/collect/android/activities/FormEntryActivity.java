@@ -17,6 +17,7 @@ package org.odk.collect.android.activities;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
@@ -25,6 +26,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -2002,6 +2006,20 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         dismissDialog(PROGRESS_DIALOG);
 
         mFormController = fc;
+        
+        Localizer mLocalizer = Localization.getGlobalLocalizerAdvanced();
+        
+        if(mLocalizer != null){
+        	String mLocale = mLocalizer.getLocale();
+        	if (mLocale != null && Arrays.asList(fc.getLanguages()).contains(mLocale)){
+        		fc.setLanguage(mLocale);
+        	}
+        	else{
+        		Logger.log("formloader", "The current locale is not set");
+        	}
+        } else{
+        	Logger.log("formloader", "Could not get the localizer");
+        }
 
         // Set saved answer path
         if (mInstancePath == null) {
@@ -2023,7 +2041,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             return; // so we don't show the intro screen before jumping to the hierarchy
         }
         
-        mFormController.setLanguage(mFormController.getLanguage());
+        //mFormController.setLanguage(mFormController.getLanguage());
         
         /* here was code that loaded cached language preferences fin the
          * collect code. we've overridden that to use our language
