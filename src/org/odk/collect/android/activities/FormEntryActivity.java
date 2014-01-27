@@ -17,6 +17,7 @@ package org.odk.collect.android.activities;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
@@ -25,6 +26,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -48,11 +52,13 @@ import org.odk.collect.android.utilities.Base64Wrapper;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ODKView;
+import org.odk.collect.android.views.ResizingImageView;
 import org.odk.collect.android.widgets.DateTimeWidget;
 import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
+import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -153,7 +159,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     public static final String KEY_HEADER_STRING = "form_header";
     
-    public static final String KEY_FORM_MANAGEMENT = "org.odk.collect.form.management";
+    public static final String KEY_INCOMPLETE_ENABLED = "org.odk.collect.form.management";
+    
+    public static final String KEY_RESIZING_ENABLED = "org.odk.collect.resizing.enabled";
     
     public static final String KEY_HAS_SAVED = "org.odk.collect.form.has.saved";
 
@@ -191,7 +199,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private ProgressDialog mProgressDialog;
     private String mErrorMessage;
     
-    private boolean mFormManagementEnabled = true;
+    private boolean mIncompleteEnabled = true;
 
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped;
@@ -286,8 +294,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             }
             if (savedInstanceState.containsKey(KEY_INSTANCEDESTINATION)) {
             	mInstanceDestination = savedInstanceState.getString(KEY_INSTANCEDESTINATION);
-            } if(savedInstanceState.containsKey(KEY_FORM_MANAGEMENT)) {
-            	mFormManagementEnabled = savedInstanceState.getBoolean(KEY_FORM_MANAGEMENT);
+            } 
+            if(savedInstanceState.containsKey(KEY_INCOMPLETE_ENABLED)) {
+            	mIncompleteEnabled = savedInstanceState.getBoolean(KEY_INCOMPLETE_ENABLED);
+            }
+            if(savedInstanceState.containsKey(KEY_RESIZING_ENABLED)) {
+            	ResizingImageView.resizeMethod = savedInstanceState.getString(KEY_RESIZING_ENABLED);
             }
             if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
 	         	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
@@ -361,8 +373,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 	this.mHeaderString = intent.getStringExtra(KEY_HEADER_STRING);
                 }
                 
-                if(intent.hasExtra(KEY_FORM_MANAGEMENT)) {
-                	this.mFormManagementEnabled = intent.getBooleanExtra(KEY_FORM_MANAGEMENT, true);
+                if(intent.hasExtra(KEY_INCOMPLETE_ENABLED)) {
+                	this.mIncompleteEnabled = intent.getBooleanExtra(KEY_INCOMPLETE_ENABLED, true);
+                }
+                
+                if(intent.hasExtra(KEY_RESIZING_ENABLED)) {
+                	ResizingImageView.resizeMethod = intent.getStringExtra(KEY_RESIZING_ENABLED);
+                	
                 }
                 
                 if(mHeaderString != null) {
@@ -466,8 +483,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         outState.putString(KEY_FORM_CONTENT_URI, formProviderContentURI.toString());
         outState.putString(KEY_INSTANCE_CONTENT_URI, instanceProviderContentURI.toString());
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
-        outState.putBoolean(KEY_FORM_MANAGEMENT, mFormManagementEnabled);
+        outState.putBoolean(KEY_INCOMPLETE_ENABLED, mIncompleteEnabled);
         outState.putBoolean(KEY_HAS_SAVED, hasSaved);
+        outState.putString(KEY_RESIZING_ENABLED, ResizingImageView.resizeMethod);
         
         if(symetricKey != null) {
         	try {
@@ -761,7 +779,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         menu.removeItem(MENU_SAVE);
         menu.removeItem(MENU_PREFERENCES);
 
-        if(mFormManagementEnabled) {
+        if(mIncompleteEnabled) {
 	        menu.add(0, MENU_SAVE, 0, StringUtils.getStringRobust(this, R.string.save_all_answers)).setIcon(
 	            android.R.drawable.ic_menu_save);
         }
@@ -1007,9 +1025,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // checkbox for if finished or ready to send
                 final CheckBox instanceComplete = ((CheckBox) endView.findViewById(R.id.mark_finished));
                 instanceComplete.setText(StringUtils.getStringRobust(this, R.string.mark_finished));
-                instanceComplete.setChecked(mFormManagementEnabled || isInstanceComplete(true));
+                instanceComplete.setChecked(mIncompleteEnabled || isInstanceComplete(true));
                 
-                if(mFormController.isFormReadOnly() || !mFormManagementEnabled) {
+                if(mFormController.isFormReadOnly() || !mIncompleteEnabled) {
                 	instanceComplete.setVisibility(View.GONE);
                 }
 
@@ -1148,6 +1166,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     private void showNextView() { showNextView(false); }
     private void showNextView(boolean resuming) {
+    	
     	if(!resuming && mFormController.getEvent() == FormEntryController.EVENT_BEGINNING_OF_FORM) {
     		//See if we should stop displaying the start screen
     		CheckBox stopShowingIntroScreen = (CheckBox)mCurrentView.findViewById(R.id.screen_form_entry_start_cbx_dismiss);
@@ -1523,7 +1542,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * Create a dialog with options to save and exit, save, or quit without saving
      */
     private void createQuitDialog() {
-        final String[] items = mFormManagementEnabled ?  
+        final String[] items = mIncompleteEnabled ?  
         		new String[] {StringUtils.getStringRobust(this, R.string.keep_changes), StringUtils.getStringRobust(this, R.string.do_not_save)} :
         		new String[] {StringUtils.getStringRobust(this, R.string.do_not_save)};
         
@@ -1991,6 +2010,20 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         dismissDialog(PROGRESS_DIALOG);
 
         mFormController = fc;
+        
+        Localizer mLocalizer = Localization.getGlobalLocalizerAdvanced();
+        
+        if(mLocalizer != null){
+        	String mLocale = mLocalizer.getLocale();
+        	if (mLocale != null && Arrays.asList(fc.getLanguages()).contains(mLocale)){
+        		fc.setLanguage(mLocale);
+        	}
+        	else{
+        		Logger.log("formloader", "The current locale is not set");
+        	}
+        } else{
+        	Logger.log("formloader", "Could not get the localizer");
+        }
 
         // Set saved answer path
         if (mInstancePath == null) {
@@ -2011,29 +2044,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             startActivityForResult(i, HIERARCHY_ACTIVITY_FIRST_START);
             return; // so we don't show the intro screen before jumping to the hierarchy
         }
-
-        // Set the language if one has already been set in the past
-        String[] languageTest = mFormController.getLanguages();
-        if (languageTest != null) {
-            String defaultLanguage = mFormController.getLanguage();
-            String newLanguage = "";
-            String selection = FormsColumns.FORM_FILE_PATH + "=?";
-            String selectArgs[] = {
-                mFormPath
-            };
-            Cursor c = managedQuery(formProviderContentURI, null, selection, selectArgs, null);
-            if (c.getCount() == 1) {
-                c.moveToFirst();
-                newLanguage = c.getString(c.getColumnIndex(FormsColumns.LANGUAGE));
-            }
-
-            // if somehow we end up with a bad language, set it to the default
-            try {
-                mFormController.setLanguage(newLanguage);
-            } catch (Exception e) {
-                mFormController.setLanguage(defaultLanguage);
-            }
-        }
+        
+        //mFormController.setLanguage(mFormController.getLanguage());
+        
+        /* here was code that loaded cached language preferences fin the
+         * collect code. we've overridden that to use our language
+         * from the shared preferences
+         */
 
         refreshCurrentView();
     }

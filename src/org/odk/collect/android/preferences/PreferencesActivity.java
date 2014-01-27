@@ -76,7 +76,7 @@ public class PreferencesActivity extends PreferenceActivity implements
     public static String KEY_SERVER_PREFS = "serverprefs";
 
     public static String googleServerBaseUrl = "https://gather.apis.google.com/odk/n/";
-
+    
     private PreferenceScreen mSplashPathPreference;
     private EditTextPreference mSubmissionUrlPreference;
     private EditTextPreference mFormListUrlPreference;

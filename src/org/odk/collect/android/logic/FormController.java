@@ -14,15 +14,22 @@
 
 package org.odk.collect.android.logic;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
@@ -33,10 +40,6 @@ import org.odk.collect.android.views.ODKView;
 import org.odk.collect.android.widgets.WidgetFactory;
 
 import android.util.Log;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Vector;
 
 /**
  * This class is a wrapper for Javarosa's FormEntryController. In theory, if you wanted to replace

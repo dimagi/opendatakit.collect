@@ -6,6 +6,7 @@ import java.io.File;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.odk.collect.android.R;
+import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.QRCodeEncoder;
 
@@ -13,19 +14,21 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.zxing.BarcodeFormat;
 
 /**
  * This layout is used anywhere we can have image/audio/video/text. TODO: It would probably be nice
@@ -39,19 +42,22 @@ public class MediaLayout extends RelativeLayout {
     private TextView mView_Text;
     private AudioButton mAudioButton;
     private ImageButton mVideoButton;
-    private ImageView mImageView;
+    private ResizingImageView mImageView;
     private TextView mMissingImage;
+    
+    private int minimumHeight =-1;
+    private int maximumHeight =-1;
 
 
     public MediaLayout(Context c) {
         super(c);
+
         mView_Text = null;
         mAudioButton = null;
         mImageView = null;
         mMissingImage = null;
         mVideoButton = null;
     }
-
     
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI) {
     	setAVT(text, audioURI, imageURI, videoURI, bigImageURI, null);
@@ -62,15 +68,16 @@ public class MediaLayout extends RelativeLayout {
 
         // Layout configurations for our elements in the relative layout
         RelativeLayout.LayoutParams textParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams audioParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams imageParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        imageParams.addRule(CENTER_IN_PARENT);
         RelativeLayout.LayoutParams videoParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         
-        RelativeLayout.LayoutParams topPaneParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams topPaneParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout topPane = new RelativeLayout(this.getContext());
         topPane.setId(2342134);
         
@@ -84,7 +91,7 @@ public class MediaLayout extends RelativeLayout {
         } else {
             // No audio file specified, so ignore.
         }
-
+        
         // Then set up the video button
         if (videoURI != null) {
             // An audio file is specified
@@ -177,11 +184,13 @@ public class MediaLayout extends RelativeLayout {
                 
             		image = qrCodeEncoder.encodeAsBitmap();
             		
-            		mImageView = new ImageView(getContext());
+            		mImageView = new ResizingImageView(getContext());
             		mImageView.setPadding(10, 10, 10, 10);
             		mImageView.setAdjustViewBounds(true);
+            		mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             		mImageView.setImageBitmap(image);
             		mImageView.setId(23423534);
+            		//mImageView.resizeMaxMin(minimumHeight, maximumHeight);
             		
             		imageView = mImageView;
             	} catch(Exception e) {
@@ -191,11 +200,29 @@ public class MediaLayout extends RelativeLayout {
         	
     	} else if (imageURI != null) {
             try {
-
+            	
+            	DisplayMetrics metrics = this.getContext().getResources().getDisplayMetrics();
+            	int maxWidth = metrics.widthPixels;
+            	int maxHeight = metrics.heightPixels;
+            	
+            	// subtract height for textviewa and buttons, if present
+            	
+            	if(mView_Text != null){
+            		maxHeight = maxHeight - mView_Text.getHeight();
+            	} if(mVideoButton != null){
+            		maxHeight = maxHeight - mVideoButton.getHeight();
+            	} else if(mAudioButton != null){
+            		maxHeight = maxHeight - mAudioButton.getHeight();
+            	}
+            	
+            	// reduce by third for safety
+            	
+            	maxHeight = (2 * maxHeight)/3;
+            	
                 
                 //If we didn't get an image yet, try for a norm
 
-                String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                final String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
                 final File imageFile = new File(imageFilename);
                 
                 if (imageFile.exists()) {
@@ -216,11 +243,18 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                        mImageView = new ImageView(getContext());
+                        mImageView = new ResizingImageView(getContext());
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
+                		
+                		if(ResizingImageView.resizeMethod.equals("full")){
+                            mImageView.setMaxHeight(maxHeight);
+                            mImageView.setMaxWidth(maxWidth);
+                		}
+                       
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
+                        
                         if (bigImageURI != null) {
                             mImageView.setOnClickListener(new OnClickListener() {
                                 String bigImageFilename = ReferenceManager._()
@@ -242,6 +276,24 @@ public class MediaLayout extends RelativeLayout {
                                     }
                                 }
                             });
+                        }
+                        else{
+                        	/* don't override ODK default behavior, but in else case make image onClick 
+                        	/ launch full screen mode.
+                        	 * TODO: Decide if we should remove default behavior. 
+                        	 */
+                        	mImageView.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+	
+								    Intent intent = new Intent();
+								    //hack in file:// so that default gallery applicaiton can open
+								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
+
+								    ((Activity)getContext()).startActivity(intent);
+
+								}
+                        	});
                         }
                         imageView = mImageView;
                     } else if (errorMsg == null) {
@@ -300,7 +352,7 @@ public class MediaLayout extends RelativeLayout {
      */
     public void addDivider(ImageView v) {
         RelativeLayout.LayoutParams dividerParams =
-            new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         if (mImageView != null) {
             dividerParams.addRule(RelativeLayout.BELOW, mImageView.getId());
         } else if (mMissingImage != null) {
