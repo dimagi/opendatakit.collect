@@ -243,20 +243,6 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
 
         FormController fc = new FormController(fec, mReadOnly);
         
-        Localizer mLocalizer = Localization.getGlobalLocalizerAdvanced();
-        
-        if(mLocalizer != null){
-        	String mLocale = mLocalizer.getLocale();
-        	if (mLocale != null){
-        		fc.setLanguage(Localization.getGlobalLocalizerAdvanced().getLocale());
-        	}
-        	else{
-        		Logger.log("formloader", "The current locale is not set");
-        	}
-        } else{
-        	Logger.log("formloader", "Could not get the localizer");
-        }
-        
         data = new FECWrapper(fc);
         return data;
 
