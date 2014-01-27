@@ -20,6 +20,8 @@ import android.widget.ImageView;
  */
 
 public class ResizingImageView extends ImageView {
+	
+	public static String resizeMethod;
 
 	private int mMaxWidth;
 	private int mMaxHeight;
@@ -63,9 +65,6 @@ public class ResizingImageView extends ImageView {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-		SharedPreferences settings =
-				PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		String resizeMethod = settings.getString(PreferencesActivity.KEY_RESIZE, "none");
 		

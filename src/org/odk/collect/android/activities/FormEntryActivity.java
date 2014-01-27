@@ -48,6 +48,7 @@ import org.odk.collect.android.utilities.Base64Wrapper;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ODKView;
+import org.odk.collect.android.views.ResizingImageView;
 import org.odk.collect.android.widgets.DateTimeWidget;
 import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
@@ -195,8 +196,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private String mErrorMessage;
     
     private boolean mIncompleteEnabled = true;
-    
-    private String mResizeMethod = "none";
 
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped;
@@ -296,7 +295,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             	mIncompleteEnabled = savedInstanceState.getBoolean(KEY_INCOMPLETE_ENABLED);
             }
             if(savedInstanceState.containsKey(KEY_RESIZING_ENABLED)) {
-            	mResizeMethod = savedInstanceState.getString(KEY_RESIZING_ENABLED);
+            	ResizingImageView.resizeMethod = savedInstanceState.getString(KEY_RESIZING_ENABLED);
             }
             if (savedInstanceState.containsKey(KEY_AES_STORAGE_KEY)) {
 	         	String base64Key = savedInstanceState.getString(KEY_AES_STORAGE_KEY);
@@ -375,14 +374,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 
                 if(intent.hasExtra(KEY_RESIZING_ENABLED)) {
-                	this.mResizeMethod = intent.getStringExtra(KEY_RESIZING_ENABLED);
-                	
-                    SharedPreferences settings =
-                        PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                    SharedPreferences.Editor editor = settings.edit();
-
-                    editor.putString(PreferencesActivity.KEY_RESIZE, mResizeMethod);
-                    editor.commit();
+                	ResizingImageView.resizeMethod = intent.getStringExtra(KEY_RESIZING_ENABLED);
                 	
                 }
                 
@@ -489,7 +481,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         outState.putString(KEY_INSTANCEDESTINATION, mInstanceDestination);
         outState.putBoolean(KEY_INCOMPLETE_ENABLED, mIncompleteEnabled);
         outState.putBoolean(KEY_HAS_SAVED, hasSaved);
-        outState.putString(KEY_RESIZING_ENABLED, mResizeMethod);
+        outState.putString(KEY_RESIZING_ENABLED, ResizingImageView.resizeMethod);
         
         if(symetricKey != null) {
         	try {
