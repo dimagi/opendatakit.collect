@@ -2015,7 +2015,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         if(mLocalizer != null){
         	String mLocale = mLocalizer.getLocale();
-        	if (mLocale != null && Arrays.asList(fc.getLanguages()).contains(mLocale)){
+        	
+        	if (mLocale != null && fc.getLanguages() != null && Arrays.asList(fc.getLanguages()).contains(mLocale)){
         		fc.setLanguage(mLocale);
         	}
         	else{
