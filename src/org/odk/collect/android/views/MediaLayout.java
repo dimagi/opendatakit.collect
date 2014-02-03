@@ -72,7 +72,7 @@ public class MediaLayout extends RelativeLayout {
         RelativeLayout.LayoutParams audioParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams imageParams =
-            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         imageParams.addRule(CENTER_IN_PARENT);
         RelativeLayout.LayoutParams videoParams =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
