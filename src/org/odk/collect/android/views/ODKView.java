@@ -344,6 +344,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * @param answer
      */
     public void setBinaryData(Object answer) {
+    	
         boolean set = false;
         for (QuestionWidget q : widgets) {
             if (q instanceof IBinaryWidget) {
@@ -356,7 +357,17 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         }
 
         if (!set) {
-            Log.w(t, "Attempting to return data to a widget or set of widgets no looking for data");
+        	Log.w(t, "Attempting to return data to a widget or set of widgets no looking for data");
+        	         
+            for (QuestionWidget q : widgets) {
+                if (q instanceof IBinaryWidget) {
+                    ((IBinaryWidget) q).setBinaryData(answer);
+                    set = true;
+                    break;
+                }
+            }
+            
+            
         }
     }
 
