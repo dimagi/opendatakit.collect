@@ -21,6 +21,7 @@
 <string name="advance">forward to\nnext\nprompt</string>
 <string name="altitude">Altitude</string>
 <string name="app_name">ODK Collect</string>
+<string name="attachment_oversized">Warning: attached large file of size %s.</string>
 <string name="audio_file_error">No audio file was specified.</string>
 <string name="audio_file_invalid">File: %s is not a valid audio file.</string>
 <string name="backup">back to\nprevious\nprompt</string>

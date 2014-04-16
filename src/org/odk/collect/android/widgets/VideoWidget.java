@@ -239,6 +239,13 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         String binaryPath = getPathFromUri((Uri) binaryuri);
         String extension = binaryPath.substring(binaryPath.lastIndexOf("."));
         String destVideoPath = mInstanceFolder + "/" + System.currentTimeMillis() + extension;
+        
+        if(FileUtils.isFileOversized(new File(binaryPath))){
+            Toast.makeText(getContext(),
+            		StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, FileUtils.getFileSize(new File(binaryPath))+"mb"),
+                    Toast.LENGTH_LONG).show();
+            
+        }
 
         File source = new File(binaryPath);
         File newVideo = new File(destVideoPath);

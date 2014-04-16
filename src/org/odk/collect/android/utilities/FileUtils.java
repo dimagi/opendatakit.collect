@@ -56,6 +56,9 @@ public class FileUtils {
 
     // Used to validate and display valid form names.
     public static final String VALID_FILENAME = "[ _\\-A-Za-z0-9]*.x[ht]*ml";
+    
+    //highest allowable file size without warning
+    public static int WARNING_SIZE = 3072;
 
     
     public static boolean createFolder(String path) {
@@ -354,5 +357,15 @@ public class FileUtils {
             }
         }
         return e;
+    }
+    
+    public static boolean isFileOversized(File mf){
+    	double length = getFileSize(mf);
+    	System.out.println(length);
+    	return length > WARNING_SIZE;
+    }
+    
+    public static double getFileSize(File mf){
+    	return mf.length()/(1024);
     }
 }

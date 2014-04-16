@@ -540,6 +540,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 String s = mInstanceFolder + "/" + System.currentTimeMillis() + ".jpg";
 
                 File nf = new File(s);
+                
+                if(FileUtils.isFileOversized(fi)){
+                    Toast.makeText(this,
+                    		StringUtils.getStringRobust(this, R.string.attachment_oversized, FileUtils.getFileSize(fi)+"mb"),
+                            Toast.LENGTH_LONG).show();
+                }
+                    
+                
                 if (!fi.renameTo(nf)) {
                     Log.e(t, "Failed to rename " + fi.getAbsolutePath());
                 } else {
@@ -594,6 +602,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
                 File source = new File(sourceImagePath);
                 File newImage = new File(destImagePath);
+                
+                if(FileUtils.isFileOversized(source)){
+                    Toast.makeText(this,
+                    		StringUtils.getStringRobust(this, R.string.attachment_oversized, FileUtils.getFileSize(source)+"mb"),
+                            Toast.LENGTH_LONG).show();
+                }
+                
                 FileUtils.copyFile(source, newImage);
 
                 if (newImage.exists()) {
@@ -624,6 +639,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // For audio/video capture/chooser, we get the URI from the content provider
                 // then the widget copies the file and makes a new entry in the content provider.
                 Uri media = intent.getData();
+
                 ((ODKView) mCurrentView).setBinaryData(media);
                 saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
                 refreshCurrentView();
