@@ -60,7 +60,6 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
 
     private boolean mWaitingForData;
 
-
     public VideoWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
@@ -159,6 +158,14 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         mBinaryName = prompt.getAnswerText();
         if (mBinaryName != null) {
             mPlayButton.setEnabled(true);
+            
+            File f = new File(mInstanceFolder + "/" + mBinaryName);
+            
+            double binarysize = FileUtils.getFileSize(f);
+            if(FileUtils.isFileOversized(f)){
+            	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
+            }
+            
         } else {
             mPlayButton.setEnabled(false);
         }
@@ -239,17 +246,15 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         String binaryPath = getPathFromUri((Uri) binaryuri);
         String extension = binaryPath.substring(binaryPath.lastIndexOf("."));
         String destVideoPath = mInstanceFolder + "/" + System.currentTimeMillis() + extension;
-        
-        if(FileUtils.isFileOversized(new File(binaryPath))){
-            Toast.makeText(getContext(),
-            		StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, FileUtils.getFileSize(new File(binaryPath))+"mb"),
-                    Toast.LENGTH_LONG).show();
-            
-        }
 
         File source = new File(binaryPath);
         File newVideo = new File(destVideoPath);
         FileUtils.copyFile(source, newVideo);
+        
+        double binarysize = FileUtils.getFileSize(newVideo);
+        if(FileUtils.isFileOversized(newVideo)){
+        	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
+        }
 
         if (newVideo.exists()) {
             // Add the copy to the content provier

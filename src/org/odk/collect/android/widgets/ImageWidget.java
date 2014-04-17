@@ -63,6 +63,8 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
     private String mInstanceFolder;
     private boolean mWaitingForData;
+    
+    private double binarysize = 0;
 
     private TextView mErrorTextView;
 
@@ -175,7 +177,12 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
             int screenHeight = display.getHeight();
 
             File f = new File(mInstanceFolder + "/" + mBinaryName);
-
+            
+            binarysize = FileUtils.getFileSize(f);
+            if(FileUtils.isFileOversized(f)){
+            	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+" mb"));
+            }
+            
             if (f.exists()) {
                 Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f, screenHeight, screenWidth);
                 if (bmp == null) {
@@ -324,7 +331,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
 
     @Override
-    public void setBinaryData(Object binaryuri) {
+	public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. delete the previous image using the
         // content provider.
         if (mBinaryName != null) {
@@ -333,6 +340,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         String binarypath = getPathFromUri((Uri) binaryuri);
         File f = new File(binarypath);
         mBinaryName = f.getName();
+        double binarysize = FileUtils.getFileSize(f);
+        if(FileUtils.isFileOversized(f)){
+        	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
+        }
         Log.i(t, "Setting current answer to " + f.getName());
 
         mWaitingForData = false;

@@ -541,13 +541,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
                 File nf = new File(s);
                 
-                if(FileUtils.isFileOversized(fi)){
-                    Toast.makeText(this,
-                    		StringUtils.getStringRobust(this, R.string.attachment_oversized, FileUtils.getFileSize(fi)+"mb"),
-                            Toast.LENGTH_LONG).show();
-                }
-                    
-                
                 if (!fi.renameTo(nf)) {
                     Log.e(t, "Failed to rename " + fi.getAbsolutePath());
                 } else {
@@ -602,12 +595,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
                 File source = new File(sourceImagePath);
                 File newImage = new File(destImagePath);
-                
-                if(FileUtils.isFileOversized(source)){
-                    Toast.makeText(this,
-                    		StringUtils.getStringRobust(this, R.string.attachment_oversized, FileUtils.getFileSize(source)+"mb"),
-                            Toast.LENGTH_LONG).show();
-                }
                 
                 FileUtils.copyFile(source, newImage);
 

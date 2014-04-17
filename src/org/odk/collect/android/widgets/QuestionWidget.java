@@ -120,6 +120,28 @@ public abstract class QuestionWidget extends LinearLayout {
         }
     }
     
+    public void notifyWarning(String text) {
+    	this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_warn));
+    	
+    	if(this.toastView == null) {
+    		this.toastView = View.inflate(this.getContext(), R.layout.toast_view, this).findViewById(R.id.toast_view_root);
+    		focusPending = true;
+    	} else {
+    		if(this.toastView.getVisibility() != View.VISIBLE) {
+    			this.toastView.setVisibility(View.VISIBLE);
+    			focusPending = true;
+    		}
+    	}
+    	TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
+    	messageView.setText(text);
+    	
+    	//If the toastView already exists, we can just scroll to it right now
+    	//if not, we actually have to do it later, when we lay this all back out
+    	if(!focusPending) {
+            requestViewOnScreen(messageView);
+    	}
+    }
+    
     public void notifyInvalid(String text) {
     	this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
     	
