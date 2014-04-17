@@ -63,8 +63,6 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
     private String mInstanceFolder;
     private boolean mWaitingForData;
-    
-    private double binarysize = 0;
 
     private TextView mErrorTextView;
 
@@ -178,7 +176,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
             File f = new File(mInstanceFolder + "/" + mBinaryName);
             
-            binarysize = FileUtils.getFileSize(f);
+            double binarysize = FileUtils.getFileSize(f);
             if(FileUtils.isFileOversized(f)){
             	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+" mb"));
             }
