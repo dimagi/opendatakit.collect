@@ -176,10 +176,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
             File f = new File(mInstanceFolder + "/" + mBinaryName);
             
-            double binarysize = FileUtils.getFileSize(f);
-            if(FileUtils.isFileOversized(f)){
-            	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+" mb"));
-            }
+            checkFileSize(f);
             
             if (f.exists()) {
                 Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f, screenHeight, screenWidth);
@@ -338,10 +335,6 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         String binarypath = getPathFromUri((Uri) binaryuri);
         File f = new File(binarypath);
         mBinaryName = f.getName();
-        double binarysize = FileUtils.getFileSize(f);
-        if(FileUtils.isFileOversized(f)){
-        	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
-        }
         Log.i(t, "Setting current answer to " + f.getName());
 
         mWaitingForData = false;

@@ -161,10 +161,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
             
             File f = new File(mInstanceFolder + "/" + mBinaryName);
             
-            double binarysize = FileUtils.getFileSize(f);
-            if(FileUtils.isFileOversized(f)){
-            	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
-            }
+            checkFileSize(f);
             
         } else {
             mPlayButton.setEnabled(false);
@@ -251,10 +248,7 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         File newVideo = new File(destVideoPath);
         FileUtils.copyFile(source, newVideo);
         
-        double binarysize = FileUtils.getFileSize(newVideo);
-        if(FileUtils.isFileOversized(newVideo)){
-        	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
-        }
+        checkFileSize(newVideo);
 
         if (newVideo.exists()) {
             // Add the copy to the content provier

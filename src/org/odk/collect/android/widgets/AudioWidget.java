@@ -159,10 +159,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
             mPlayButton.setEnabled(true);
             File f = new File(mInstanceFolder + "/" + mBinaryName);
             
-            double binarysize = FileUtils.getFileSize(f);
-            if(FileUtils.isFileOversized(f)){
-            	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
-            }
+            checkFileSize(f);
         } else {
             mPlayButton.setEnabled(false);
         }
@@ -247,10 +244,7 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
         File newAudio = new File(destAudioPath);
         FileUtils.copyFile(source, newAudio);
         
-        double binarysize = FileUtils.getFileSize(newAudio);
-        if(FileUtils.isFileOversized(newAudio)){
-        	this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, binarysize+""));
-        }
+       checkFileSize(newAudio);
 
         if (newAudio.exists()) {
             // Add the copy to the content provier

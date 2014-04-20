@@ -1,6 +1,6 @@
 package org.odk.collect.android.widgets;
 
-import java.util.regex.Matcher;
+import java.io.File;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.AnswerDataFactory;
@@ -10,6 +10,8 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.MediaLayout;
 import org.odk.collect.android.views.ShrinkingTextView;
 
@@ -22,7 +24,6 @@ import android.text.Spannable;
 import android.text.TextPaint;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
-import android.text.util.Linkify.TransformFilter;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -120,8 +121,12 @@ public abstract class QuestionWidget extends LinearLayout {
         }
     }
     
-    public void notifyWarning(String text) {
-    	this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_warn));
+    public void notifyOnScreen(String text, boolean strong){
+    	if(strong){
+    		this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
+    	} else{
+    		this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_warn));
+    	}
     	
     	if(this.toastView == null) {
     		this.toastView = View.inflate(this.getContext(), R.layout.toast_view, this).findViewById(R.id.toast_view_root);
@@ -142,26 +147,12 @@ public abstract class QuestionWidget extends LinearLayout {
     	}
     }
     
+    public void notifyWarning(String text) {
+    	notifyOnScreen(text, false);
+    }
+    
     public void notifyInvalid(String text) {
-    	this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
-    	
-    	if(this.toastView == null) {
-    		this.toastView = View.inflate(this.getContext(), R.layout.toast_view, this).findViewById(R.id.toast_view_root);
-    		focusPending = true;
-    	} else {
-    		if(this.toastView.getVisibility() != View.VISIBLE) {
-    			this.toastView.setVisibility(View.VISIBLE);
-    			focusPending = true;
-    		}
-    	}
-    	TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
-    	messageView.setText(text);
-    	
-    	//If the toastView already exists, we can just scroll to it right now
-    	//if not, we actually have to do it later, when we lay this all back out
-    	if(!focusPending) {
-            requestViewOnScreen(messageView);
-    	}
+    	notifyOnScreen(text, true);
     }
     
     private void requestViewOnScreen(View view) {
@@ -325,5 +316,15 @@ public abstract class QuestionWidget extends LinearLayout {
 		if(hasListener){
 			widgetChangedListener.widgetEntryChanged();
 		}
+	}
+	
+	public void checkFileSize(File file){
+		if(FileUtils.isFileOversized(file)){
+			this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, FileUtils.getFileSize(file)+""));
+		}
+	}
+	
+	public void checkFileSize(String filepath){
+		checkFileSize(new File(filepath));
 	}
 }
