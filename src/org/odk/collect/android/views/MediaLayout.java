@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
@@ -282,15 +283,17 @@ public class MediaLayout extends RelativeLayout {
                         	/ launch full screen mode.
                         	 * TODO: Decide if we should remove default behavior. 
                         	 */
-                        	mImageView.setOnClickListener(new OnClickListener() {
+                        	mImageView.setOnTouchListener(new OnTouchListener() {
 								@Override
-								public void onClick(View v) {
+								public boolean onTouch(View v, MotionEvent event) {
 	
 								    Intent intent = new Intent();
 								    //hack in file:// so that default gallery applicaiton can open
 								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
 
 								    ((Activity)getContext()).startActivity(intent);
+								    
+								    return true;
 
 								}
                         	});
