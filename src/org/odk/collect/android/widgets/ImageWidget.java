@@ -175,7 +175,9 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
             int screenHeight = display.getHeight();
 
             File f = new File(mInstanceFolder + "/" + mBinaryName);
-
+            
+            checkFileSize(f);
+            
             if (f.exists()) {
                 Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f, screenHeight, screenWidth);
                 if (bmp == null) {
@@ -324,7 +326,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
 
     @Override
-    public void setBinaryData(Object binaryuri) {
+	public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. delete the previous image using the
         // content provider.
         if (mBinaryName != null) {

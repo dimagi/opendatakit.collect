@@ -60,7 +60,6 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
 
     private boolean mWaitingForData;
 
-
     public AudioWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
@@ -158,6 +157,9 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
         mBinaryName = prompt.getAnswerText();
         if (mBinaryName != null) {
             mPlayButton.setEnabled(true);
+            File f = new File(mInstanceFolder + "/" + mBinaryName);
+            
+            checkFileSize(f);
         } else {
             mPlayButton.setEnabled(false);
         }
@@ -241,6 +243,8 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
         File source = new File(binaryPath);
         File newAudio = new File(destAudioPath);
         FileUtils.copyFile(source, newAudio);
+        
+       checkFileSize(newAudio);
 
         if (newAudio.exists()) {
             // Add the copy to the content provier

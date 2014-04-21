@@ -60,7 +60,6 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
 
     private boolean mWaitingForData;
 
-
     public VideoWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
@@ -159,6 +158,11 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         mBinaryName = prompt.getAnswerText();
         if (mBinaryName != null) {
             mPlayButton.setEnabled(true);
+            
+            File f = new File(mInstanceFolder + "/" + mBinaryName);
+            
+            checkFileSize(f);
+            
         } else {
             mPlayButton.setEnabled(false);
         }
@@ -243,6 +247,8 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         File source = new File(binaryPath);
         File newVideo = new File(destVideoPath);
         FileUtils.copyFile(source, newVideo);
+        
+        checkFileSize(newVideo);
 
         if (newVideo.exists()) {
             // Add the copy to the content provier
