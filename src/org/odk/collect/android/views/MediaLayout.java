@@ -185,7 +185,11 @@ public class MediaLayout extends RelativeLayout {
                 
             		image = qrCodeEncoder.encodeAsBitmap();
             		
-            		mImageView = new ResizingImageView(getContext());
+            		mImageView = new ResizingImageView(getContext()){
+            			public void onDoubleClick(){
+            				
+            			}
+            		};
             		mImageView.setPadding(10, 10, 10, 10);
             		mImageView.setAdjustViewBounds(true);
             		mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -244,7 +248,35 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                        mImageView = new ResizingImageView(getContext());
+                    	mImageView = new ResizingImageView(getContext()){
+                    		public void onDoubleClick(){
+                    			if(bigImageURI != null){
+                    				String bigImageFilename;
+									try {
+										bigImageFilename = ReferenceManager._()
+												.DeriveReference(bigImageURI).getLocalURI();
+	                    				File bigImage = new File(bigImageFilename);
+
+	                    				Intent i = new Intent("android.intent.action.VIEW");
+	                    				i.setDataAndType(Uri.fromFile(bigImage), "image/*");
+	                    				getContext().startActivity(i);
+									} catch (InvalidReferenceException e1) {
+										e1.printStackTrace();
+									} catch (ActivityNotFoundException e) {
+                    					Toast.makeText(
+                    							getContext(),
+                    							getContext().getString(R.string.activity_not_found,
+                    									"view image"), Toast.LENGTH_SHORT);
+                    				}
+                    			} else{
+								    Intent intent = new Intent();
+								    //hack in file:// so that default gallery applicaiton can open
+								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
+
+								    ((Activity)getContext()).startActivity(intent);
+                    			}
+                    		}
+                    	};
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
                 		
@@ -255,49 +287,6 @@ public class MediaLayout extends RelativeLayout {
                        
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
-                        
-                        if (bigImageURI != null) {
-                            mImageView.setOnClickListener(new OnClickListener() {
-                                String bigImageFilename = ReferenceManager._()
-                                        .DeriveReference(bigImageURI).getLocalURI();
-                                File bigImage = new File(bigImageFilename);
-
-
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent("android.intent.action.VIEW");
-                                    i.setDataAndType(Uri.fromFile(bigImage), "image/*");
-                                    try {
-                                        getContext().startActivity(i);
-                                    } catch (ActivityNotFoundException e) {
-                                        Toast.makeText(
-                                            getContext(),
-                                            getContext().getString(R.string.activity_not_found,
-                                                "view image"), Toast.LENGTH_SHORT);
-                                    }
-                                }
-                            });
-                        }
-                        else{
-                        	/* don't override ODK default behavior, but in else case make image onClick 
-                        	/ launch full screen mode.
-                        	 * TODO: Decide if we should remove default behavior. 
-                        	 */
-                        	mImageView.setOnTouchListener(new OnTouchListener() {
-								@Override
-								public boolean onTouch(View v, MotionEvent event) {
-	
-								    Intent intent = new Intent();
-								    //hack in file:// so that default gallery applicaiton can open
-								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
-
-								    ((Activity)getContext()).startActivity(intent);
-								    
-								    return true;
-
-								}
-                        	});
-                        }
                         imageView = mImageView;
                     } else if (errorMsg == null) {
                         // An error hasn't been logged and loading the image failed, so it's likely

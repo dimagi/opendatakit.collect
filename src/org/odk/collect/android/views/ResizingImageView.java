@@ -1,10 +1,15 @@
 package org.odk.collect.android.views;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 
 /**
@@ -15,25 +20,37 @@ import android.widget.ImageView;
  *  and onMeasure from the ImageView super class.
  */
 
-public class ResizingImageView extends ImageView {
+public abstract class ResizingImageView extends ImageView {
+	
+	public abstract void onDoubleClick();
 	
 	public static String resizeMethod;
 
 	private int mMaxWidth;
 	private int mMaxHeight;
+	
+	GestureDetector gestureDetector;
 
 	public ResizingImageView(Context context) {
 		super(context);
+		gestureDetector = new GestureDetector(context, new GestureListener());
 	}
 
 	public ResizingImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		gestureDetector = new GestureDetector(context, new GestureListener());
 	}
 
 	public ResizingImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		gestureDetector = new GestureDetector(context, new GestureListener());
 	}
 
+	@Override
+	public boolean onTouchEvent(MotionEvent e) {
+	    return gestureDetector.onTouchEvent(e);
+	}
+	
 	@Override
 	public void setMaxWidth(int maxWidth) {
 		super.setMaxWidth(maxWidth);
@@ -44,6 +61,24 @@ public class ResizingImageView extends ImageView {
 	public void setMaxHeight(int maxHeight) {
 		super.setMaxHeight(maxHeight);
 		mMaxHeight = maxHeight;
+	}
+	
+	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+	    @Override
+	    public boolean onDown(MotionEvent e) {
+	        return true;
+	    }
+	    // event when double tap occurs
+	    @Override
+	    public boolean onDoubleTap(MotionEvent e) {
+	        float x = e.getX();
+	        float y = e.getY();
+	        
+		    onDoubleClick();
+
+	        return true;
+	    }
 	}
 
 	/*
