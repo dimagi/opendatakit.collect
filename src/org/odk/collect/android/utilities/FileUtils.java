@@ -361,7 +361,6 @@ public class FileUtils {
     
     public static boolean isFileOversized(File mf){
     	double length = getFileSize(mf);
-    	System.out.println(length);
     	return length > WARNING_SIZE;
     }
     
