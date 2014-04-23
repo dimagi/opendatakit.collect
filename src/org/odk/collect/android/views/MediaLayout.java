@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
@@ -224,7 +225,6 @@ public class MediaLayout extends RelativeLayout {
 
                 final String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
                 final File imageFile = new File(imageFilename);
-                
                 if (imageFile.exists()) {
                     Bitmap b = null;
                     try {
@@ -243,7 +243,7 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                        mImageView = new ResizingImageView(getContext());
+                    	mImageView = new ResizingImageView(getContext(), imageURI, bigImageURI);
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
                 		
@@ -254,47 +254,6 @@ public class MediaLayout extends RelativeLayout {
                        
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
-                        
-                        if (bigImageURI != null) {
-                            mImageView.setOnClickListener(new OnClickListener() {
-                                String bigImageFilename = ReferenceManager._()
-                                        .DeriveReference(bigImageURI).getLocalURI();
-                                File bigImage = new File(bigImageFilename);
-
-
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent("android.intent.action.VIEW");
-                                    i.setDataAndType(Uri.fromFile(bigImage), "image/*");
-                                    try {
-                                        getContext().startActivity(i);
-                                    } catch (ActivityNotFoundException e) {
-                                        Toast.makeText(
-                                            getContext(),
-                                            getContext().getString(R.string.activity_not_found,
-                                                "view image"), Toast.LENGTH_SHORT);
-                                    }
-                                }
-                            });
-                        }
-                        else{
-                        	/* don't override ODK default behavior, but in else case make image onClick 
-                        	/ launch full screen mode.
-                        	 * TODO: Decide if we should remove default behavior. 
-                        	 */
-                        	mImageView.setOnClickListener(new OnClickListener() {
-								@Override
-								public void onClick(View v) {
-	
-								    Intent intent = new Intent();
-								    //hack in file:// so that default gallery applicaiton can open
-								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
-
-								    ((Activity)getContext()).startActivity(intent);
-
-								}
-                        	});
-                        }
                         imageView = mImageView;
                     } else if (errorMsg == null) {
                         // An error hasn't been logged and loading the image failed, so it's likely

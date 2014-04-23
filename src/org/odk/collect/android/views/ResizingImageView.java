@@ -1,11 +1,25 @@
 package org.odk.collect.android.views;
 
+import java.io.File;
+
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
+import org.odk.collect.android.R;
+import org.odk.collect.android.listeners.DoubleClickListener;
+
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 /**
  * @author wspride
@@ -21,19 +35,28 @@ public class ResizingImageView extends ImageView {
 
 	private int mMaxWidth;
 	private int mMaxHeight;
+	
+	GestureDetector gestureDetector;
+	
+	String imageURI;
+	String bigImageURI;
 
 	public ResizingImageView(Context context) {
+		this(context, null, null);
+	}
+	
+	public ResizingImageView(Context context, String imageURI, String bigImageURI){
 		super(context);
+		gestureDetector = new GestureDetector(context, new GestureListener());
+		this.imageURI = imageURI;
+		this.bigImageURI = bigImageURI;
 	}
 
-	public ResizingImageView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	@Override
+	public boolean onTouchEvent(MotionEvent e) {
+	    return gestureDetector.onTouchEvent(e);
 	}
-
-	public ResizingImageView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-	}
-
+	
 	@Override
 	public void setMaxWidth(int maxWidth) {
 		super.setMaxWidth(maxWidth);
@@ -44,6 +67,54 @@ public class ResizingImageView extends ImageView {
 	public void setMaxHeight(int maxHeight) {
 		super.setMaxHeight(maxHeight);
 		mMaxHeight = maxHeight;
+	}
+	
+	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+	    @Override
+	    public boolean onDown(MotionEvent e) {
+	        return true;
+	    }
+	    // event when double tap occurs
+	    @Override
+	    public boolean onDoubleTap(MotionEvent e) {
+	        float x = e.getX();
+	        float y = e.getY();
+	        
+		    onDoubleClick();
+
+	        return true;
+	    }
+	}
+	
+	public void onDoubleClick(){
+		
+		String imageFileURI;
+		
+		if(bigImageURI != null){
+			imageFileURI = bigImageURI;
+		} else if(imageURI != null){
+			imageFileURI = imageURI;
+		} else{
+			return;
+		}
+		
+		try {
+			String imageFilename = ReferenceManager._()
+					.DeriveReference(imageFileURI).getLocalURI();
+			File bigImage = new File(imageFilename);
+
+			Intent i = new Intent("android.intent.action.VIEW");
+			i.setDataAndType(Uri.fromFile(bigImage), "image/*");
+			getContext().startActivity(i);
+		} catch (InvalidReferenceException e1) {
+			e1.printStackTrace();
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(
+					getContext(),
+					getContext().getString(R.string.activity_not_found,
+							"view image"), Toast.LENGTH_SHORT);
+		}
 	}
 
 	/*
