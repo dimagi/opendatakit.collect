@@ -46,7 +46,6 @@ public class DateWidget extends QuestionWidget {
     @SuppressLint("NewApi")
     public DateWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
-
         mDatePicker = new DatePicker(getContext());
         mDatePicker.setFocusable(!prompt.isReadOnly());
         mDatePicker.setEnabled(!prompt.isReadOnly());
@@ -73,6 +72,9 @@ public class DateWidget extends QuestionWidget {
                         if(!(mDatePicker.getDayOfMonth() == day && mDatePicker.getMonth() == month && mDatePicker.getYear() == year)) {
                         	//CTS: No reason to change the day if it's already correct
                         	mDatePicker.updateDate(year, month, day);
+                        	
+                        } else{
+                        	return;
                         }
                     }
                 }
