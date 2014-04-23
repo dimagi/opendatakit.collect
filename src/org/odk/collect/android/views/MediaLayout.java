@@ -185,11 +185,7 @@ public class MediaLayout extends RelativeLayout {
                 
             		image = qrCodeEncoder.encodeAsBitmap();
             		
-            		mImageView = new ResizingImageView(getContext()){
-            			public void onDoubleClick(){
-            				
-            			}
-            		};
+            		mImageView = new ResizingImageView(getContext());
             		mImageView.setPadding(10, 10, 10, 10);
             		mImageView.setAdjustViewBounds(true);
             		mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -229,7 +225,6 @@ public class MediaLayout extends RelativeLayout {
 
                 final String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
                 final File imageFile = new File(imageFilename);
-                
                 if (imageFile.exists()) {
                     Bitmap b = null;
                     try {
@@ -248,35 +243,7 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                    	mImageView = new ResizingImageView(getContext()){
-                    		public void onDoubleClick(){
-                    			if(bigImageURI != null){
-                    				String bigImageFilename;
-									try {
-										bigImageFilename = ReferenceManager._()
-												.DeriveReference(bigImageURI).getLocalURI();
-	                    				File bigImage = new File(bigImageFilename);
-
-	                    				Intent i = new Intent("android.intent.action.VIEW");
-	                    				i.setDataAndType(Uri.fromFile(bigImage), "image/*");
-	                    				getContext().startActivity(i);
-									} catch (InvalidReferenceException e1) {
-										e1.printStackTrace();
-									} catch (ActivityNotFoundException e) {
-                    					Toast.makeText(
-                    							getContext(),
-                    							getContext().getString(R.string.activity_not_found,
-                    									"view image"), Toast.LENGTH_SHORT);
-                    				}
-                    			} else{
-								    Intent intent = new Intent();
-								    //hack in file:// so that default gallery applicaiton can open
-								    intent.setAction(android.content.Intent.ACTION_VIEW); intent.setDataAndType(Uri.parse("file://"+imageFile.getAbsolutePath()),"image/*");
-
-								    ((Activity)getContext()).startActivity(intent);
-                    			}
-                    		}
-                    	};
+                    	mImageView = new ResizingImageView(getContext(), imageURI, bigImageURI);
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
                 		
