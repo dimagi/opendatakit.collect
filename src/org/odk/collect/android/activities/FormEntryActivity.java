@@ -1025,7 +1025,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // checkbox for if finished or ready to send
                 final CheckBox instanceComplete = ((CheckBox) endView.findViewById(R.id.mark_finished));
                 instanceComplete.setText(StringUtils.getStringRobust(this, R.string.mark_finished));
-                instanceComplete.setChecked(mIncompleteEnabled || isInstanceComplete(true));
+                
+                //If incomplete is not enabled, make sure this box is checked.
+                instanceComplete.setChecked(!mIncompleteEnabled || isInstanceComplete(true));
                 
                 if(mFormController.isFormReadOnly() || !mIncompleteEnabled) {
                 	instanceComplete.setVisibility(View.GONE);
