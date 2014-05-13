@@ -1137,7 +1137,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 
     @SuppressLint("NewApi")
-	@Override
+    @Override
     public boolean dispatchTouchEvent(MotionEvent mv) {
     	//We need to ignore this even if it's processed by the action
     	//bar (if one exists)
@@ -2007,11 +2007,16 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     /**
      * loadingComplete() is called by FormLoaderTask once it has finished loading a form.
      */
+    @SuppressLint("NewApi")
     @Override
     public void loadingComplete(FormController fc) {
         dismissDialog(PROGRESS_DIALOG);
 
         mFormController = fc;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+            // Newer menus may have already built the menu, before all data was ready
+            invalidateOptionsMenu();
+        }
         
         Localizer mLocalizer = Localization.getGlobalLocalizerAdvanced();
         
