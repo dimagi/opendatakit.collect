@@ -182,14 +182,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     public void removeQuestionFromIndex(int i){
     	mView.removeView((View) widgets.get(i));
-    	if(i == 0){
-    		mView.removeView(dividers.get(0));
-    	}
-    	else{
-    		mView.removeView(dividers.get(i-1));
-    	}
+    	int dividerIndex = Math.max(i - 1, 0);
+    	mView.removeView(dividers.get(dividerIndex));
     	widgets.remove(i);
-    	dividers.remove(i-1);
+    	dividers.remove(dividerIndex);
     }
     
     public void removeQuestionsFromIndex(ArrayList<Integer> indexes){
@@ -205,11 +201,19 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     public void addQuestionToIndex(QuestionWidget newQuestionWidget, int i){
 
+        System.out.println("[jls] need divider, adding question at index " + i);
         View divider = new View(getContext());
         divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
         divider.setMinimumHeight(3);
-        mView.addView(divider,2 * i - 1 + mViewBannerCount);
-        dividers.add(i-1, divider);
+        int dividerIndex = mViewBannerCount;
+        if(i > 0) {
+            dividerIndex += 2 * i - 1;
+        }
+        else {
+            dividerIndex += 0;
+        }
+        mView.addView(divider,dividerIndex);
+        dividers.add(Math.max(0, i - 1), divider);
         
         QuestionWidget qw = newQuestionWidget;
         qw.setLongClickable(true);
