@@ -201,7 +201,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     public void addQuestionToIndex(QuestionWidget newQuestionWidget, int i){
 
-        System.out.println("[jls] need divider, adding question at index " + i);
         View divider = new View(getContext());
         divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
         divider.setMinimumHeight(3);
