@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.ColorPickerDialog;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.app.Activity;
@@ -75,13 +74,11 @@ public class DrawActivity extends Activity {
 	private File output = null;
 	private File savepointImage = null;
 
-	private Button btnDrawColor;
 	private Button btnFinished;
 	private Button btnReset;
 	private Button btnCancel;
 	private Paint paint;
 	private Paint pointPaint;
-	private int currentColor = 0xFF000000;
 	private DrawView drawView;
 	private String alertTitleString;
 	private AlertDialog alertDialog;
@@ -139,6 +136,7 @@ public class DrawActivity extends Activity {
 					FileUtils.copyFile(refImage, savepointImage);
 				}
 			}
+			//sets where the result will be saved to
 			uri = (Uri) extras.get(EXTRA_OUTPUT);
 			if (uri != null) {
 				output = new File(uri.getPath());
@@ -186,62 +184,23 @@ public class DrawActivity extends Activity {
 		paint = new Paint();
 		paint.setAntiAlias(true);
 		paint.setDither(true);
-		paint.setColor(currentColor);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStrokeWidth(10);
+		paint.setColor(Color.BLACK);
 
 		pointPaint = new Paint();
 		pointPaint.setAntiAlias(true);
 		pointPaint.setDither(true);
-		pointPaint.setColor(currentColor);
 		pointPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 		pointPaint.setStrokeWidth(10);
+		pointPaint.setColor(Color.BLACK);
 
-		btnDrawColor = (Button) findViewById(R.id.btnSelectColor);
-		btnDrawColor.setTextColor(getInverseColor(currentColor));
-		btnDrawColor.getBackground().setColorFilter(currentColor,
-				PorterDuff.Mode.SRC_ATOP);
-		btnDrawColor.setText(getString(R.string.set_color));
-		btnDrawColor.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(
-						DrawActivity.this,
-						"setColorButton",
-						"click",
-						Collect.getInstance().getFormController()
-						.getFormIndex());
-				ColorPickerDialog cpd = new ColorPickerDialog(
-						DrawActivity.this,
-						new ColorPickerDialog.OnColorChangedListener() {
-							public void colorChanged(String key, int color) {
-								btnDrawColor
-								.setTextColor(getInverseColor(color));
-								btnDrawColor.getBackground().setColorFilter(
-										color, PorterDuff.Mode.SRC_ATOP);
-								currentColor = color;
-								paint.setColor(color);
-								pointPaint.setColor(color);
-							}
-						}, "key", currentColor, currentColor,
-						getString(R.string.select_drawing_color));
-				cpd.show();
-			}
-		});
 		btnFinished = (Button) findViewById(R.id.btnFinishDraw);
 		btnFinished.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(
-						DrawActivity.this,
-						"saveAndCloseButton",
-						"click",
-						Collect.getInstance().getFormController()
-						.getFormIndex());
+
 				SaveAndClose();
 			}
 		});
@@ -249,14 +208,6 @@ public class DrawActivity extends Activity {
 		btnReset.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(
-						DrawActivity.this,
-						"resetButton",
-						"click",
-						Collect.getInstance().getFormController()
-						.getFormIndex());
 				Reset();
 			}
 		});
@@ -264,26 +215,11 @@ public class DrawActivity extends Activity {
 		btnCancel.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(
-						DrawActivity.this,
-						"cancelAndCloseButton",
-						"click",
-						Collect.getInstance().getFormController()
-						.getFormIndex());
+
 				CancelAndClose();
 			}
 		});
 
-	}
-
-	private int getInverseColor(int color) {
-		int red = Color.red(color);
-		int green = Color.green(color);
-		int blue = Color.blue(color);
-		int alpha = Color.alpha(color);
-		return Color.argb(alpha, 255 - red, 255 - green, 255 - blue);
 	}
 
 	private void SaveAndClose() {
@@ -345,26 +281,19 @@ public class DrawActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_BACK:
-			Collect.getInstance().getActivityLogger()
-			.logInstanceAction(this, "onKeyDown.KEYCODE_BACK", "quit");
+
 			createQuitDrawDialog();
 			return true;
 		case KeyEvent.KEYCODE_DPAD_RIGHT:
 			if (event.isAltPressed()) {
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(this,
-						"onKeyDown.KEYCODE_DPAD_RIGHT", "showNext");
+
 				createQuitDrawDialog();
 				return true;
 			}
 			break;
 		case KeyEvent.KEYCODE_DPAD_LEFT:
 			if (event.isAltPressed()) {
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(this, "onKeyDown.KEYCODE_DPAD_LEFT",
-						"showPrevious");
+
 				createQuitDrawDialog();
 				return true;
 			}
@@ -381,8 +310,7 @@ public class DrawActivity extends Activity {
 		String[] items = { getString(R.string.keep_changes),
 				getString(R.string.do_not_save) };
 
-		Collect.getInstance().getActivityLogger()
-		.logInstanceAction(this, "createQuitDrawDialog", "show");
+
 		alertDialog = new AlertDialog.Builder(this)
 		.setIcon(android.R.drawable.ic_dialog_info)
 		.setTitle(alertTitleString)
@@ -391,11 +319,7 @@ public class DrawActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(this,
-						"createQuitDrawDialog",
-						"cancel");
+
 				dialog.cancel();
 
 			}
@@ -406,29 +330,16 @@ public class DrawActivity extends Activity {
 				switch (which) {
 
 				case 0: // save and exit
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(this,
-						"createQuitDrawDialog",
-						"saveAndExit");
-				SaveAndClose();
-				break;
+					SaveAndClose();
+					break;
 
 				case 1: // discard changes and exit
 
-				Collect.getInstance()
-				.getActivityLogger()
-				.logInstanceAction(this,
-						"createQuitDrawDialog",
-						"discardAndExit");
-				CancelAndClose();
-				break;
+					CancelAndClose();
+					break;
 
 				case 2:// do nothing
-					Collect.getInstance()
-					.getActivityLogger()
-					.logInstanceAction(this,
-							"createQuitDrawDialog", "cancel");
+
 					break;
 				}
 			}
@@ -473,8 +384,8 @@ public class DrawActivity extends Activity {
 						mBackgroundBitmapFile, w, h).copy(
 								Bitmap.Config.ARGB_8888, true);
 				// mBitmap =
-						// Bitmap.createScaledBitmap(BitmapFactory.decodeFile(mBackgroundBitmapFile.getPath()),
-								// w, h, true);
+				// Bitmap.createScaledBitmap(BitmapFactory.decodeFile(mBackgroundBitmapFile.getPath()),
+				// w, h, true);
 				mCanvas = new Canvas(mBitmap);
 			} else {
 				mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);

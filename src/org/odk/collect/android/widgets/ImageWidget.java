@@ -23,7 +23,9 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.MediaUtils;
 import org.odk.collect.android.utilities.StringUtils;
+import org.odk.collect.android.utilities.UrlUtils;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -240,43 +242,18 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
     private void deleteMedia() {
         // get the file path and delete the file
-
-        // There's only 1 in this case, but android 1.6 doesn't implement delete on
-        // android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI only on
-        // android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI + a #
-        String[] projection = {
-            Images.ImageColumns._ID
-        };
-        int del = 0;
-        Cursor c = null;
-        try {
-        	c = getContext().getContentResolver().query(
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
-                "_data='" + mInstanceFolder + mBinaryName + "'", null, null);
-	        if (c.getCount() > 0) {
-	            c.moveToFirst();
-	            String id = c.getString(c.getColumnIndex(Images.ImageColumns._ID));
-	
-	            Log.i(
-	                t,
-	                "attempting to delete: "
-	                        + Uri.withAppendedPath(
-	                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id));
-	            del =
-	                getContext().getContentResolver().delete(
-	                    Uri.withAppendedPath(
-	                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id), null,
-	                    null);
-	        }
-        } finally {
-        	if ( c != null ) {
-                c.close();
-        	}
+        File f = new File(mInstanceFolder + "/" + mBinaryName);
+        if (!f.delete()) {
+            Log.e(t, "Failed to delete " + f);
         }
-
         // clean up variables
         mBinaryName = null;
+        
+        //TODO: possibly switch back to this implementation, but causes NullPointerException right now
+    	/*
+        int del = MediaUtils.deleteImageFileFromMediaProvider(mInstanceFolder + File.separator + mBinaryName);
         Log.i(t, "Deleted " + del + " rows from media content provider");
+        mBinaryName = null;*/
     }
 
 
@@ -302,29 +279,6 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
-    private String getPathFromUri(Uri uri) {
-        if (uri.toString().startsWith("file")) {
-            return uri.toString().substring(6);
-        } else {
-            // find entry in content provider
-        	String colString = null;
-            Cursor c = null;
-            try {
-            	c = getContext().getContentResolver().query(uri, null, null, null, null);
-            	c.moveToFirst();
-
-	            // get data path
-	            colString = c.getString(c.getColumnIndex("_data"));
-            } finally {
-            	if ( c != null ) {
-            		c.close();
-            	}
-            }
-            return colString;
-        }
-    }
-
-
     @Override
 	public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. delete the previous image using the
@@ -332,7 +286,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         if (mBinaryName != null) {
             deleteMedia();
         }
-        String binarypath = getPathFromUri((Uri) binaryuri);
+        String binarypath = UrlUtils.getPathFromUri((Uri) binaryuri,getContext());
         File f = new File(binarypath);
         mBinaryName = f.getName();
         Log.i(t, "Setting current answer to " + f.getName());
