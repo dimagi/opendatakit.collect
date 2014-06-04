@@ -36,6 +36,11 @@ public interface AudioController {
 	public Object getCurrId();
 	
 	/*
+	 * reset the state of the current MediaEntity
+	 */
+	public void setCurrState(ButtonState state);
+	
+	/*
 	 * If the current button and the button passed in are
 	 * not the same button, reset the current button to
 	 * the ready state

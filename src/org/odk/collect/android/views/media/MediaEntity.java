@@ -29,6 +29,10 @@ public class MediaEntity {
 		this.player = mp;
 	}
 	
+	public void setState(ButtonState state) {
+		this.buttonState = state;
+	}
+	
 	public MediaPlayer getPlayer() {
 		return player;
 	}

@@ -38,6 +38,70 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public AudioButton(Context context, String URI) {
     	super(context);
     	resetButton(URI);
+    	//default implementation of controller if none is passed in
+    	this.controller = new AudioController() {
+
+			@Override
+			public MediaEntity getCurrMedia() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void setCurrent(MediaEntity newEntity) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void setCurrent(MediaEntity newEntity, AudioButton newButton) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void stopCurrent() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void removeCurrent() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public Object getCurrId() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void refreshCurrentButton(AudioButton clicked) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onImplementerDestroy() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onImplementerPause() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void setCurrState(ButtonState state) {
+				// TODO Auto-generated method stub
+				
+			}
+    		
+    	};
     }
     
     /*
@@ -66,6 +130,10 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public Object getViewId() {
     	return residingViewId;
     }
+        
+    public String getSource() {
+    	return URI;
+    }
     
     public void modifyButtonForNewView(Object newViewId, String audioResource) {
 		MediaEntity currentEntity = controller.getCurrMedia();
@@ -88,10 +156,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	}
     }
     
-    public String getSource() {
-    	return URI;
-    }
-    
     public void setStateToReady() {
     	currentState = ButtonState.Ready;
     	refreshAppearance();
@@ -99,6 +163,11 @@ public class AudioButton extends ImageButton implements OnClickListener {
     
     public void setStateToPlaying() {
     	currentState = ButtonState.Playing;
+    	refreshAppearance();
+    }
+    
+    public void setStateToPaused() {
+    	currentState = ButtonState.Paused;
     	refreshAppearance();
     }
     
@@ -110,8 +179,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	case Playing:
         	this.setImageResource(R.drawable.ic_media_pause);
         	break;
-    	//case Paused:
-          //  this.setImageResource(R.drawable.ic_media_btn_continue);
+    	case Paused:
+            this.setImageResource(R.drawable.ic_media_btn_continue);
     	}
     }
 
@@ -168,23 +237,25 @@ public class AudioButton extends ImageButton implements OnClickListener {
                 e.printStackTrace();
             }
         	break;
-        //case Paused:
-        	//startPlaying();
-        	//break;
+        case Paused:
+        	startPlaying();
+        	controller.setCurrState(ButtonState.Playing);
+        	break;
         case Playing:
-        	//pausePlaying();
-        	endPlaying();
-        	if (controller != null) controller.removeCurrent();
+        	pausePlaying();
+        	controller.setCurrState(ButtonState.Paused);
+        	//TODO: need to be doing something else here to accurately set the state of the current player
         	break;
         }
     }
+   
     
     public ButtonState getButtonState() {
     	return currentState;
     }
     
     public void startPlaying() {
-    	if (currentState.equals(ButtonState.Ready)) {
+    	if (!currentState.equals(ButtonState.Playing)) {
     		player.start();
     		setStateToPlaying();
     	}
@@ -199,10 +270,11 @@ public class AudioButton extends ImageButton implements OnClickListener {
         }
     }
     
-    /*public void pausePlaying() {
+    public void pausePlaying() {
     	if (currentState.equals(ButtonState.Playing)) {
     		player.pause();
-    		currentState = ButtonState.Paused;
+    		setStateToPaused();
     	}
-    }*/
+    }
+    
 }
