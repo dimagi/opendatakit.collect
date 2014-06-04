@@ -33,7 +33,7 @@ public interface AudioController {
 	/*
 	 * Gets the associated viewId of the current MediaEntity
 	 */
-	public ViewId getCurrId();
+	public Object getCurrId();
 	
 	/*
 	 * If the current button and the button passed in are
@@ -41,5 +41,17 @@ public interface AudioController {
 	 * the ready state
 	 */
 	public void refreshCurrentButton(AudioButton clicked);
+	
+	/*
+	 * Method to be called by the implementing class's
+	 * onDestroy method
+	 */
+	public void onImplementerDestroy();
+	
+	/*
+	 * Method to be called by the implementing class's
+	 * onPause method
+	 */
+	public void onImplementerPause();
 	
 }

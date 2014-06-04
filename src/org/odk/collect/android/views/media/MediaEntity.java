@@ -6,18 +6,18 @@ import org.odk.collect.android.views.media.ViewId;
 public class MediaEntity {
 	
 	private String source;
-	private ViewId idOfOriginView;
+	private Object idOfOriginView;
 	private MediaPlayer player;
 	private ButtonState buttonState;
 	
-	public MediaEntity(String source, MediaPlayer player, ViewId id, ButtonState state) {
+	public MediaEntity(String source, MediaPlayer player, Object id, ButtonState state) {
 		this.player = player;
 		this.source = source;
 		this.idOfOriginView = id;
 		this.buttonState = state;
 	}
 	
-	public ViewId getId() {
+	public Object getId() {
 		return idOfOriginView;
 	}
 	

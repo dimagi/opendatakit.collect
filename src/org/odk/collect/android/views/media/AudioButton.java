@@ -30,7 +30,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     private MediaPlayer player;
     private ButtonState currentState;
     private AudioController controller;
-    private ViewId residingViewId;
+    private Object residingViewId;
     
     /*
      * Constructor for if not using an AudioController
@@ -43,8 +43,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     /*
      * Constructor for if an AudioController is being used
      */
-    public AudioButton(Context context, String URI, ViewId id,
-    		AudioController controller) {
+    public AudioButton(Context context, String URI, Object id, AudioController controller) {
     	this(context, URI);
     	this.controller = controller;
     	this.residingViewId = id;
@@ -59,22 +58,22 @@ public class AudioButton extends ImageButton implements OnClickListener {
         this.setOnClickListener(this);
     }
     
-    public void resetButton(String URI, ViewId id) {
+    public void resetButton(String URI, Object id) {
     	resetButton(URI);
     	this.residingViewId = id;
     }
     
-    public ViewId getViewId() {
+    public Object getViewId() {
     	return residingViewId;
     }
     
-    public void modifyButtonForNewView(ViewId newViewId, String audioResource) {
+    public void modifyButtonForNewView(Object newViewId, String audioResource) {
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
 			resetButton(audioResource, newViewId);
 			return;
 		}
-    	ViewId activeId = currentEntity.getId();
+    	Object activeId = currentEntity.getId();
     	if (activeId.equals(newViewId)) {
     		//restore old button
     		this.URI = currentEntity.getSource();
@@ -159,7 +158,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
                 });
                 startPlaying();
                 if (controller != null) {  
-                	controller.refreshCurrentButton(this);
                 	controller.setCurrent(new MediaEntity(URI, player, residingViewId, 
                 			currentState), this);
                 }
