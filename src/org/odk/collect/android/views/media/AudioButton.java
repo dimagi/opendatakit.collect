@@ -39,69 +39,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	super(context);
     	resetButton(URI);
     	//default implementation of controller if none is passed in
-    	this.controller = new AudioController() {
-
-			@Override
-			public MediaEntity getCurrMedia() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void setCurrent(MediaEntity newEntity) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void setCurrent(MediaEntity newEntity, AudioButton newButton) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void stopCurrent() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void removeCurrent() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public Object getCurrId() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void refreshCurrentButton(AudioButton clicked) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onImplementerDestroy() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onImplementerPause() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void setCurrState(ButtonState state) {
-				// TODO Auto-generated method stub
-				
-			}
-    		
-    	};
+    	this.controller = new DefaultController();
     }
     
     /*
@@ -225,11 +163,9 @@ public class AudioButton extends ImageButton implements OnClickListener {
                     }
 
                 });
-                startPlaying();
-                if (controller != null) {  
-                	controller.setCurrent(new MediaEntity(URI, player, residingViewId, 
+                controller.setCurrent(new MediaEntity(URI, player, residingViewId, 
                 			currentState), this);
-                }
+                startPlaying();
             } catch (IOException e) {
                 String errorMsg = getContext().getString(R.string.audio_file_invalid);
                 Log.e(t, errorMsg);
@@ -239,12 +175,9 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	break;
         case Paused:
         	startPlaying();
-        	controller.setCurrState(ButtonState.Playing);
         	break;
         case Playing:
         	pausePlaying();
-        	controller.setCurrState(ButtonState.Paused);
-        	//TODO: need to be doing something else here to accurately set the state of the current player
         	break;
         }
     }
@@ -253,28 +186,103 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public ButtonState getButtonState() {
     	return currentState;
     }
-    
+
     public void startPlaying() {
-    	if (!currentState.equals(ButtonState.Playing)) {
+    	controller.playCurrent();
+    	setStateToPlaying();
+    	/*if (!currentState.equals(ButtonState.Playing)) {
     		player.start();
     		setStateToPlaying();
-    	}
-    	
+    	}*/
+
     }
-    
+
     public void endPlaying() {
-        if (currentState.equals(ButtonState.Playing)) {
-        	player.reset();
-            player.release();
-            setStateToReady();
-        }
+    	controller.removeCurrent();
+    	setStateToReady();
+    	/*if (currentState.equals(ButtonState.Playing)) {
+    		player.reset();
+    		player.release();
+    		setStateToReady();
+    	}*/
     }
-    
+
     public void pausePlaying() {
-    	if (currentState.equals(ButtonState.Playing)) {
+    	controller.pauseCurrent();
+    	setStateToPaused();
+    	/*if (currentState.equals(ButtonState.Playing)) {
     		player.pause();
     		setStateToPaused();
-    	}
+    	}*/
     }
-    
+
+    private class DefaultController implements AudioController {
+    	private AudioButton currentButton;
+    	private MediaEntity currentEntity;
+
+    	@Override
+    	public MediaEntity getCurrMedia() {
+    		// TODO Auto-generated method stub
+    		return null;
+    	}
+
+    	@Override
+    	public void setCurrent(MediaEntity newEntity) {
+    		// TODO Auto-generated method stub
+
+    	}
+
+    	@Override
+    	public void setCurrent(MediaEntity newEntity, AudioButton newButton) {
+    		// TODO Auto-generated method stub
+
+    	}
+
+    	@Override
+    	public void removeCurrent() {
+    		// TODO Auto-generated method stub
+
+    	}
+
+    	@Override
+    	public Object getCurrId() {
+    		// TODO Auto-generated method stub
+    		return null;
+    	}
+
+    	@Override
+    	public void refreshCurrentButton(AudioButton clicked) {
+    		// TODO Auto-generated method stub
+
+    	}
+
+    	@Override
+    	public void onImplementerDestroy() {
+    		//leave empty
+
+    	}
+
+    	@Override
+    	public void onImplementerPause() {
+    		//leave empty
+    	}
+
+    	@Override
+    	public void setCurrState(ButtonState state) {
+
+    	}
+
+		@Override
+		public void playCurrent() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void pauseCurrent() {
+			// TODO Auto-generated method stub
+			
+		}
+
+    }
 }

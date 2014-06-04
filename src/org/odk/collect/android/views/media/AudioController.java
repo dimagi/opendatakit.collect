@@ -22,13 +22,20 @@ public interface AudioController {
 	
 	/*
 	 * Releases the current MediaEntity's associated MediaPlayer
-	 */
-	public void stopCurrent();
-	
-	/*
-	 * Sets the current MediaEntity to null
+	 * and sets the current MediaEntity to null
 	 */
 	public void removeCurrent();
+	
+	/*
+	 * Starts playing the current MediaPlayer,
+	 * assuming setDataSource() and prepare() were already called successfully
+	 */
+	public void playCurrent();
+	
+	/*
+	 * Pauses the current MediaPlayer
+	 */
+	public void pauseCurrent();
 	
 	/*
 	 * Gets the associated viewId of the current MediaEntity
