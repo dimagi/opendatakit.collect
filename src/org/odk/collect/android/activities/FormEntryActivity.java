@@ -740,7 +740,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	public void updateProgressBar() {
 	    int totalQuestions = 0;
 	    int completedQuestions = 0;
-	    System.out.println("[jls] ================== updating progress bar");
 	    
 	    FormIndex currentFormIndex = mFormController.getFormIndex();
 	    int event = mFormController.getEvent();
@@ -771,7 +770,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	    mFormController.jumpToIndex(currentFormIndex);
         mProgressBar.setMax(totalQuestions);
         mProgressBar.setProgress(completedQuestions);
-        System.out.println("[jls] setting bar to " + completedQuestions + "/" + totalQuestions);
 	}
 
 	/**
