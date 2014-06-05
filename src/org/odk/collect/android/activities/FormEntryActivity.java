@@ -30,6 +30,7 @@ import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathTypeMismatchException;
@@ -108,6 +109,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -193,6 +195,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private Animation mOutAnimation;
 
     private RelativeLayout mRelativeLayout;
+    private ProgressBar mProgressBar;
     private View mCurrentView;
 
     private AlertDialog mAlertDialog;
@@ -260,6 +263,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         setContentView(R.layout.form_entry);
 
         mRelativeLayout = (RelativeLayout) findViewById(R.id.rl);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         mBeenSwiped = false;
         mAlertDialog = null;
@@ -728,6 +732,23 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     	}
     }
 
+	/**
+	 * 
+	 */
+	public void updateProgressBar() {
+        FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+        int answeredCount = 0;
+        for (FormEntryPrompt prompt : prompts) {
+            if (prompt.getAnswerValue() != null) {
+                answeredCount++;
+            }
+        }
+        mProgressBar.setMax(prompts.length);
+        mProgressBar.setProgress(answeredCount);
+        System.out.println("[jls] setting bar to " + answeredCount + "/" + prompts.length);
+        mProgressBar.setMax(10);
+        mProgressBar.setProgress(8);
+	}
 
 	/**
      * Refreshes the current view. the controller and the displayed view can get out of sync due to
@@ -1127,7 +1148,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         registerForContextMenu(qw);
                     }
                 }
-
+                
+                updateProgressBar();
+                
                 return odkv;
             default:
                 Log.e(t, "Attempted to create a view that does not exist.");
@@ -2282,6 +2305,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	@Override
 	public void widgetEntryChanged() {
 		updateFormRelevencies();
+		updateProgressBar();
 	}
 
 }
