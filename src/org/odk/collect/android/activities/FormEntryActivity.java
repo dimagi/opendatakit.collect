@@ -740,57 +740,31 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	public void updateProgressBar() {
 	    int totalQuestions = 0;
 	    int completedQuestions = 0;
-	    int event;
-	    FormIndex currentFormIndex = mFormController.getFormIndex();
 	    System.out.println("[jls] ================== updating progress bar");
 	    
-	    // Previous screens: consider all questions answered
-	    event = mFormController.stepToPreviousEvent();
+	    FormIndex currentFormIndex = mFormController.getFormIndex();
+	    int event = mFormController.getEvent();
 	    while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
-	        System.out.println("[jls] [previous] " + (mFormController.getFormIndex().compareTo(currentFormIndex) < 0));
-	        if (event == FormEntryController.EVENT_QUESTION) {
-                FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                totalQuestions += prompts.length;
-                completedQuestions += prompts.length;
-                for (FormEntryPrompt prompt : prompts) {
-//                    System.out.println("[jls] [previous] adding " + prompt.getQuestionText());
-                }
-	        }
-	        else {
-//	            System.out.println("[jls] skipped event " + event);
-	        }
-    	    event = mFormController.stepToPreviousEvent();
+	        event = mFormController.stepToPreviousEvent();
 	    }
-	    
-	    // Future screens: consider only answered questions answered
-	    mFormController.jumpToIndex(currentFormIndex);
-	    event = mFormController.stepToNextEvent(false);
 	    while (event != FormEntryController.EVENT_END_OF_FORM) {
-	        System.out.println("[jls] [future] " + (mFormController.getFormIndex().compareTo(currentFormIndex) < 0));
 	        if (event == FormEntryController.EVENT_QUESTION) {
                 FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                 totalQuestions += prompts.length;
-                for (FormEntryPrompt prompt : prompts) {
-//                    System.out.println("[jls] [future] adding " + prompt.getQuestionText());
-                    if (prompt.getAnswerValue() != null) {
-                        completedQuestions++;
-                    }
+                if (mFormController.getFormIndex().compareTo(currentFormIndex) >= 0) {
+                    // For future or current questions, consider them complete only if they're answered
+                    for (FormEntryPrompt prompt : prompts) {
+                      if (prompt.getAnswerValue() != null) {
+                          completedQuestions++;
+                      }
+                  }
+                }
+                else {
+                    // For previous questions, consider all "complete"
+                    completedQuestions += prompts.length;
                 }
 	        }
 	        event = mFormController.stepToNextEvent(false);
-	    }
-	    
-	    // Current screen
-	    mFormController.jumpToIndex(currentFormIndex);
-	    if (mFormController.getEvent() == FormEntryController.EVENT_QUESTION) {
-            FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-            totalQuestions += prompts.length;
-            for (FormEntryPrompt prompt : prompts) {
-//                System.out.println("[jls] [current] adding " + prompt.getQuestionText());
-                if (prompt.getAnswerValue() != null) {
-                    completedQuestions++;
-                }
-            }
 	    }
 	    
         // Update bar
