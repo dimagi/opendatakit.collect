@@ -33,13 +33,69 @@ public class AudioButton extends ImageButton implements OnClickListener {
     private Object residingViewId;
     
     /*
-     * Constructor for if not using an AudioController
+     * Constructor for if not explicitly using an AudioController
      */
     public AudioButton(Context context, String URI) {
     	super(context);
     	resetButton(URI);
     	//default implementation of controller if none is passed in
-    	this.controller = new DefaultController();
+    	this.controller = new AudioController() {
+    		@Override
+        	public MediaEntity getCurrMedia() {
+        		return null;
+        	}
+
+        	@Override
+        	public void setCurrent(MediaEntity newEntity) {
+        		return;
+        	}
+
+        	@Override
+        	public void setCurrent(MediaEntity newEntity, AudioButton newButton) {
+        		return;
+        	}
+
+        	@Override
+        	public void removeCurrent() {
+        		player.reset();
+        		player.release();
+        	}
+
+        	@Override
+        	public Object getCurrId() {
+        		return residingViewId;
+        	}
+
+        	@Override
+        	public void refreshCurrentButton(AudioButton clicked) {
+        		return;
+        	}
+
+        	@Override
+        	public void onImplementerDestroy() {
+        		return;
+        	}
+
+        	@Override
+        	public void onImplementerPause() {
+        		return;
+        	}
+
+        	@Override
+        	public void setCurrState(ButtonState state) {
+        		return;
+        	}
+
+    		@Override
+    		public void playCurrent() {
+    			player.start();
+    		}
+
+    		@Override
+    		public void pauseCurrent() {
+    			player.pause();
+    		}
+    	};
     }
     
     /*
@@ -181,7 +237,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	break;
         }
     }
-   
     
     public ButtonState getButtonState() {
     	return currentState;
@@ -190,99 +245,16 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public void startPlaying() {
     	controller.playCurrent();
     	setStateToPlaying();
-    	/*if (!currentState.equals(ButtonState.Playing)) {
-    		player.start();
-    		setStateToPlaying();
-    	}*/
-
     }
 
     public void endPlaying() {
     	controller.removeCurrent();
     	setStateToReady();
-    	/*if (currentState.equals(ButtonState.Playing)) {
-    		player.reset();
-    		player.release();
-    		setStateToReady();
-    	}*/
     }
 
     public void pausePlaying() {
     	controller.pauseCurrent();
     	setStateToPaused();
-    	/*if (currentState.equals(ButtonState.Playing)) {
-    		player.pause();
-    		setStateToPaused();
-    	}*/
     }
 
-    private class DefaultController implements AudioController {
-    	private AudioButton currentButton;
-    	private MediaEntity currentEntity;
-
-    	@Override
-    	public MediaEntity getCurrMedia() {
-    		// TODO Auto-generated method stub
-    		return null;
-    	}
-
-    	@Override
-    	public void setCurrent(MediaEntity newEntity) {
-    		// TODO Auto-generated method stub
-
-    	}
-
-    	@Override
-    	public void setCurrent(MediaEntity newEntity, AudioButton newButton) {
-    		// TODO Auto-generated method stub
-
-    	}
-
-    	@Override
-    	public void removeCurrent() {
-    		// TODO Auto-generated method stub
-
-    	}
-
-    	@Override
-    	public Object getCurrId() {
-    		// TODO Auto-generated method stub
-    		return null;
-    	}
-
-    	@Override
-    	public void refreshCurrentButton(AudioButton clicked) {
-    		// TODO Auto-generated method stub
-
-    	}
-
-    	@Override
-    	public void onImplementerDestroy() {
-    		//leave empty
-
-    	}
-
-    	@Override
-    	public void onImplementerPause() {
-    		//leave empty
-    	}
-
-    	@Override
-    	public void setCurrState(ButtonState state) {
-
-    	}
-
-		@Override
-		public void playCurrent() {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void pauseCurrent() {
-			// TODO Auto-generated method stub
-			
-		}
-
-    }
 }
