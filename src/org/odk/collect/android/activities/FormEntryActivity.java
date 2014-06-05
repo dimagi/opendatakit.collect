@@ -26,10 +26,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -736,18 +738,66 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	 * 
 	 */
 	public void updateProgressBar() {
-        FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-        int answeredCount = 0;
-        for (FormEntryPrompt prompt : prompts) {
-            if (prompt.getAnswerValue() != null) {
-                answeredCount++;
+	    int totalQuestions = 0;
+	    int completedQuestions = 0;
+	    int event;
+	    FormIndex currentFormIndex = mFormController.getFormIndex();
+	    System.out.println("[jls] ================== updating progress bar");
+	    
+	    // Previous screens: consider all questions answered
+	    event = mFormController.stepToPreviousEvent();
+	    while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
+	        System.out.println("[jls] [previous] " + (mFormController.getFormIndex().compareTo(currentFormIndex) < 0));
+	        if (event == FormEntryController.EVENT_QUESTION) {
+                FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                totalQuestions += prompts.length;
+                completedQuestions += prompts.length;
+                for (FormEntryPrompt prompt : prompts) {
+//                    System.out.println("[jls] [previous] adding " + prompt.getQuestionText());
+                }
+	        }
+	        else {
+//	            System.out.println("[jls] skipped event " + event);
+	        }
+    	    event = mFormController.stepToPreviousEvent();
+	    }
+	    
+	    // Future screens: consider only answered questions answered
+	    mFormController.jumpToIndex(currentFormIndex);
+	    event = mFormController.stepToNextEvent(false);
+	    while (event != FormEntryController.EVENT_END_OF_FORM) {
+	        System.out.println("[jls] [future] " + (mFormController.getFormIndex().compareTo(currentFormIndex) < 0));
+	        if (event == FormEntryController.EVENT_QUESTION) {
+                FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                totalQuestions += prompts.length;
+                for (FormEntryPrompt prompt : prompts) {
+//                    System.out.println("[jls] [future] adding " + prompt.getQuestionText());
+                    if (prompt.getAnswerValue() != null) {
+                        completedQuestions++;
+                    }
+                }
+	        }
+	        event = mFormController.stepToNextEvent(false);
+	    }
+	    
+	    // Current screen
+	    mFormController.jumpToIndex(currentFormIndex);
+	    if (mFormController.getEvent() == FormEntryController.EVENT_QUESTION) {
+            FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+            totalQuestions += prompts.length;
+            for (FormEntryPrompt prompt : prompts) {
+//                System.out.println("[jls] [current] adding " + prompt.getQuestionText());
+                if (prompt.getAnswerValue() != null) {
+                    completedQuestions++;
+                }
             }
-        }
-        mProgressBar.setMax(prompts.length);
-        mProgressBar.setProgress(answeredCount);
-        System.out.println("[jls] setting bar to " + answeredCount + "/" + prompts.length);
-        mProgressBar.setMax(10);
-        mProgressBar.setProgress(8);
+	    }
+	    
+        // Update bar
+	    mFormController.jumpToIndex(currentFormIndex);
+        mProgressBar.setMax(totalQuestions);
+        mProgressBar.setProgress(completedQuestions);
+        System.out.println("[jls] setting bar to " + completedQuestions + "/" + totalQuestions);
 	}
 
 	/**
