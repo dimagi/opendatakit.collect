@@ -21,6 +21,11 @@ public interface AudioController {
 	public void setCurrent(MediaEntity newEntity, AudioButton newButton);
 	
 	/*
+	 * Set/replace the current button
+	 */
+	public void setCurrentButton(AudioButton b);
+	
+	/*
 	 * Releases the current MediaEntity's associated MediaPlayer
 	 * and sets the current MediaEntity to null
 	 */
@@ -54,11 +59,6 @@ public interface AudioController {
 	 */
 	public void refreshCurrentButton(AudioButton clicked);
 	
-	/*
-	 * Method to be called by the implementing class's
-	 * onDestroy method
-	 */
-	public void onImplementerDestroy();
 	
 	/*
 	 * Method to be called by the implementing class's

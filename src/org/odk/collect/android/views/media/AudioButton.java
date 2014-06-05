@@ -71,10 +71,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
         		return;
         	}
 
-        	@Override
-        	public void onImplementerDestroy() {
-        		return;
-        	}
 
         	@Override
         	public void onImplementerPause() {
@@ -95,6 +91,12 @@ public class AudioButton extends ImageButton implements OnClickListener {
     		public void pauseCurrent() {
     			player.pause();
     		}
+
+			@Override
+			public void setCurrentButton(AudioButton b) {
+				return;
+			}
+
     	};
     }
     
@@ -103,8 +105,23 @@ public class AudioButton extends ImageButton implements OnClickListener {
      */
     public AudioButton(Context context, String URI, Object id, AudioController controller) {
     	this(context, URI);
+    	System.out.println("AudioButton constructor called");
     	this.controller = controller;
     	this.residingViewId = id;
+    	/*
+    	 * Check if the button in this view had media assigned to 
+    	 * it in a previously-existing app (before rotation, etc.)
+    	 */
+    	MediaEntity oldEntity = controller.getCurrMedia();
+    	if (oldEntity != null) {
+    		Object oldId = oldEntity.getId();
+    		if (oldId.equals(id)) {
+    			System.out.println("restoreButtonFromEntity called in CONSTRUCTOR");
+    			controller.setCurrentButton(this);
+    			restoreButtonFromEntity(oldEntity);
+    			controller.setCurrState(currentState);
+    		}
+    	}
     }
     
     public void resetButton(String URI) {
@@ -119,6 +136,15 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public void resetButton(String URI, Object id) {
     	resetButton(URI);
     	this.residingViewId = id;
+    }
+    
+    public void restoreButtonFromEntity(MediaEntity currentEntity) {
+		this.URI = currentEntity.getSource();
+		this.player = currentEntity.getPlayer();
+		this.residingViewId = currentEntity.getId();
+		this.currentState = currentEntity.getState();
+		System.out.println("state set to " + currentState + " in restoreButtonFromEntity");
+		refreshAppearance();
     }
     
     public Object getViewId() {
@@ -137,13 +163,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
 		}
     	Object activeId = currentEntity.getId();
     	if (activeId.equals(newViewId)) {
-    		//restore old button
-    		this.URI = currentEntity.getSource();
-    		this.player = currentEntity.getPlayer();
-    		this.residingViewId = newViewId;
-    		this.currentState = currentEntity.getState();
-    		System.out.println("state was reset to " + currentState);
-    		refreshAppearance();
+			System.out.println("restoreButtonFromEntity called in modifyButtonForrNewView");
+    		restoreButtonFromEntity(currentEntity);
     	}
     	else {
     		resetButton(audioResource, newViewId);
@@ -175,6 +196,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	break;
     	case Paused:
             this.setImageResource(R.drawable.ic_media_btn_continue);
+    	case PausedForRenewal:
+    		break;
     	}
     }
 
@@ -234,6 +257,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	break;
         case Playing:
         	pausePlaying();
+        	break;
+        case PausedForRenewal:
         	break;
         }
     }
