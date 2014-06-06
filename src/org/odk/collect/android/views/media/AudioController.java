@@ -32,6 +32,11 @@ public interface AudioController {
 	public void removeCurrent();
 	
 	/*
+	 * Sets the current MediaEntity to null
+	 */
+	public void nullCurrent();
+	
+	/*
 	 * Starts playing the current MediaPlayer,
 	 * assuming setDataSource() and prepare() were already called successfully
 	 */

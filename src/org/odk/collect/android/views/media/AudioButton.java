@@ -27,7 +27,6 @@ import android.widget.Toast;
 public class AudioButton extends ImageButton implements OnClickListener {
     private final static String t = "AudioButton";
     private String URI;
-    private MediaPlayer player;
     private ButtonState currentState;
     private AudioController controller;
     private Object residingViewId;
@@ -57,8 +56,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
         	@Override
         	public void removeCurrent() {
-        		player.reset();
-        		player.release();
+        		//player.reset();
+        		//player.release();
         	}
 
         	@Override
@@ -84,16 +83,21 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
     		@Override
     		public void playCurrent() {
-    			player.start();
+    			//player.start();
     		}
 
     		@Override
     		public void pauseCurrent() {
-    			player.pause();
+    			//player.pause();
     		}
 
 			@Override
 			public void setCurrentButton(AudioButton b) {
+				return;
+			}
+
+			@Override
+			public void nullCurrent() {
 				return;
 			}
 
@@ -105,21 +109,22 @@ public class AudioButton extends ImageButton implements OnClickListener {
      */
     public AudioButton(Context context, String URI, Object id, AudioController controller) {
     	this(context, URI);
-    	System.out.println("AudioButton constructor called");
+    	System.out.println("AudioButton constructor called with id " + id);
+    	System.out.println("Controller in AudioButton: " + controller);
     	this.controller = controller;
     	this.residingViewId = id;
     	/*
     	 * Check if the button in this view had media assigned to 
     	 * it in a previously-existing app (before rotation, etc.)
     	 */
-    	MediaEntity oldEntity = controller.getCurrMedia();
-    	if (oldEntity != null) {
-    		Object oldId = oldEntity.getId();
+    	MediaEntity currEntity = controller.getCurrMedia();
+    	if (currEntity != null) {
+    		Object oldId = currEntity.getId();
+    		System.out.println("oldId: " + oldId + ", newId: " + id);
     		if (oldId.equals(id)) {
     			System.out.println("restoreButtonFromEntity called in CONSTRUCTOR");
     			controller.setCurrentButton(this);
-    			restoreButtonFromEntity(oldEntity);
-    			controller.setCurrState(currentState);
+    			restoreButtonFromEntity(currEntity);
     		}
     	}
     }
@@ -140,7 +145,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     
     public void restoreButtonFromEntity(MediaEntity currentEntity) {
 		this.URI = currentEntity.getSource();
-		this.player = currentEntity.getPlayer();
+		//this.player = currentEntity.getPlayer();
 		this.residingViewId = currentEntity.getId();
 		this.currentState = currentEntity.getState();
 		System.out.println("state set to " + currentState + " in restoreButtonFromEntity");
@@ -163,7 +168,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
 		}
     	Object activeId = currentEntity.getId();
     	if (activeId.equals(newViewId)) {
-			System.out.println("restoreButtonFromEntity called in modifyButtonForrNewView");
+			System.out.println("restoreButtonFromEntity called in modifyButtonForNewView");
     		restoreButtonFromEntity(currentEntity);
     	}
     	else {
@@ -195,9 +200,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	this.setImageResource(R.drawable.ic_media_pause);
         	break;
     	case Paused:
-            this.setImageResource(R.drawable.ic_media_btn_continue);
     	case PausedForRenewal:
-    		break;
+            this.setImageResource(R.drawable.ic_media_btn_continue);
     	}
     }
 
@@ -231,7 +235,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
         
         switch(currentState) {
         case Ready:
-        	player = new MediaPlayer();
+        	MediaPlayer player = new MediaPlayer();
             try {
                 player.setDataSource(audioFilename);
                 player.prepare();
@@ -252,13 +256,12 @@ public class AudioButton extends ImageButton implements OnClickListener {
                 e.printStackTrace();
             }
         	break;
+        case PausedForRenewal:
         case Paused:
         	startPlaying();
         	break;
         case Playing:
         	pausePlaying();
-        	break;
-        case PausedForRenewal:
         	break;
         }
     }
