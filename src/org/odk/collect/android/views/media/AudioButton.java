@@ -34,30 +34,33 @@ public class AudioButton extends ImageButton implements OnClickListener {
     /*
      * Constructor for if not explicitly using an AudioController
      */
-    public AudioButton(Context context, String URI) {
+    public AudioButton(Context context, final String URI) {
     	super(context);
     	resetButton(URI);
     	//default implementation of controller if none is passed in
     	this.controller = new AudioController() {
+    		private MediaPlayer mp;
+    		
     		@Override
         	public MediaEntity getCurrMedia() {
-        		return null;
+        		return new MediaEntity(URI, this.mp, residingViewId, 
+            			currentState);
         	}
 
         	@Override
         	public void setCurrent(MediaEntity newEntity) {
-        		return;
+        		this.mp = newEntity.getPlayer();
         	}
 
         	@Override
         	public void setCurrent(MediaEntity newEntity, AudioButton newButton) {
-        		return;
+        		setCurrent(newEntity);
         	}
 
         	@Override
         	public void removeCurrent() {
-        		//player.reset();
-        		//player.release();
+        		mp.reset();
+        		mp.release();
         	}
 
         	@Override
@@ -83,12 +86,12 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
     		@Override
     		public void playCurrent() {
-    			//player.start();
+    			mp.start();
     		}
 
     		@Override
     		public void pauseCurrent() {
-    			//player.pause();
+    			mp.pause();
     		}
 
 			@Override
