@@ -53,8 +53,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 
     public final static String FIELD_LIST = "field-list";
     
-    private boolean inCompoundMode = false;
-    
     private WidgetChangedListener wcListener;
     private boolean hasListener = false;
     
@@ -81,8 +79,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl, boolean isGroup) {
         super(context);
-        
-        inCompoundMode = isGroup;
         
         if(wcl !=null){
         	hasListener = true;
@@ -148,13 +144,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
                 first = false;
             }
             QuestionWidget qw;
-  //          if(inCompoundMode){
- //           	qw = factory.createWidgetFromPrompt(p, getContext(), this);
- //           }
-//            else{
-                // if question or answer type is not supported, use text widget
-            	qw = factory.createWidgetFromPrompt(p, getContext());
- //           }
+            // if question or answer type is not supported, use text widget
+            qw = factory.createWidgetFromPrompt(p, getContext());
             qw.setLongClickable(true);
             qw.setOnLongClickListener(this);
             qw.setId(VIEW_ID + widgetIdCount++);
@@ -411,11 +402,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             qw.cancelLongPress();
         }
     }
-
-    public boolean inCompoundMode(){
-    	return inCompoundMode;
-    }
-
 
 	@Override
 	public void widgetEntryChanged() {
