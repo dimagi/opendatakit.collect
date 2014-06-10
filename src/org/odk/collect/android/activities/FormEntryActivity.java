@@ -198,7 +198,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private Animation mOutAnimation;
 
     private RelativeLayout mRelativeLayout;
-    private ProgressBar mProgressBar;
     private View mCurrentView;
 
     private AlertDialog mAlertDialog;
@@ -266,7 +265,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         setContentView(R.layout.form_entry);
 
         mRelativeLayout = (RelativeLayout) findViewById(R.id.rl);
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         mBeenSwiped = false;
         mAlertDialog = null;
@@ -735,20 +733,31 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     	}
     }
 
-	/**
-	 * 
-	 */
-	public void updateProgressBar() {
-	    int totalQuestions = 0;
-	    int completedQuestions = 0;
-	    
-	    FormIndex currentFormIndex = mFormController.getFormIndex();
-	    int event = mFormController.getEvent();
-	    while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
-	        event = mFormController.stepToPreviousEvent();
-	    }
-	    while (event != FormEntryController.EVENT_END_OF_FORM) {
-	        if (event == FormEntryController.EVENT_QUESTION) {
+    /**
+     * Update progress bar's max and value, based on mCurrentView.
+     */
+    public void updateProgressBar() {
+        if(!(mCurrentView instanceof ODKView)){
+            throw new RuntimeException("Tried to update progress bar not on ODKView");
+        }
+        updateProgressBar((ODKView) mCurrentView);
+    }
+
+    /**
+     * Update progress bar's max and value.
+     * @param odkv ODKView to update
+     */
+    public void updateProgressBar(ODKView odkv) {
+        int totalQuestions = 0;
+        int completedQuestions = 0;
+
+        FormIndex currentFormIndex = mFormController.getFormIndex();
+        int event = mFormController.getEvent();
+        while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
+            event = mFormController.stepToPreviousEvent();
+        }
+        while (event != FormEntryController.EVENT_END_OF_FORM) {
+            if (event == FormEntryController.EVENT_QUESTION) {
                 FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                 totalQuestions += prompts.length;
                 if (mFormController.getFormIndex().compareTo(currentFormIndex) >= 0) {
@@ -764,15 +773,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     // For previous questions, consider all "complete"
                     completedQuestions += prompts.length;
                 }
-	        }
-	        event = mFormController.stepToNextEvent(false);
-	    }
-	    
-        // Update bar
-	    mFormController.jumpToIndex(currentFormIndex);
-        mProgressBar.setMax(totalQuestions);
-        mProgressBar.setProgress(completedQuestions);
-	}
+            }
+            event = mFormController.stepToNextEvent(false);
+        }
+
+        // Set form back to correct state & actually update bar
+        mFormController.jumpToIndex(currentFormIndex);
+        odkv.updateProgressBar(completedQuestions, totalQuestions);
+    }
 
 	/**
      * Refreshes the current view. the controller and the displayed view can get out of sync due to
@@ -1173,7 +1181,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
                 
-                updateProgressBar();
+                updateProgressBar(odkv);
                 
                 return odkv;
             default:

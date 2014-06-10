@@ -11,6 +11,7 @@ import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
+import org.odk.collect.android.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.view.ViewParent;
 import android.view.View.OnLongClickListener;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -48,6 +50,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     private LinearLayout.LayoutParams mLayout;
     private ArrayList<QuestionWidget> widgets;
     private ArrayList<View> dividers;
+    private ProgressBar mProgressBar;
     
     private int mQuestionFontsize;
 
@@ -160,6 +163,13 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             
             qw.setChangedListener(this);
         }
+        
+        // Construct progress bar
+        mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
+        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
+        mLayout.setMargins(15, 15, 15, 15);
+        mLayout.gravity = Gravity.BOTTOM;
+        mView.addView((View) mProgressBar, mLayout);
 
         addView(mView);
 
@@ -268,6 +278,15 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 		}
 	}
 
+    /**
+     * Update progress bar
+     * @param progress Current value
+     * @param max Progress bar will be given range 0..max
+     */
+    public void updateProgressBar(int progress, int max) {
+        mProgressBar.setMax(max);
+        mProgressBar.setProgress(progress);
+    }
 
     /**
      * // * Add a TextView containing the hierarchy of groups to which the question belongs. //
