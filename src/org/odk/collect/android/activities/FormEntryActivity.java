@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
@@ -753,7 +754,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 if (mFormController.getFormIndex().compareTo(currentFormIndex) >= 0) {
                     // For future or current questions, consider them complete only if they're answered
                     for (FormEntryPrompt prompt : prompts) {
-                      if (prompt.getAnswerValue() != null) {
+                      if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                          //Constants.DATATYPE_NULL
                           completedQuestions++;
                       }
                   }
