@@ -99,6 +99,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         widgets = new ArrayList<QuestionWidget>();
         dividers = new ArrayList<View>();
 
+        // Force view to fill screen so that progress bar can be floated to the bottom
         this.setFillViewport(true);
 
         mView = new LinearLayout(getContext());

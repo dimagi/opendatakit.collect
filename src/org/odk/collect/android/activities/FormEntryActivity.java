@@ -751,6 +751,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         int totalQuestions = 0;
         int completedQuestions = 0;
 
+        // Step through form and count questions
         FormIndex currentFormIndex = mFormController.getFormIndex();
         int event = mFormController.getEvent();
         while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
@@ -764,7 +765,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     // For future or current questions, consider them complete only if they're answered
                     for (FormEntryPrompt prompt : prompts) {
                       if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                          //Constants.DATATYPE_NULL
                           completedQuestions++;
                       }
                   }
