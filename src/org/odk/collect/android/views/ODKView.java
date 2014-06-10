@@ -96,10 +96,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 
         mQuestionFontsize = new Integer(question_font).intValue();
 
-
-
         widgets = new ArrayList<QuestionWidget>();
         dividers = new ArrayList<View>();
+
+        this.setFillViewport(true);
 
         mView = new LinearLayout(getContext());
         mView.setOrientation(LinearLayout.VERTICAL);
@@ -167,12 +167,20 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         // Construct progress bar
         mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
         mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
-        mLayout.setMargins(15, 15, 15, 15);
-        mLayout.gravity = Gravity.BOTTOM;
-        mView.addView((View) mProgressBar, mLayout);
+        
+        LinearLayout.LayoutParams barLayout =
+            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+        barLayout.setMargins(15, 15, 15, 15);
+        barLayout.gravity = Gravity.BOTTOM;
+        
+        LinearLayout barView = new LinearLayout(getContext());
+        barView.setOrientation(LinearLayout.VERTICAL);
+        barView.setGravity(Gravity.BOTTOM);
+        barView.addView((View) mProgressBar);
+        mView.addView(barView, barLayout);
 
         addView(mView);
-
     }
     
     public void removeQuestionFromIndex(int i){
