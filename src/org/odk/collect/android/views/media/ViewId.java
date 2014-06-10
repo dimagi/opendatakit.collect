@@ -4,16 +4,10 @@ public class ViewId {
 	
 	private long rowId;
 	private long colId;
-	private boolean isCaseDetailView;
 	
-	public ViewId(long a, long b, boolean isCaseDetail) {
+	public ViewId(long a, long b) {
 		rowId = a;
 		colId = b;
-		this.isCaseDetailView = isCaseDetail;
-	}
-	
-	public boolean getBoolean() {
-		return isCaseDetailView;
 	}
 	
 	public long getRow() {

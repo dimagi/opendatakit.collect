@@ -142,8 +142,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
      */
     public AudioButton(Context context, String URI, Object id, AudioController controller) {
     	this(context, URI);
-    	//System.out.println("AudioButton constructor called with id " + id);
-    	//System.out.println("Controller in AudioButton: " + controller);
+    	System.out.println("AudioButton constructor called");
     	this.controller = controller;
     	this.residingViewId = id;
     	/*
@@ -153,9 +152,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	MediaEntity currEntity = controller.getCurrMedia();
     	if (currEntity != null) {
     		Object oldId = currEntity.getId();
-    		//System.out.println("oldId: " + oldId + ", newId: " + id);
     		if (oldId.equals(id)) {
-    			//System.out.println("restoreButtonFromEntity called in CONSTRUCTOR");
     			//TODO: Maybe change ordering of this?
     			this.controller.setCurrentButton(this);
     			restoreButtonFromEntity(currEntity);
@@ -194,6 +191,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
     
     public void modifyButtonForNewView(Object newViewId, String audioResource) {
+    	System.out.println("modifyButtonForNewView called with newViewId" + newViewId);
     	if (twinButton != null) {
 			twinButton.removeTwin();
     		removeTwin();
@@ -202,34 +200,26 @@ public class AudioButton extends ImageButton implements OnClickListener {
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
 			resetButton(audioResource, newViewId);
-			return;
 		}
-    	Object activeId = currentEntity.getId();
-    	if (activeId.equals(newViewId)) {
-			//System.out.println("restoreButtonFromEntity called in modifyButtonForNewView");
-    		restoreButtonFromEntity(currentEntity);
-    	}
-    	else {
-    		resetButton(audioResource, newViewId);
-    	}
-    	controller.addIdButtonMapping(residingViewId, this);
+		else {
+			Object activeId = currentEntity.getId();
+			if (activeId.equals(newViewId)) {
+				restoreButtonFromEntity(currentEntity);
+			}
+			else {
+				resetButton(audioResource, newViewId);
+			}
+		}
+		controller.addIdButtonMapping(residingViewId, this);
     }
-    
-    public boolean hasOppositeViewBoolean(AudioButton b) {
-    	if (residingViewId instanceof ViewId && b.getViewId() instanceof ViewId) {
-    		ViewId id1 = (ViewId) this.residingViewId;
-    		ViewId id2 = (ViewId) b.getViewId();
-    		return id1.getBoolean() != id2.getBoolean();
-    	} else return false;
-    }
-    
+
     public void setStateToReady(boolean callTwin) {
     	currentState = ButtonState.Ready;
     	System.out.println("setting state to ready for button " + this);
     	refreshAppearance();
     	if (twinButton != null && callTwin) {
     		twinButton.setStateToReady(false);
-    		twinButton.refreshAppearance();
+    		//twinButton.refreshAppearance();
     	}
     }
     
@@ -239,7 +229,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	refreshAppearance();
     	if (twinButton != null && callTwin) {
     		twinButton.setStateToPlaying(false);
-    		twinButton.refreshAppearance();
+    		//twinButton.refreshAppearance();
     	}
     }
     
@@ -249,17 +239,16 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	refreshAppearance();
     	if (twinButton != null && callTwin) {
     		twinButton.setStateToPaused(false);
-    		twinButton.refreshAppearance();
+    		//twinButton.refreshAppearance();
     	}
     }
     
     public String locationToString() {
     	ViewId viewid = (ViewId)residingViewId;
-    	return "(" + viewid.getRow() + "," + viewid.getCol() + "," + viewid.getBoolean() + ")";
+    	return "(" + viewid.getRow() + "," + viewid.getCol() + ")";
     }
     
     public void refreshAppearance() {
-    	//System.out.println("refreshAppearance CALLED on button with id " + locationToString());
     	switch(currentState) {
     	case Ready:
             this.setImageResource(R.drawable.ic_media_btn_play);
