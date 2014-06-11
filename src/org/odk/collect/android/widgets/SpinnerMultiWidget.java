@@ -33,7 +33,7 @@ import android.widget.TextView;
  * 
  * @author Jeff Beorse (jeff@beorse.net)
  */
-public class SpinnerMultiWidget extends QuestionWidget implements OnCheckedChangeListener{
+public class SpinnerMultiWidget extends QuestionWidget {
 
     Vector<SelectChoice> mItems;
 
@@ -102,6 +102,11 @@ public class SpinnerMultiWidget extends QuestionWidget implements OnCheckedChang
                                     }
                                 }
                             }
+                            
+                        	if(hasListener){
+                        		widgetChangedListener.widgetEntryChanged();
+                        	}
+                            
                         }
                     });
 
@@ -111,6 +116,11 @@ public class SpinnerMultiWidget extends QuestionWidget implements OnCheckedChang
                         @Override
                         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                             selections[which] = isChecked;
+                            
+                        	if(hasListener){
+                        		widgetChangedListener.widgetEntryChanged();
+                        	}
+                            
                         }
                     });
                 AlertDialog alert = alert_builder.create();
@@ -210,12 +220,4 @@ public class SpinnerMultiWidget extends QuestionWidget implements OnCheckedChang
         super.cancelLongPress();
         button.cancelLongPress();
     }
-
-	@Override
-	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-    	if(hasListener){
-    		widgetChangedListener.widgetEntryChanged();
-    	}
-	}
-    
 }

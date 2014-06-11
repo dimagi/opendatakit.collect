@@ -29,10 +29,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.RadioButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -43,7 +42,7 @@ import android.widget.TextView;
  * 
  * @author Jeff Beorse (jeff@beorse.net)
  */
-public class SpinnerWidget extends QuestionWidget implements OnCheckedChangeListener{
+public class SpinnerWidget extends QuestionWidget {
     Vector<SelectChoice> mItems;
     Spinner spinner;
     String[] choices;
@@ -85,6 +84,21 @@ public class SpinnerWidget extends QuestionWidget implements OnCheckedChangeList
 
             }
         }
+        
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            	if(hasListener){
+            		widgetChangedListener.widgetEntryChanged();
+            	}
+            }
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				//do nothing here
+			}
+
+        });
 
         addView(spinner);
 
@@ -183,13 +197,5 @@ public class SpinnerWidget extends QuestionWidget implements OnCheckedChangeList
         super.cancelLongPress();
         spinner.cancelLongPress();
     }
-
-
-	@Override
-	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-    	if(hasListener){
-    		widgetChangedListener.widgetEntryChanged();
-    	}
-	}
 
 }
