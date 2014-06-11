@@ -30,6 +30,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -40,7 +43,7 @@ import android.widget.TextView;
  * 
  * @author Jeff Beorse (jeff@beorse.net)
  */
-public class SpinnerWidget extends QuestionWidget {
+public class SpinnerWidget extends QuestionWidget implements OnCheckedChangeListener{
     Vector<SelectChoice> mItems;
     Spinner spinner;
     String[] choices;
@@ -180,5 +183,13 @@ public class SpinnerWidget extends QuestionWidget {
         super.cancelLongPress();
         spinner.cancelLongPress();
     }
+
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    	if(hasListener){
+    		widgetChangedListener.widgetEntryChanged();
+    	}
+	}
 
 }

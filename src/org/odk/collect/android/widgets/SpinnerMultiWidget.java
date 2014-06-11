@@ -18,6 +18,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 /**
@@ -31,7 +33,7 @@ import android.widget.TextView;
  * 
  * @author Jeff Beorse (jeff@beorse.net)
  */
-public class SpinnerMultiWidget extends QuestionWidget {
+public class SpinnerMultiWidget extends QuestionWidget implements OnCheckedChangeListener{
 
     Vector<SelectChoice> mItems;
 
@@ -209,4 +211,11 @@ public class SpinnerMultiWidget extends QuestionWidget {
         button.cancelLongPress();
     }
 
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    	if(hasListener){
+    		widgetChangedListener.widgetEntryChanged();
+    	}
+	}
+    
 }
