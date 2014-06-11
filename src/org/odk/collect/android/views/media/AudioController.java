@@ -1,6 +1,5 @@
 package org.odk.collect.android.views.media;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,8 +70,8 @@ public interface AudioController {
 	
 	/*
 	 * Returns the current button
-	 */
-	public AudioButton getCurrButton();
+	 *
+	public AudioButton getCurrButton();*/
 	
 	
 	/*
@@ -88,20 +87,5 @@ public interface AudioController {
 	public void onImplementerPause();
 	
 	
-	/*
-	 * Return the map from view ids to the active
-	 * buttons currently residing in them
-	 */
-	public Map<Object, Set<AudioButton>> getActiveButtonViewIds();
-	
-	/*
-	 * Add an id, button pair to the map
-	 */
-	public void addIdButtonMapping(Object id, AudioButton b);
-	
-	/*
-	 * Remove an id, button pair from the map
-	 */
-	public void removeIdButtonMapping(Object id, AudioButton b);
 	
 }

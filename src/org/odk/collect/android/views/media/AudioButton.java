@@ -6,9 +6,6 @@ package org.odk.collect.android.views.media;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
@@ -33,7 +30,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
     private ButtonState currentState;
     private AudioController controller;
     private Object residingViewId;
-    private AudioButton twinButton;
     
     /*
      * Constructor for if not explicitly using an AudioController
@@ -107,31 +103,10 @@ public class AudioButton extends ImageButton implements OnClickListener {
 			public void nullCurrent() {
 				return;
 			}
-
-			@Override
-			public AudioButton getCurrButton() {
-				return null;
-			}
-
-			@Override
-			public Map<Object, Set<AudioButton>> getActiveButtonViewIds() {
-				return null;
-			}
-
-			@Override
-			public void addIdButtonMapping(Object id, AudioButton b) {
-				return;
-			}
-
-			@Override
-			public void removeIdButtonMapping(Object id, AudioButton b) {
-				return;
-			}
-
+			
 			@Override
 			public void onImplementerDestroy() {
-				// TODO Auto-generated method stub
-				
+				return;
 			}
 
     	};
@@ -142,7 +117,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
      */
     public AudioButton(Context context, String URI, Object id, AudioController controller) {
     	this(context, URI);
-    	System.out.println("AudioButton constructor called");
+    	System.out.println("AudioButton constructor called with id " + id);
+    	System.out.println("Controller in AudioButton: " + controller);
     	this.controller = controller;
     	this.residingViewId = id;
     	/*
@@ -152,13 +128,13 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	MediaEntity currEntity = controller.getCurrMedia();
     	if (currEntity != null) {
     		Object oldId = currEntity.getId();
+    		System.out.println("oldId: " + oldId + ", newId: " + id);
     		if (oldId.equals(id)) {
-    			//TODO: Maybe change ordering of this?
-    			this.controller.setCurrentButton(this);
+    			System.out.println("restoreButtonFromEntity called in CONSTRUCTOR");
+    			controller.setCurrentButton(this);
     			restoreButtonFromEntity(currEntity);
     		}
     	}
-    	this.controller.addIdButtonMapping(this.residingViewId, this);
     }
     
     public void resetButton(String URI) {
@@ -177,8 +153,10 @@ public class AudioButton extends ImageButton implements OnClickListener {
     
     public void restoreButtonFromEntity(MediaEntity currentEntity) {
 		this.URI = currentEntity.getSource();
+		//this.player = currentEntity.getPlayer();
 		this.residingViewId = currentEntity.getId();
 		this.currentState = currentEntity.getState();
+		System.out.println("state set to " + currentState + " in restoreButtonFromEntity");
 		refreshAppearance();
     }
     
@@ -191,61 +169,34 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
     
     public void modifyButtonForNewView(Object newViewId, String audioResource) {
-    	System.out.println("modifyButtonForNewView called with newViewId" + newViewId);
-    	if (twinButton != null) {
-			twinButton.removeTwin();
-    		removeTwin();
-    	}
-    	controller.removeIdButtonMapping(residingViewId, this);
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
 			resetButton(audioResource, newViewId);
+			return;
 		}
-		else {
-			Object activeId = currentEntity.getId();
-			if (activeId.equals(newViewId)) {
-				restoreButtonFromEntity(currentEntity);
-			}
-			else {
-				resetButton(audioResource, newViewId);
-			}
-		}
-		controller.addIdButtonMapping(residingViewId, this);
+    	Object activeId = currentEntity.getId();
+    	if (activeId.equals(newViewId)) {
+			System.out.println("restoreButtonFromEntity called in modifyButtonForNewView");
+    		restoreButtonFromEntity(currentEntity);
+    	}
+    	else {
+    		resetButton(audioResource, newViewId);
+    	}
     }
-
-    public void setStateToReady(boolean callTwin) {
+    
+    public void setStateToReady() {
     	currentState = ButtonState.Ready;
-    	System.out.println("setting state to ready for button " + this);
     	refreshAppearance();
-    	if (twinButton != null && callTwin) {
-    		twinButton.setStateToReady(false);
-    		//twinButton.refreshAppearance();
-    	}
     }
     
-    public void setStateToPlaying(boolean callTwin) {
+    public void setStateToPlaying() {
     	currentState = ButtonState.Playing;
-    	System.out.println("setting state to playing for button " + this);
     	refreshAppearance();
-    	if (twinButton != null && callTwin) {
-    		twinButton.setStateToPlaying(false);
-    		//twinButton.refreshAppearance();
-    	}
     }
     
-    public void setStateToPaused(boolean callTwin) {
+    public void setStateToPaused() {
     	currentState = ButtonState.Paused;
-    	System.out.println("setting state to paused for button " + this);
     	refreshAppearance();
-    	if (twinButton != null && callTwin) {
-    		twinButton.setStateToPaused(false);
-    		//twinButton.refreshAppearance();
-    	}
-    }
-    
-    public String locationToString() {
-    	ViewId viewid = (ViewId)residingViewId;
-    	return "(" + viewid.getRow() + "," + viewid.getCol() + ")";
     }
     
     public void refreshAppearance() {
@@ -329,25 +280,17 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
     public void startPlaying() {
     	controller.playCurrent();
-    	setStateToPlaying(true);
+    	setStateToPlaying();
     }
 
     public void endPlaying() {
     	controller.removeCurrent();
-    	setStateToReady(true);
+    	setStateToReady();
     }
 
     public void pausePlaying() {
     	controller.pauseCurrent();
-    	setStateToPaused(true);
+    	setStateToPaused();
     }
 
-    public void setTwin(AudioButton b) {
-    	this.twinButton = b;
-    }
-    
-    public void removeTwin() {
-    	this.twinButton = null;
-    }
-    
 }

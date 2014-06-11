@@ -4,10 +4,17 @@ public class ViewId {
 	
 	private long rowId;
 	private long colId;
+	private boolean isDetail;
 	
-	public ViewId(long a, long b) {
+	public ViewId(long a, long b, boolean isDetail) {
 		rowId = a;
 		colId = b;
+		this.isDetail = isDetail;
+	}
+
+	
+	public boolean getDetailBool() {
+		return isDetail;
 	}
 	
 	public long getRow() {
@@ -23,6 +30,7 @@ public class ViewId {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (colId ^ (colId >>> 32));
+		result = prime * result + (isDetail ? 1231 : 1237);
 		result = prime * result + (int) (rowId ^ (rowId >>> 32));
 		return result;
 	}
@@ -36,7 +44,16 @@ public class ViewId {
 		if (getClass() != obj.getClass())
 			return false;
 		ViewId other = (ViewId) obj;
-		return colId == other.getCol() && rowId == other.getRow();
+		if (colId != other.colId)
+			return false;
+		if (isDetail != other.isDetail)
+			return false;
+		if (rowId != other.rowId)
+			return false;
+		return true;
 	}
+	
+	
+
 
 }
