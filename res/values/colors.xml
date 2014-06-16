@@ -30,12 +30,16 @@ the License.
     <color name="solid_blue">#0000ff</color>
     <color name="solid_green">#f0f0</color>
     <color name="solid_yellow">#ffffff00</color>
-   <color name="border_grey">#20959699</color>
-   <color name="blue_grad_end">#903867AD</color>
-   <color name="blue_grad_start">#806884AD</color>
-   <color name="light_blue">#CCFFFF</color>
-   <color name="dark_blue">#000080</color>
-   <color name="light_red">#F5A6A6</color>
-   <color name="dark_red">#20959699</color>
+    <color name="border_grey">#20959699</color>
+    <color name="blue_grad_end">#903867AD</color>
+    <color name="blue_grad_start">#806884AD</color>
+    <color name="light_blue">#CCFFFF</color>
+    <color name="dark_blue">#000080</color>
+    <color name="light_red">#F5A6A6</color>
+    <color name="dark_red">#20959699</color>
+    <color name="bright_blue_grad_start">#ff266cc9</color>
+    <color name="bright_blue_grad_end">#ff1e559e</color>
+    <color name="grey_grad_start">#ff8e9caf</color>
+    <color name="grey_grad_end">#ff70829a</color>
 
 </resources>
