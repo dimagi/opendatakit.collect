@@ -2,6 +2,14 @@ package org.odk.collect.android.views.media;
 
 import android.media.MediaPlayer;
 
+/**
+ * This class can be used to represent any single entity of audio or video media,
+ * encompassing its source, the current state (playing, paused, etc.), the MediaPlayer
+ * object used to play it, etc.
+ * 
+ * @author amstone326
+ */
+
 public class MediaEntity {
 	
 	private String source;

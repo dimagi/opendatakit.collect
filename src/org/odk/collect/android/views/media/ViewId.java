@@ -1,5 +1,12 @@
 package org.odk.collect.android.views.media;
 
+/**
+ * Used to represent the unique id of each view in a ListAdapter
+ * 
+ * @author amstone326
+ *
+ */
+
 public class ViewId {
 	
 	private long rowId;
@@ -10,6 +17,11 @@ public class ViewId {
 		rowId = a;
 		colId = b;
 		this.isDetail = isDetail;
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + getRow() + "," + getCol() + "," + getDetailBool() + ")";  
 	}
 
 	

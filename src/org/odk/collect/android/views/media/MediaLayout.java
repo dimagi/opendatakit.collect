@@ -66,7 +66,8 @@ public class MediaLayout extends RelativeLayout {
     }
 
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI, final String qrCodeContent) {
-        mView_Text = text;
+        System.out.println("setAVT called in MediaLayout");
+    	mView_Text = text;
 
         // Layout configurations for our elements in the relative layout
         RelativeLayout.LayoutParams textParams =

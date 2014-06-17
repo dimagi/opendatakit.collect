@@ -1,8 +1,15 @@
 package org.odk.collect.android.views.media;
 
-import java.util.Map;
-import java.util.Set;
-
+/**
+ * This interface is currently used for purposes of controlling audio buttons 
+ * that appear in a list adapter, for managing the re-attachment of a currently
+ * active MediaEntity to its button of origin. 
+ * 
+ * Can be used for any need to control multiple audio buttons residing within the
+ * same view
+ * 
+ * @author amstone326
+ */
 
 public interface AudioController {
 	
@@ -24,67 +31,66 @@ public interface AudioController {
 	public void setCurrent(MediaEntity newEntity, AudioButton newButton);
 	
 	/*
-	 * Set/replace the current button
+	 * Sets/replaces the current button
 	 */
-	public void setCurrentButton(AudioButton b);
+	public void setCurrentAudioButton(AudioButton b);
 	
 	/*
 	 * Releases the current MediaEntity's associated MediaPlayer
 	 * and sets the current MediaEntity to null
 	 */
-	public void removeCurrent();
+	public void releaseCurrentMediaEntity();
 	
 	/*
 	 * Sets the current MediaEntity to null
 	 */
-	public void nullCurrent();
+	public void removeCurrentMediaEntity();
 	
 	/*
-	 * Starts playing the current MediaPlayer,
-	 * assuming setDataSource() and prepare() were already called successfully
+	 * Starts playing the current MediaPlayer, assuming
+	 * setDataSource() and prepare() were already called successfully
 	 */
-	public void playCurrent();
+	public void playCurrentMediaEntity();
 	
 	/*
 	 * Pauses the current MediaPlayer
 	 */
-	public void pauseCurrent();
+	public void pauseCurrentMediaEntity();
 	
 	/*
 	 * Gets the associated viewId of the current MediaEntity
 	 */
-	public Object getCurrId();
+	public Object getMediaEntityId();
 	
 	/*
-	 * reset the state of the current MediaEntity
+	 * Sets the state of the current MediaEntity
 	 */
-	public void setCurrState(ButtonState state);
+	public void setMediaEntityState(ButtonState state);
 	
 	/*
 	 * If the current button and the button passed in are
-	 * not the same button, reset the current button to
+	 * not the same button, resets the current button to
 	 * the ready state
 	 */
-	public void refreshCurrentButton(AudioButton clicked);
+	public void refreshCurrentAudioButton(AudioButton clicked);
 	
 	
 	/*
-	 * Returns the current button
-	 *
-	public AudioButton getCurrButton();*/
-	
-	
-	/*
-	 * Method to be called by the implementing class's
-	 * onDestroy method
+	 * -Sets the current media entity's state to PausedForRenewal
+	 *  IF the state before it was paused was ButtonState.Playing
+	 * -Should only be called after saveStateAndClear
+	 * -If implementing class is an activity, should be called in
+	 *  implementing class's onDestroy method
 	 */
-	public void onImplementerDestroy();
+	public void attemptSetStateToPauseForRenewal();
 	
 	/*
-	 * Method to be called by the implementing class's
-	 * onPause method
+	 * -Saves the current state and then pauses the current
+	 * media and clears the current button
+	 * -If implementing class is an activity, should be called in
+	 * implementing class's onPause method
 	 */
-	public void onImplementerPause();
+	public void saveEntityStateAndClear();
 	
 	
 	

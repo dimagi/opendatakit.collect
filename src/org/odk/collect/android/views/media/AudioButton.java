@@ -23,6 +23,7 @@ import android.widget.Toast;
 /**
  * @author ctsims
  * @author carlhartung
+ * @author amstone326
  */
 public class AudioButton extends ImageButton implements OnClickListener {
     private final static String t = "AudioButton";
@@ -58,54 +59,56 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	}
 
         	@Override
-        	public void removeCurrent() {
-        		mp.reset();
-        		mp.release();
+        	public void releaseCurrentMediaEntity() {
+        		if (mp != null) {
+        			mp.reset();
+        			mp.release();
+        		}
         	}
 
         	@Override
-        	public Object getCurrId() {
+        	public Object getMediaEntityId() {
         		return residingViewId;
         	}
 
         	@Override
-        	public void refreshCurrentButton(AudioButton clicked) {
+        	public void refreshCurrentAudioButton(AudioButton clicked) {
         		return;
         	}
 
 
         	@Override
-        	public void onImplementerPause() {
+        	public void saveEntityStateAndClear() {
         		return;
         	}
 
         	@Override
-        	public void setCurrState(ButtonState state) {
+        	public void setMediaEntityState(ButtonState state) {
         		return;
         	}
 
     		@Override
-    		public void playCurrent() {
+    		public void playCurrentMediaEntity() {
     			mp.start();
     		}
 
     		@Override
-    		public void pauseCurrent() {
+    		public void pauseCurrentMediaEntity() {
     			mp.pause();
     		}
 
 			@Override
-			public void setCurrentButton(AudioButton b) {
+			public void setCurrentAudioButton(AudioButton b) {
 				return;
 			}
 
 			@Override
-			public void nullCurrent() {
+			public void removeCurrentMediaEntity() {
 				return;
 			}
 			
 			@Override
-			public void onImplementerDestroy() {
+			public void attemptSetStateToPauseForRenewal() {
 				return;
 			}
 
@@ -117,10 +120,9 @@ public class AudioButton extends ImageButton implements OnClickListener {
      */
     public AudioButton(Context context, String URI, Object id, AudioController controller) {
     	this(context, URI);
-    	System.out.println("AudioButton constructor called with id " + id);
-    	System.out.println("Controller in AudioButton: " + controller);
     	this.controller = controller;
     	this.residingViewId = id;
+    	//System.out.println("Constructing AudioButton " + toString() + " at location " + locationToString());
     	/*
     	 * Check if the button in this view had media assigned to 
     	 * it in a previously-existing app (before rotation, etc.)
@@ -128,10 +130,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	MediaEntity currEntity = controller.getCurrMedia();
     	if (currEntity != null) {
     		Object oldId = currEntity.getId();
-    		System.out.println("oldId: " + oldId + ", newId: " + id);
     		if (oldId.equals(id)) {
-    			System.out.println("restoreButtonFromEntity called in CONSTRUCTOR");
-    			controller.setCurrentButton(this);
+    			controller.setCurrentAudioButton(this);
     			restoreButtonFromEntity(currEntity);
     		}
     	}
@@ -153,10 +153,8 @@ public class AudioButton extends ImageButton implements OnClickListener {
     
     public void restoreButtonFromEntity(MediaEntity currentEntity) {
 		this.URI = currentEntity.getSource();
-		//this.player = currentEntity.getPlayer();
 		this.residingViewId = currentEntity.getId();
 		this.currentState = currentEntity.getState();
-		System.out.println("state set to " + currentState + " in restoreButtonFromEntity");
 		refreshAppearance();
     }
     
@@ -168,6 +166,14 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	return URI;
     }
     
+    public String locationToString() {
+    	if (residingViewId == null) {
+    		return "";
+    	}
+    	ViewId viewid = (ViewId) residingViewId;
+    	return viewid.toString();
+    }
+    
     public void modifyButtonForNewView(Object newViewId, String audioResource) {
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
@@ -176,7 +182,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
 		}
     	Object activeId = currentEntity.getId();
     	if (activeId.equals(newViewId)) {
-			System.out.println("restoreButtonFromEntity called in modifyButtonForNewView");
     		restoreButtonFromEntity(currentEntity);
     	}
     	else {
@@ -185,11 +190,13 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
     
     public void setStateToReady() {
+		System.out.println("setStateToReady called on button " + this + " in view " + locationToString());
     	currentState = ButtonState.Ready;
     	refreshAppearance();
     }
     
     public void setStateToPlaying() {
+		System.out.println("setStateToPlaying called on button " + this + " in view " + locationToString());
     	currentState = ButtonState.Playing;
     	refreshAppearance();
     }
@@ -215,7 +222,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+    	System.out.println("AudioButton onClick called");
         if (URI == null) {
             // No audio file specified
             Log.e(t, "No audio file was specified");
@@ -279,17 +286,17 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
 
     public void startPlaying() {
-    	controller.playCurrent();
+    	controller.playCurrentMediaEntity();
     	setStateToPlaying();
     }
 
     public void endPlaying() {
-    	controller.removeCurrent();
+    	controller.releaseCurrentMediaEntity();
     	setStateToReady();
     }
 
     public void pausePlaying() {
-    	controller.pauseCurrent();
+    	controller.pauseCurrentMediaEntity();
     	setStateToPaused();
     }
 
