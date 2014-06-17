@@ -757,19 +757,36 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
             event = mFormController.stepToPreviousEvent();
         }
+        
+        boolean onCurrentScreen = false;
+        FormIndex currentScreenExit = null;
         while (event != FormEntryController.EVENT_END_OF_FORM) {
+            int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
+
+            if (comparison == 0) {
+                onCurrentScreen = true;
+                mFormController.stepToNextEvent(true);
+                currentScreenExit = mFormController.getFormIndex();
+                mFormController.stepToPreviousEvent();
+            }
+            if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
+                onCurrentScreen = false;
+            }
+            
             if (event == FormEntryController.EVENT_QUESTION) {
                 FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                 totalQuestions += prompts.length;
-                if (mFormController.getFormIndex().compareTo(currentFormIndex) >= 0) {
-                    // For future or current questions, consider them complete only if they're answered
+                // Current questions are complete only if they're answered.
+                // Past questions are always complete.
+                // Future questions are never complete.
+                if (onCurrentScreen) {
                     for (FormEntryPrompt prompt : prompts) {
                       if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
                           completedQuestions++;
                       }
                   }
                 }
-                else {
+                else if (comparison < 0) {
                     // For previous questions, consider all "complete"
                     completedQuestions += prompts.length;
                 }
