@@ -1,5 +1,5 @@
 
-package org.odk.collect.android.views;
+package org.odk.collect.android.views.media;
 
 import java.io.File;
 
@@ -9,6 +9,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.QRCodeEncoder;
+import org.odk.collect.android.views.ResizingImageView;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -65,7 +66,8 @@ public class MediaLayout extends RelativeLayout {
     }
 
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI, final String qrCodeContent) {
-        mView_Text = text;
+        System.out.println("setAVT called in MediaLayout");
+    	mView_Text = text;
 
         // Layout configurations for our elements in the relative layout
         RelativeLayout.LayoutParams textParams =
@@ -336,7 +338,7 @@ public class MediaLayout extends RelativeLayout {
         super.onWindowVisibilityChanged(visibility);
         if (visibility != View.VISIBLE) {
             if (mAudioButton != null) {
-                mAudioButton.stopPlaying();
+                mAudioButton.endPlaying();
             }
         }
     }

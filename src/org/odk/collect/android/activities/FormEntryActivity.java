@@ -145,6 +145,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     public static final int VIDEO_CHOOSER = 9;
 	public static final int INTENT_CALLOUT = 10;
 	public static final int HIERARCHY_ACTIVITY_FIRST_START = 11;
+	public static final int SIGNATURE_CAPTURE = 12;
 
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
@@ -530,6 +531,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             	processIntentResponse(intent);
                 break;
             case IMAGE_CAPTURE:
+            case SIGNATURE_CAPTURE:
                 /*
                  * We saved the image to the tempfile_path, but we really want it to be in:
                  * /sdcard/odk/instances/[current instnace]/something.jpg so we move it there before
