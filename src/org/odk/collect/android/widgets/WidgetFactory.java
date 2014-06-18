@@ -105,7 +105,6 @@ public class WidgetFactory {
                 break;
             case Constants.CONTROL_IMAGE_CHOOSE:
             	if (appearance != null && appearance.equals("signature")) {
-            		System.out.println("launched signature widget");
                     questionWidget = new SignatureWidget(context, fep);
             	} else {
                 questionWidget = new ImageWidget(context, fep);
