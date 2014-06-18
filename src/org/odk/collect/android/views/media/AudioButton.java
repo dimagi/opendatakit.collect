@@ -148,7 +148,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
     @Override
     protected void onAttachedToWindow() {
     	super.onAttachedToWindow();
-    	System.out.println("onAttachedToWindow called");
     	/*As soon as this button is attached to the Window we want it to "grab" the handle
     	to the currently playing media. This will have the side effect of dropping the handle
     	from anything else that was currently holding it. Only one View at a time should
@@ -195,7 +194,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
     
     public void modifyButtonForNewView(Object newViewId, String audioResource, boolean visible) {
-    	System.out.println("modifyButtonForNewView called");
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
 			resetButton(audioResource, newViewId, visible);
