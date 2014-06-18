@@ -35,9 +35,9 @@ public class AudioButton extends ImageButton implements OnClickListener {
     /*
      * Constructor for if not explicitly using an AudioController
      */
-    public AudioButton(Context context, final String URI) {
+    public AudioButton(Context context, final String URI, boolean visible) {
     	super(context);
-    	resetButton(URI);
+    	resetButton(URI, visible);
     	//default implementation of controller if none is passed in
     	this.controller = new AudioController() {
     		private MediaPlayer mp;
@@ -118,11 +118,44 @@ public class AudioButton extends ImageButton implements OnClickListener {
     /*
      * Constructor for if an AudioController is being used
      */
-    public AudioButton(Context context, String URI, Object id, AudioController controller) {
-    	this(context, URI);
+    public AudioButton(Context context, String URI, Object id, AudioController controller,
+    		boolean visible) {
+    	this(context, URI, visible);
     	this.controller = controller;
     	this.residingViewId = id;
-    	//System.out.println("Constructing AudioButton " + toString() + " at location " + locationToString());
+    }
+    
+    public void resetButton(String URI, boolean visible) {
+        this.URI = URI;
+        this.currentState = ButtonState.Ready;
+    	this.setImageResource(R.drawable.ic_media_btn_play);
+        setFocusable(false);
+        setFocusableInTouchMode(false);
+        this.setOnClickListener(this);
+        if (visible) {
+        	this.setVisibility(View.VISIBLE);
+        }
+        else {
+        	this.setVisibility(View.INVISIBLE);
+        }
+    }
+    
+    public void resetButton(String URI, Object id, boolean visible) {
+    	resetButton(URI, visible);
+    	this.residingViewId = id;
+    }
+    
+    @Override
+    protected void onAttachedToWindow() {
+    	super.onAttachedToWindow();
+    	/*As soon as this button is attached to the Window we want it to "grab" the handle
+    	to the currently playing media. This will have the side effect of dropping the handle
+    	from anything else that was currently holding it. Only one View at a time should
+    	be in control of the media handle.*/
+    	attachToMedia();
+    }
+    
+    private void attachToMedia() {
     	/*
     	 * Check if the button in this view had media assigned to 
     	 * it in a previously-existing app (before rotation, etc.)
@@ -130,25 +163,11 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	MediaEntity currEntity = controller.getCurrMedia();
     	if (currEntity != null) {
     		Object oldId = currEntity.getId();
-    		if (oldId.equals(id)) {
+    		if (oldId.equals(residingViewId)) {
     			controller.setCurrentAudioButton(this);
     			restoreButtonFromEntity(currEntity);
     		}
     	}
-    }
-    
-    public void resetButton(String URI) {
-        this.URI = URI;
-        this.currentState = ButtonState.Ready;
-    	this.setImageResource(R.drawable.ic_media_btn_play);
-        setFocusable(false);
-        setFocusableInTouchMode(false);
-        this.setOnClickListener(this);
-    }
-    
-    public void resetButton(String URI, Object id) {
-    	resetButton(URI);
-    	this.residingViewId = id;
     }
     
     public void restoreButtonFromEntity(MediaEntity currentEntity) {
@@ -174,10 +193,10 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	return viewid.toString();
     }
     
-    public void modifyButtonForNewView(Object newViewId, String audioResource) {
+    public void modifyButtonForNewView(Object newViewId, String audioResource, boolean visible) {
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
-			resetButton(audioResource, newViewId);
+			resetButton(audioResource, newViewId, visible);
 			return;
 		}
     	Object activeId = currentEntity.getId();
@@ -185,18 +204,16 @@ public class AudioButton extends ImageButton implements OnClickListener {
     		restoreButtonFromEntity(currentEntity);
     	}
     	else {
-    		resetButton(audioResource, newViewId);
+    		resetButton(audioResource, newViewId, visible);
     	}
     }
     
     public void setStateToReady() {
-		System.out.println("setStateToReady called on button " + this + " in view " + locationToString());
     	currentState = ButtonState.Ready;
     	refreshAppearance();
     }
     
     public void setStateToPlaying() {
-		System.out.println("setStateToPlaying called on button " + this + " in view " + locationToString());
     	currentState = ButtonState.Playing;
     	refreshAppearance();
     }
@@ -222,7 +239,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
     @Override
     public void onClick(View v) {
-    	System.out.println("AudioButton onClick called");
         if (URI == null) {
             // No audio file specified
             Log.e(t, "No audio file was specified");
