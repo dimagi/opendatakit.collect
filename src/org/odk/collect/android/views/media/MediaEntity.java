@@ -15,13 +15,13 @@ public class MediaEntity {
 	private String source;
 	private Object idOfOriginView;
 	private MediaPlayer player;
-	private ButtonState buttonState;
+	private MediaState MediaState;
 	
-	public MediaEntity(String source, MediaPlayer player, Object id, ButtonState state) {
+	public MediaEntity(String source, MediaPlayer player, Object id, MediaState state) {
 		this.player = player;
 		this.source = source;
 		this.idOfOriginView = id;
-		this.buttonState = state;
+		this.MediaState = state;
 	}
 	
 	public MediaEntity() {
@@ -32,16 +32,16 @@ public class MediaEntity {
 		return idOfOriginView;
 	}
 	
-	public ButtonState getState() {
-		return buttonState;
+	public MediaState getState() {
+		return MediaState;
 	}
 	
 	public void setPlayer(MediaPlayer mp) {
 		this.player = mp;
 	}
 	
-	public void setState(ButtonState state) {
-		this.buttonState = state;
+	public void setState(MediaState state) {
+		this.MediaState = state;
 	}
 	
 	public MediaPlayer getPlayer() {

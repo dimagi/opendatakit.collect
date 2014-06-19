@@ -9,20 +9,25 @@ package org.odk.collect.android.views.media;
  * @author amstone326
  */
 
-public enum ButtonState {
+public enum MediaState {
 	
-	/*
-	 * Playing - the MediaPlayer is currently playing music
-	 * Paused - setDataSource() and prepare() have been called for this
-	 *   media player, but music is not currently playing
-	 * Ready - the MediaPlayer has not had any data source initialized yet
-	 * PausedForRenewal - Represents the same MediaPlayer state as paused, 
+	/** The MediaPlayer is currently playing music **/
+	Playing, 
+	
+	/** MediaPlayer methods setDataSource() and prepare() have been called, 
+	 *   but music is not currently playing **/
+	Paused, 
+	
+	/** The MediaPlayer has not had any data source initialized yet **/
+	Ready,
+	
+	/** Represents the same MediaPlayer state as paused, 
 	 *   but used for activity life cycle purposes in handling rotation.
 	 *   This state can be used to indicate to the onCreate method that 
 	 *   music was playing in the previous version of the app, was paused 
-	 *   onDestroy, and should be renewed to the Playing state upon resuming
-	 */
+	 *   onDestroy, and should be renewed to the Playing state upon resuming **/
+	PausedForRenewal;
 	
-    Playing, Ready, Paused, PausedForRenewal;
+    
 
 }

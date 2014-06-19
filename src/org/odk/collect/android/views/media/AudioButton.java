@@ -28,7 +28,7 @@ import android.widget.Toast;
 public class AudioButton extends ImageButton implements OnClickListener {
     private final static String t = "AudioButton";
     private String URI;
-    private ButtonState currentState;
+    private MediaState currentState;
     private AudioController controller;
     private Object residingViewId;
     
@@ -83,7 +83,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
         	}
 
         	@Override
-        	public void setMediaEntityState(ButtonState state) {
+        	public void setMediaEntityState(MediaState state) {
         		return;
         	}
 
@@ -127,7 +127,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     
     public void resetButton(String URI, boolean visible) {
         this.URI = URI;
-        this.currentState = ButtonState.Ready;
+        this.currentState = MediaState.Ready;
     	this.setImageResource(R.drawable.ic_media_btn_play);
         setFocusable(false);
         setFocusableInTouchMode(false);
@@ -185,14 +185,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
     	return URI;
     }
     
-    public String locationToString() {
-    	if (residingViewId == null) {
-    		return "";
-    	}
-    	ViewId viewid = (ViewId) residingViewId;
-    	return viewid.toString();
-    }
-    
     public void modifyButtonForNewView(Object newViewId, String audioResource, boolean visible) {
 		MediaEntity currentEntity = controller.getCurrMedia();
 		if (currentEntity == null) {
@@ -209,17 +201,17 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
     
     public void setStateToReady() {
-    	currentState = ButtonState.Ready;
+    	currentState = MediaState.Ready;
     	refreshAppearance();
     }
     
     public void setStateToPlaying() {
-    	currentState = ButtonState.Playing;
+    	currentState = MediaState.Playing;
     	refreshAppearance();
     }
     
     public void setStateToPaused() {
-    	currentState = ButtonState.Paused;
+    	currentState = MediaState.Paused;
     	refreshAppearance();
     }
     
@@ -236,15 +228,18 @@ public class AudioButton extends ImageButton implements OnClickListener {
             this.setImageResource(R.drawable.ic_media_btn_continue);
     	}
     }
-
-    @Override
-    public void onClick(View v) {
+    
+    /*
+     * Derives the audio source filename from the URI. Returns the 
+     * filename if successful, and an empty string otherwise
+     */
+    private String preprocessClick() {
         if (URI == null) {
             // No audio file specified
             Log.e(t, "No audio file was specified");
             Toast.makeText(getContext(), getContext().getString(R.string.audio_file_error),
            			Toast.LENGTH_LONG).show();
-            return;
+            return "";
         }
 
         String audioFilename = "";
@@ -253,6 +248,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
         } catch (InvalidReferenceException e) {
             Log.e(t, "Invalid reference exception");
             e.printStackTrace();
+            return "";
         }
 
         File audioFile = new File(audioFilename);
@@ -261,8 +257,15 @@ public class AudioButton extends ImageButton implements OnClickListener {
             String errorMsg = getContext().getString(R.string.file_missing, audioFile);
             Log.e(t, errorMsg);
             Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
-            return;
+            return "";
         }
+        return audioFilename;
+    }
+
+    @Override
+    public void onClick(View v) {
+    	String audioFilename = preprocessClick();
+    	if ("".equals(audioFilename)) return;
         
         switch(currentState) {
         case Ready:
@@ -297,7 +300,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
         }
     }
     
-    public ButtonState getButtonState() {
+    public MediaState getMediaState() {
     	return currentState;
     }
 

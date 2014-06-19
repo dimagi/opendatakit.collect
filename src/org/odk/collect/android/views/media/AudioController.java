@@ -65,7 +65,7 @@ public interface AudioController {
 	/*
 	 * Sets the state of the current MediaEntity
 	 */
-	public void setMediaEntityState(ButtonState state);
+	public void setMediaEntityState(MediaState state);
 	
 	/*
 	 * If the current button and the button passed in are
@@ -77,7 +77,7 @@ public interface AudioController {
 	
 	/*
 	 * -Sets the current media entity's state to PausedForRenewal
-	 *  IF the state before it was paused was ButtonState.Playing
+	 *  IF the state before it was paused was MediaState.Playing
 	 * -Should only be called after saveStateAndClear
 	 * -If implementing class is an activity, should be called in
 	 *  implementing class's onDestroy method
