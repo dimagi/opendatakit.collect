@@ -52,10 +52,6 @@ import android.provider.DocumentsContract;
 public class MediaUtils {
 	private static final String t = "MediaUtils";
 
-	private MediaUtils() {
-		// static methods only
-	}
-
 	private static String escapePath(String path) {
 		String ep = path;
 		ep = ep.replaceAll("\\!", "!!");
