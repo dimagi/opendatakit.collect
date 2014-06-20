@@ -29,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -82,6 +84,21 @@ public class SpinnerWidget extends QuestionWidget {
 
             }
         }
+        
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            	if(hasListener){
+            		widgetChangedListener.widgetEntryChanged();
+            	}
+            }
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				//do nothing here
+			}
+
+        });
 
         addView(spinner);
 

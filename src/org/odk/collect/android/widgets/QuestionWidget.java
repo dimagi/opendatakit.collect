@@ -12,8 +12,8 @@ import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.StringUtils;
-import org.odk.collect.android.views.MediaLayout;
 import org.odk.collect.android.views.ShrinkingTextView;
+import org.odk.collect.android.views.media.MediaLayout;
 
 import android.content.Context;
 import android.content.SharedPreferences;

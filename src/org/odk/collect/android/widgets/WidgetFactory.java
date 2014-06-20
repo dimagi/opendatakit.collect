@@ -104,7 +104,11 @@ public class WidgetFactory {
                 }
                 break;
             case Constants.CONTROL_IMAGE_CHOOSE:
+            	if (appearance != null && appearance.equals("signature")) {
+                    questionWidget = new SignatureWidget(context, fep);
+            	} else {
                 questionWidget = new ImageWidget(context, fep);
+            	}
                 break;
             case Constants.CONTROL_AUDIO_CAPTURE:
                 questionWidget = new AudioWidget(context, fep);

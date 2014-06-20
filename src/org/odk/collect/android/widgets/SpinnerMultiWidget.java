@@ -18,6 +18,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 /**
@@ -100,6 +102,11 @@ public class SpinnerMultiWidget extends QuestionWidget {
                                     }
                                 }
                             }
+                            
+                        	if(hasListener){
+                        		widgetChangedListener.widgetEntryChanged();
+                        	}
+                            
                         }
                     });
 
@@ -109,6 +116,11 @@ public class SpinnerMultiWidget extends QuestionWidget {
                         @Override
                         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                             selections[which] = isChecked;
+                            
+                        	if(hasListener){
+                        		widgetChangedListener.widgetEntryChanged();
+                        	}
+                            
                         }
                     });
                 AlertDialog alert = alert_builder.create();
@@ -208,5 +220,4 @@ public class SpinnerMultiWidget extends QuestionWidget {
         super.cancelLongPress();
         button.cancelLongPress();
     }
-
 }
