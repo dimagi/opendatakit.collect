@@ -16,6 +16,8 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
+import android.os.AsyncTask;
+
 public class PollSensorAction extends Action {
 	private static String name = "pollsensor";
 	private TreeReference target;
@@ -30,18 +32,29 @@ public class PollSensorAction extends Action {
 	}
 
 	public void processAction(FormDef model, TreeReference contextRef) {
-		if (this.target != null) {
-			TreeReference qualifiedReference = contextRef == null ? target : target.contextualize(contextRef);
-			EvaluationContext context = new EvaluationContext(model.getEvaluationContext(), qualifiedReference);
-			String result = "42.36521590986622 -71.10284802016257 -4.0 5.0";
+		AsyncTask<Object, Void, Void> poller = new AsyncTask<Object, Void, Void>() {
+			@Override
+			protected Void doInBackground(Object... params) {
+				FormDef model = (FormDef) params[0];
+				TreeReference contextRef = (TreeReference) params[1];
+				
+				String result = "42.36521590986622 -71.10284802016257 -4.0 5.0";
+				if (PollSensorAction.this.target != null) {
+					TreeReference qualifiedReference = contextRef == null ? target : target.contextualize(contextRef);
+					EvaluationContext context = new EvaluationContext(model.getEvaluationContext(), qualifiedReference);
 		
-			AbstractTreeElement node = context.resolveReference(qualifiedReference);
-			if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
-			int dataType = node.getDataType();
-			IAnswerData val = Recalculate.wrapData(result, dataType);
+					AbstractTreeElement node = context.resolveReference(qualifiedReference);
+					if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
+					int dataType = node.getDataType();
+					IAnswerData val = Recalculate.wrapData(result, dataType);
 		
-			model.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
-		}
+					model.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
+				}
+				return null;
+			}
+		};
+		Object[] taskParams = { model, contextRef };
+		poller.execute(taskParams);
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
