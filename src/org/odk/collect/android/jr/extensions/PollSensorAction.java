@@ -33,7 +33,7 @@ public class PollSensorAction extends Action {
 		if (this.target != null) {
 			TreeReference qualifiedReference = contextRef == null ? target : target.contextualize(contextRef);
 			EvaluationContext context = new EvaluationContext(model.getEvaluationContext(), qualifiedReference);
-			String result = "chennai";
+			String result = "42.36521590986622 -71.10284802016257 -4.0 5.0";
 		
 			AbstractTreeElement node = context.resolveReference(qualifiedReference);
 			if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
