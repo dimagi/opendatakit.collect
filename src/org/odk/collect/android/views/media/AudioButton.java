@@ -44,8 +44,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     		
     		@Override
         	public MediaEntity getCurrMedia() {
-        		return new MediaEntity(URI, this.mp, residingViewId, 
-            			currentState);
+        		return null;
         	}
 
         	@Override
