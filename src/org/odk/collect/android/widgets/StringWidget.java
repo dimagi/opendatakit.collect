@@ -187,9 +187,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         if (event.isAltPressed() == true) {
             return false;
         }
-        if(hasListener){
-        	widgetChangedListener.widgetEntryChanged();
-        }
+        widgetEntryChanged();
         return super.onKeyDown(keyCode, event);
     }
 
