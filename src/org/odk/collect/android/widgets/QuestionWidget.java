@@ -7,6 +7,7 @@ import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
+import org.odk.collect.android.R.color;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
@@ -15,7 +16,9 @@ import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ShrinkingTextView;
 import org.odk.collect.android.views.media.MediaLayout;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -27,7 +30,11 @@ import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public abstract class QuestionWidget extends LinearLayout {
@@ -43,6 +50,7 @@ public abstract class QuestionWidget extends LinearLayout {
     protected final static String ACQUIREFIELD = "acquire";
 
     private TextView mQuestionText;
+    private FrameLayout helpPlaceholder;
     private ShrinkingTextView mHelpText;
     protected boolean hasListener;
     private View toastView;
@@ -90,10 +98,43 @@ public abstract class QuestionWidget extends LinearLayout {
 
             addQuestionText(p);
             addHelpText(p);
+            
+            addHelpPlaceholder(p);
     }
 
 
-    public FormEntryPrompt getPrompt() {
+    private void addHelpPlaceholder(FormEntryPrompt p) {
+    	helpPlaceholder = new FrameLayout(this.getContext());
+    	helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT));
+    	
+    	if("help".equals(p.getSpecialFormQuestionText("help"))) {
+	        String specialHelpText = p.getSpecialFormQuestionText("help-text");
+	        
+	        String specialHelpImage = p.getSpecialFormQuestionText("help-image");
+	        String specialHelpVideo = p.getSpecialFormQuestionText("help-video");
+	        
+	        TextView helpText = new TextView(getContext());
+	        helpText.setText(specialHelpText);
+	        helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+	        helpText.setPadding(0, 0, 0, 7);
+	        helpText.setId(38475483); // assign random id
+	
+	        
+	        MediaLayout helpLayout = new MediaLayout(getContext());
+	        helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
+	        helpLayout.setPadding(15, 15, 15, 15);
+	        
+	        helpLayout.setBackgroundResource(color.very_light_blue);
+	        helpPlaceholder.addView(helpLayout);
+    	}
+
+    	this.addView(helpPlaceholder);
+    	
+    	helpPlaceholder.setVisibility(View.GONE);
+	}
+
+	public FormEntryPrompt getPrompt() {
         return mPrompt;
     }
 
@@ -198,7 +239,7 @@ public abstract class QuestionWidget extends LinearLayout {
      * To satisfy the RelativeLayout constraints, we add the audio first if it exists, then the
      * TextView to fit the rest of the space, then the image if applicable.
      */
-    protected void addQuestionText(FormEntryPrompt p) {
+    protected void addQuestionText(final FormEntryPrompt p) {
         String imageURI = p.getImageText();
         String audioURI = p.getAudioText();
         String videoURI = p.getSpecialFormQuestionText("video");
@@ -233,11 +274,131 @@ public abstract class QuestionWidget extends LinearLayout {
         }
 
         // Create the layout for audio, image, text
-        MediaLayout mediaLayout = new MediaLayout(getContext());
+        MediaLayout mediaLayout = new MediaLayout(getContext()) {
+            protected void onHelpPressed() {
+            	fireHelpText(p);
+            }
+
+        };
+        
+        String helpText = p.getSpecialFormQuestionText("help");
+        if("help".equals(helpText)) {
+        	videoURI = helpText;
+        }
+        
+        
         mediaLayout.setAVT(mQuestionText, audioURI, imageURI, videoURI, bigImageURI, qrCodeContent);
 
         addView(mediaLayout, mLayout);
     }
+    
+    private void fireHelpText(FormEntryPrompt prompt) {
+    	
+
+        if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
+        		getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
+        	
+	        AlertDialog mAlertDialog = new AlertDialog.Builder(this.getContext()).create();
+	        mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
+	        mAlertDialog.setTitle("");
+	        
+	        String specialHelpText = prompt.getSpecialFormQuestionText("help-text");
+	        
+	        String specialHelpImage = prompt.getSpecialFormQuestionText("help-image");
+	        String specialHelpVideo = prompt.getSpecialFormQuestionText("help-video");
+	        
+	        ScrollView scrollView = new ScrollView(this.getContext());
+	        TextView helpText = new TextView(getContext());
+	        helpText.setText(specialHelpText);
+	        helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+	        helpText.setPadding(0, 0, 0, 7);
+	        helpText.setId(38475483); // assign random id
+	
+	        
+	        MediaLayout helpLayout = new MediaLayout(getContext());
+	        helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
+	        helpLayout.setPadding(15, 15, 15, 15);
+	        
+	        scrollView.addView(helpLayout);
+	        mAlertDialog.setView(scrollView);
+	        
+	        //mAlertDialog.setMessage();
+	        DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+	            @Override
+	            public void onClick(DialogInterface dialog, int i) {
+	                switch (i) {
+	                    case DialogInterface.BUTTON1:
+	                        dialog.cancel();
+	                        break;
+	                }
+	            }
+	        };
+	        mAlertDialog.setCancelable(true);
+	        mAlertDialog.setButton(StringUtils.getStringRobust(this.getContext(), R.string.ok), errorListener);
+	        mAlertDialog.show();
+        } else {
+    	
+	    	if(helpPlaceholder.getVisibility() == View.GONE) {
+	    		expand(helpPlaceholder);
+	    	} else {
+	    		collapse(helpPlaceholder);
+	    	}
+        }
+    }
+    
+    public static void expand(final View v) {
+        v.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        final int targtetHeight = v.getMeasuredHeight();
+
+        v.getLayoutParams().height = 0;
+        v.setVisibility(View.VISIBLE);
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? LayoutParams.WRAP_CONTENT
+                        : (int)(targtetHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
+    public static void collapse(final View v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    v.setVisibility(View.GONE);
+                }else{
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
     
     public void updateHelpSize(int newMax) {
     	if(mHelpText != null) {
