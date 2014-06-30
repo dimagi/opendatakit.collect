@@ -18,6 +18,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.odk.collect.android.utilities.GeoUtils;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,8 +34,6 @@ public class PollSensorAction extends Action implements LocationListener {
 	private TreeReference target;
 	private Context context;
 	
-	private static final double LOCATION_ACCURACY = 5;
-	private static final int MAXIMUM_SECONDS = 300;
 	private static final String ACTION = "org.odk.collection.android.jr.extensions.PollSensorAction";
 	
 	private LocationManager mLocationManager;
@@ -85,7 +84,7 @@ public class PollSensorAction extends Action implements LocationListener {
 		        }
 		        
 		        Timer timeout = new Timer();
-		        timeout.schedule(new LocationUpdateTimerTask(), MAXIMUM_SECONDS * 1000);
+		        timeout.schedule(new LocationUpdateTimerTask(), GeoUtils.MAXIMUM_WAIT);
 			}
 		}, new IntentFilter(ACTION));
 		
@@ -105,7 +104,7 @@ public class PollSensorAction extends Action implements LocationListener {
 	public void onLocationChanged(Location location) {
 		if (location != null) {
 			if (this.target != null) {
-				String result = location.getLatitude() + " " + location.getLongitude() + " " + location.getAltitude() + " " + location.getAccuracy();	// TODO: share with GeoPointActivity and GeoPointMapActivity
+				String result = GeoUtils.locationToString(location);
 				TreeReference qualifiedReference = mContextRef == null ? target : target.contextualize(mContextRef);
 				EvaluationContext context = new EvaluationContext(mModel.getEvaluationContext(), qualifiedReference);
 	
@@ -117,7 +116,7 @@ public class PollSensorAction extends Action implements LocationListener {
 				mModel.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
 			}
 			
-			if (location.getAccuracy() <= LOCATION_ACCURACY) {
+			if (location.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
 				mLocationManager.removeUpdates(this);
 			}
 		}

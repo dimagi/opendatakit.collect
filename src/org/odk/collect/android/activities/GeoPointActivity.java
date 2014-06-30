@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.GeoProgressDialog;
+import org.odk.collect.android.utilities.GeoUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,10 +42,6 @@ public class GeoPointActivity extends Activity implements LocationListener {
     private boolean mNetworkOn = false;
     
     private int acceptableThreshold = 1600;
-
-    // default location accuracy
-    private static double LOCATION_ACCURACY = 5;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,10 +182,7 @@ public class GeoPointActivity extends Activity implements LocationListener {
     private void returnLocation() {
         if (mLocation != null) {
             Intent i = new Intent();
-            i.putExtra(
-                FormEntryActivity.LOCATION_RESULT,
-                mLocation.getLatitude() + " " + mLocation.getLongitude() + " "
-                        + mLocation.getAltitude() + " " + mLocation.getAccuracy());
+            i.putExtra(FormEntryActivity.LOCATION_RESULT, GeoUtils.locationToString(mLocation));
             setResult(RESULT_OK, i);
         }
         finish();
@@ -202,7 +196,7 @@ public class GeoPointActivity extends Activity implements LocationListener {
             mLocationDialog.setMessage(getString(R.string.location_provider_accuracy,
                 mLocation.getProvider(), truncateDouble(mLocation.getAccuracy())));
 
-            if (mLocation.getAccuracy() <= LOCATION_ACCURACY) {
+            if (mLocation.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
                 returnLocation();
             }
             
