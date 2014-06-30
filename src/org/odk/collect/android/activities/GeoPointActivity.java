@@ -16,6 +16,7 @@ package org.odk.collect.android.activities;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Set;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.GeoProgressDialog;
@@ -38,8 +39,7 @@ public class GeoPointActivity extends Activity implements LocationListener {
     private GeoProgressDialog mLocationDialog;
     private LocationManager mLocationManager;
     private Location mLocation;
-    private boolean mGPSOn = false;
-    private boolean mNetworkOn = false;
+    private Set<String> mProviders;
     
     private int acceptableThreshold = 1600;
 
@@ -51,28 +51,11 @@ public class GeoPointActivity extends Activity implements LocationListener {
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         
-        evalProviders();
+        mProviders = GeoUtils.evaluateProviders(mLocationManager);
         
     	setupLocationDialog();
 
     }
-
-
-	private void evalProviders() {
-
-        // make sure we have a good location provider before continuing
-        List<String> providers = mLocationManager.getProviders(true);
-        for (String provider : providers) {
-            if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
-                mGPSOn = true;
-            }
-            if (provider.equalsIgnoreCase(LocationManager.NETWORK_PROVIDER)) {
-                mNetworkOn = true;
-            }
-        }
-
-	}
-
 
 	private void showNoGpsDialog() {
 		AlertDialog dialog = new AlertDialog.Builder(this).create();
@@ -128,16 +111,13 @@ public class GeoPointActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
-        evalProviders();
-        if (!mGPSOn && !mNetworkOn) {
+        mProviders = GeoUtils.evaluateProviders(mLocationManager);
+        if (mProviders.isEmpty()) {
             showNoGpsDialog();
         } else {
-	        if (mGPSOn) {
-	            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);            
-	        }
-	        if (mNetworkOn) {
-	            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-	        }
+        	for (String provider : mProviders) {
+	            mLocationManager.requestLocationUpdates(provider, 0, 0, this);            
+        	}
 	        mLocationDialog.show();
         }
     }

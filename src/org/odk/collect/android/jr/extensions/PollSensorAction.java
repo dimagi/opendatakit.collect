@@ -3,7 +3,7 @@ package org.odk.collect.android.jr.extensions;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -63,25 +63,11 @@ public class PollSensorAction extends Action implements LocationListener {
 		
 		this.context.registerReceiver(new BroadcastReceiver() {
 			public void onReceive(Context context, Intent intent) {
-				// TODO: DRY up (with GeoPointActivity and GeoPointMapActivity)
 				mLocationManager = (LocationManager) PollSensorAction.this.context.getSystemService(Context.LOCATION_SERVICE);
-				boolean mGPSOn = false;
-				boolean mNetworkOn = false;
-				List<String> providers = mLocationManager.getProviders(true);
+				Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
 				for (String provider : providers) {
-					if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
-						mGPSOn = true;
-					}
-					if (provider.equalsIgnoreCase(LocationManager.NETWORK_PROVIDER)) {
-						mNetworkOn = true;
-					}
+		            mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);            
 				}
-		        if (mGPSOn) {
-		            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, PollSensorAction.this);            
-		        }
-		        if (mNetworkOn) {
-		            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, PollSensorAction.this);
-		        }
 		        
 		        Timer timeout = new Timer();
 		        timeout.schedule(new LocationUpdateTimerTask(), GeoUtils.MAXIMUM_WAIT);
