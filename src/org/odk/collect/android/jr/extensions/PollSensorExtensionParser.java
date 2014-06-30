@@ -9,7 +9,14 @@ import org.javarosa.xform.parse.IElementHandler;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
 
+import android.content.Context;
+
 public class PollSensorExtensionParser implements IElementHandler {
+	Context context;
+	
+	public PollSensorExtensionParser(Context c) {
+		this.context = c;
+	}
 
 	@Override
 	public void handle(XFormParser p, Element e, Object parent) {
@@ -25,7 +32,7 @@ public class PollSensorExtensionParser implements IElementHandler {
 			}
 			TreeReference treeRef = FormInstance.unpackReference(dataRef);
 			p.registerActionTarget(treeRef);
-			action = new PollSensorAction(treeRef);
+			action = new PollSensorAction(treeRef, this.context);
 		}
 
 		form.registerEventListener(event, action);
