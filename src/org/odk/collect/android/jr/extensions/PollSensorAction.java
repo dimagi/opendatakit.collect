@@ -1,3 +1,7 @@
+/**
+ * XForms Action extension to periodically poll a sensor and optionally save its value.
+ * @author jschweers
+ */
 package org.odk.collect.android.jr.extensions;
 
 import java.io.DataInputStream;
@@ -37,7 +41,7 @@ public class PollSensorAction extends Action implements LocationListener {
 	private FormDef mModel;
 	private TreeReference mContextRef;
 	
-	private class LocationUpdateTimerTask extends TimerTask {
+	private class StopPollingTask extends TimerTask {
 		@Override
 		public void run() {
 			mLocationManager.removeUpdates(PollSensorAction.this);
@@ -55,20 +59,28 @@ public class PollSensorAction extends Action implements LocationListener {
 		this.context = c;
 	}
 	
+	/**
+	 * Deal with a pollsensor action: start getting a GPS fix, and prepare to cancel after maximum amount of time.
+	 * @param model The FormDef that triggered the action
+	 * @param contextRef
+	 */
 	public void processAction(FormDef model, TreeReference contextRef) {
 		mModel = model;
 		mContextRef = contextRef;
 		
+		// LocationManager needs to be dealt with in the main UI thread, so wrap GPS-checking logic in a Handler
 		new Handler(Looper.getMainLooper()).post(new Runnable() {
 			public void run() {
+				// Start requesting GPS updates
 				mLocationManager = (LocationManager) PollSensorAction.this.context.getSystemService(Context.LOCATION_SERVICE);
 				Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
 				for (String provider : providers) {
 		            mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);            
 				}
 		        
+				// Cancel polling after maximum time is exceeded
 		        Timer timeout = new Timer();
-		        timeout.schedule(new LocationUpdateTimerTask(), GeoUtils.MAXIMUM_WAIT);
+		        timeout.schedule(new StopPollingTask(), GeoUtils.MAXIMUM_WAIT);
 			}
 		});
 	}
@@ -86,6 +98,10 @@ public class PollSensorAction extends Action implements LocationListener {
 		}
 	}
 
+	/**
+	 * If this action has a target node, update its value with the given location.
+	 * @param location
+	 */
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location != null) {

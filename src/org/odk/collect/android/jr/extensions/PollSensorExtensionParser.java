@@ -1,3 +1,7 @@
+/**
+ * Handler for <pollsensor> tags, which get processed by PollSensorActions.
+ * @author jschweers
+ */
 package org.odk.collect.android.jr.extensions;
 
 import org.javarosa.core.model.FormDef;
@@ -18,6 +22,13 @@ public class PollSensorExtensionParser implements IElementHandler {
 		this.context = c;
 	}
 
+	/**
+	 * Handle pollsensor node, creating a new PollSensor action with the 
+	 * current context and the node that sensor data will be written to.
+	 * @param p Parser
+	 * @param e pollsensor Element
+	 * @param parent FormDef for the form being parsed
+	 */
 	@Override
 	public void handle(XFormParser p, Element e, Object parent) {
 		String event = e.getAttributeValue(null, "event");
