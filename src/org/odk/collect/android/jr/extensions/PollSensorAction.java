@@ -20,21 +20,18 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.odk.collect.android.utilities.GeoUtils;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 public class PollSensorAction extends Action implements LocationListener {
 	private static String name = "pollsensor";
 	private TreeReference target;
 	private Context context;
-	
-	private static final String ACTION = "org.odk.collection.android.jr.extensions.PollSensorAction";
 	
 	private LocationManager mLocationManager;
 	private FormDef mModel;
@@ -62,8 +59,8 @@ public class PollSensorAction extends Action implements LocationListener {
 		mModel = model;
 		mContextRef = contextRef;
 		
-		this.context.registerReceiver(new BroadcastReceiver() {
-			public void onReceive(Context context, Intent intent) {
+		new Handler(Looper.getMainLooper()).post(new Runnable() {
+			public void run() {
 				mLocationManager = (LocationManager) PollSensorAction.this.context.getSystemService(Context.LOCATION_SERVICE);
 				Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
 				for (String provider : providers) {
@@ -73,10 +70,7 @@ public class PollSensorAction extends Action implements LocationListener {
 		        Timer timeout = new Timer();
 		        timeout.schedule(new LocationUpdateTimerTask(), GeoUtils.MAXIMUM_WAIT);
 			}
-		}, new IntentFilter(ACTION));
-		
-		Intent i = new Intent(ACTION);
-		this.context.sendBroadcast(i);
+		});
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
