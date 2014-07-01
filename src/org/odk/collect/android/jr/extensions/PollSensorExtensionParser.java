@@ -22,7 +22,7 @@ public class PollSensorExtensionParser implements IElementHandler {
 	public void handle(XFormParser p, Element e, Object parent) {
 		String event = e.getAttributeValue(null, "event");
 		FormDef form = (FormDef) parent;
-		PollSensorAction action = new PollSensorAction();
+		PollSensorAction action;
 		
 		String ref = e.getAttributeValue(null, "ref");
 		if (ref != null) {
@@ -32,7 +32,10 @@ public class PollSensorExtensionParser implements IElementHandler {
 			}
 			TreeReference treeRef = FormInstance.unpackReference(dataRef);
 			p.registerActionTarget(treeRef);
-			action = new PollSensorAction(treeRef, this.context);
+			action = new PollSensorAction(this.context, treeRef);
+		}
+		else {
+			action = new PollSensorAction(this.context);
 		}
 
 		form.registerEventListener(event, action);

@@ -46,12 +46,13 @@ public class PollSensorAction extends Action implements LocationListener {
 			mLocationManager.removeUpdates(PollSensorAction.this);
 		}
 	}
-
-	public PollSensorAction() {
+	
+	public PollSensorAction(Context c) {
 		super(name);
+		this.context = c;
 	}
 	
-	public PollSensorAction(TreeReference target, Context c) {
+	public PollSensorAction(Context c, TreeReference target) {
 		super(name);
 		this.target = target;
 		this.context = c;
@@ -83,7 +84,12 @@ public class PollSensorAction extends Action implements LocationListener {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, target);
+		if (target != null) {
+			ExtUtil.write(out, target);
+		}
+		else {
+			super.writeExternal(out);
+		}
 	}
 
 	@Override
