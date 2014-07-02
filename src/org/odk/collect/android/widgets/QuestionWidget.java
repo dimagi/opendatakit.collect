@@ -48,6 +48,13 @@ public abstract class QuestionWidget extends LinearLayout {
     protected final int mQuestionFontsize;
     protected final int mAnswerFontsize;
     protected final static String ACQUIREFIELD = "acquire";
+    
+    //the height of the "Frame" available to this widget. The frame
+    //is the size of the parent that is available (it is roughly
+    //the window without the keyboard/top bars/etc.)
+    //Note that this value is only populated after the widget is
+    //drawn for now.
+    protected int mFrameHeight = -1;
 
     private TextView mQuestionText;
     private FrameLayout helpPlaceholder;
@@ -197,7 +204,7 @@ public abstract class QuestionWidget extends LinearLayout {
     	//If the toastView already exists, we can just scroll to it right now
     	//if not, we actually have to do it later, when we lay this all back out
     	if(!focusPending) {
-            requestViewOnScreen(messageView);
+    		requestChildViewOnScreen(messageView);
     	}
     }
     
@@ -209,10 +216,74 @@ public abstract class QuestionWidget extends LinearLayout {
     	notifyOnScreen(text, true);
     }
     
-    private void requestViewOnScreen(View view) {
-        Rect toShow = new Rect();
-	    view.getDrawingRect(toShow);
-	    view.requestRectangleOnScreen(toShow);
+    /*
+     * Use to signal that there's a portion of this view that wants to be 
+     * visible to the user on the screen. This method will place the sub 
+     * view on the screen, and will also place as much of this view as possible
+     * on the screen. If this view is smaller than the viewable area available, it
+     * will be fully visible in addition to the subview.
+     */
+    private void requestChildViewOnScreen(View child) {
+    	
+    	//Get the rectangle that wants to put itself on the screen
+        Rect vitalPortion = new Rect();
+        child.getDrawingRect(vitalPortion);
+	    
+        //Save a reference to it in case we have to manipulate it later.
+	    Rect vitalPortionSaved = new Rect();
+	    child.getDrawingRect(vitalPortionSaved);
+	    
+	    //Then get the bounding rectangle for this whole view.
+	    Rect wholeView = new Rect();
+	    this.getDrawingRect(wholeView);
+	    
+	    //If we don't know enough about the screen, just default to asking to see the
+	    //subview that was requested.
+	    if(mFrameHeight == -1){
+	    	child.requestRectangleOnScreen(vitalPortion);
+	    }	    
+	    
+	    //If the whole view fits, just request that we display the whole thing.
+	    if(wholeView.height() < mFrameHeight) {
+	    	this.requestRectangleOnScreen(wholeView);
+	    	return;
+	    }
+	    
+	    //The whole view will not fit, we need to scale down our requested focus.
+	    //Trying to construct the "ideal" rectangle here is actually pretty hard
+	    //but the base case is just to see if we can get the view onto the screen from
+	    //the bottom or the top
+	    
+	    int topY = wholeView.top;
+	    int bottomY = wholeView.bottom;
+	    
+	    //shrink the view to contain only the current frame size.
+	    wholeView.inset(0, (wholeView.height() - mFrameHeight) / 2);
+	    wholeView.offsetTo(wholeView.left, topY);
+	    
+	    //The view is now the size of the frame and anchored back at the top. 
+	    
+	    //Now let's contextualize where the child view actually is in this frame.
+	    this.offsetDescendantRectToMyCoords(child, vitalPortion);
+	    
+	    //If the newly transformed view now contains the child portion, we're good
+	    if(wholeView.contains(vitalPortion)) {
+	    	this.requestRectangleOnScreen(wholeView);
+	    	return;
+	    }
+	    
+	    //otherwise, move to the requested frame to be at the bottom of this view
+	    wholeView.offsetTo(wholeView.left, bottomY - wholeView.height());
+	    
+	    //now see if the transformed view contains the vital portion
+	    if(wholeView.contains(vitalPortion)) {
+	    	this.requestRectangleOnScreen(wholeView);
+	    	return;
+	    }
+
+	    //Otherwise the child is hidden in the frame, so it won't matter which
+	    //we choose.
+	    child.requestRectangleOnScreen(vitalPortionSaved);
     }
     
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -228,7 +299,7 @@ public abstract class QuestionWidget extends LinearLayout {
                 //for some reason (there's no other negative consequence)
 			} else {
 				TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
-		    	requestViewOnScreen(messageView);
+				requestChildViewOnScreen(messageView);
 			}
 		}
 	}
@@ -411,12 +482,13 @@ public abstract class QuestionWidget extends LinearLayout {
         a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
     }
-
     
-    public void updateHelpSize(int newMax) {
+    public void updateFrameSize(int width, int height) {
+    	int maxHelpHeight = height / 4;
     	if(mHelpText != null) {
-    		mHelpText.updateMaxHeight(newMax);
+    		mHelpText.updateMaxHeight(maxHelpHeight);
     	}
+    	mFrameHeight = height;
     }
 
 	/**
