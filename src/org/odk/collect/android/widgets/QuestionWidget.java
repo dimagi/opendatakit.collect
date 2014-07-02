@@ -74,6 +74,14 @@ public abstract class QuestionWidget extends LinearLayout {
     		hasListener = false;
     		widgetChangedListener = w;
     	}
+    	this.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				QuestionWidget.this.acceptFocus();
+			}
+    		
+    	});
     	
     	hasListener = (w != null);
     	
@@ -101,6 +109,11 @@ public abstract class QuestionWidget extends LinearLayout {
             
             addHelpPlaceholder(p);
     }
+    
+
+	protected void acceptFocus() {
+		
+	}
 
 
     private void addHelpPlaceholder(FormEntryPrompt p) {

@@ -210,6 +210,11 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
 		setFocus(getContext());
         mAnswer.setImeOptions(EditorInfo.IME_ACTION_UNSPECIFIED);
 	}
+	
+	@Override
+	public void acceptFocus() {
+		mAnswer.performClick();
+	}
 
 	@Override
 	public void afterTextChanged(Editable s) {
