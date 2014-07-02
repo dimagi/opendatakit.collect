@@ -2297,16 +2297,36 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         // Looks for user swipes. If the user has swiped, move to the appropriate screen.
-
-        // for all screens a swipe is left/right of at least .25" and up/down of less than .25"
-        // OR left/right of > .5"
+    	
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int xPixelLimit = (int) (dm.xdpi * .25);
-        int yPixelLimit = (int) (dm.ydpi * .25);
+        
+        //screen width and height in inches.
+        double sw = dm.xdpi * dm.widthPixels;
+        double sh = dm.ydpi * dm.heightPixels;
+    	
+    	//relative metrics for what constitutes a swipe (to adjust per screen size)
+    	double swipeX = 0.25;
+    	double swipeY = 0.25;
+    	
+    	//details of the motion itself
+    	float xMov = Math.abs(e1.getX() - e2.getX());
+    	float yMov = Math.abs(e1.getY() - e2.getY());
+    	
+    	double angleOfMotion = ((Math.atan(yMov / xMov) / Math.PI) * 180);
+    	
+    	//large screen (tablet style 
+    	if( sw > 5 || sh > 5) {
+    		swipeX = 0.5;
+    	}
+    	
 
-        if ((Math.abs(e1.getX() - e2.getX()) > xPixelLimit && Math.abs(e1.getY() - e2.getY()) < yPixelLimit)
-                || Math.abs(e1.getX() - e2.getX()) > xPixelLimit * 2) {
+        // for all screens a swipe is left/right of at least .25" and at an angle of no more than 30
+    	//degrees
+        int xPixelLimit = (int) (dm.xdpi * .25);
+        //int yPixelLimit = (int) (dm.ydpi * .25);
+
+        if ((xMov > xPixelLimit && angleOfMotion < 30)) {
             if (velocityX > 0) {
                 mBeenSwiped = true;
                 showPreviousView();
