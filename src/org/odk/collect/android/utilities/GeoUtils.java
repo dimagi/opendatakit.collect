@@ -4,6 +4,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.odk.collect.android.R;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationManager;
 
@@ -44,5 +49,33 @@ public class GeoUtils {
 		}
 				
 		return set;
+	}
+	
+	/**
+	 * Display a non-cancel-able dialog asking user if they want to turn on their GPS.
+	 * @param context
+	 * @param onChange Listener to call when dialog button is pressed.
+	 */
+	public static void showNoGpsDialog(Context context, DialogInterface.OnClickListener onChange) {
+		showNoGpsDialog(context, onChange, null);
+	}
+
+	/**
+	 * Display a cancel-able dialog asking user if they want to turn on their GPS.
+	 * @param context
+	 * @param onChange Listener to call when dialog button is pressed.
+	 * @param onCancel Listener to call when dialog is canceled.
+	 */
+	public static void showNoGpsDialog(Context context, DialogInterface.OnClickListener onChange, DialogInterface.OnCancelListener onCancel) {
+		AlertDialog dialog = new AlertDialog.Builder(context).create();
+		dialog.setTitle(context.getString(R.string.no_gps_title));
+		dialog.setMessage(context.getString(R.string.no_gps_message));
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.change_settings), onChange);
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, context.getString(R.string.cancel), onChange);
+        if (onCancel != null) {
+        	dialog.setCancelable(true);
+        	dialog.setOnCancelListener(onCancel);
+        }
+        dialog.show();
 	}
 }

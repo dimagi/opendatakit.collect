@@ -22,10 +22,8 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.odk.collect.android.R;
 import org.odk.collect.android.utilities.GeoUtils;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,6 +44,14 @@ public class PollSensorAction extends Action implements LocationListener {
 	private LocationManager mLocationManager;
 	private FormDef mModel;
 	private TreeReference mContextRef;
+
+	private class ProvidersChangedHandler extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
+			requestLocationUpdates(providers);
+		}
+	}
 	
 	private class StopPollingTask extends TimerTask {
 		@Override
@@ -65,19 +71,6 @@ public class PollSensorAction extends Action implements LocationListener {
 		this.context = c;
 	}
 	
-	private class ProvidersChangedHandler extends BroadcastReceiver {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
-			for (String provider : providers) {
-				System.out.println("[jls] in onReceive, requesting updates from " + provider);
-	            mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);            
-			}
-		}
-		
-	}
-	
 	/**
 	 * Deal with a pollsensor action: start getting a GPS fix, and prepare to cancel after maximum amount of time.
 	 * @param model The FormDef that triggered the action
@@ -87,8 +80,6 @@ public class PollSensorAction extends Action implements LocationListener {
 		mModel = model;
 		mContextRef = contextRef;
 		
-		this.context.registerReceiver(new ProvidersChangedHandler(), new IntentFilter(android.location.LocationManager.PROVIDERS_CHANGED_ACTION));
-		
 		// LocationManager needs to be dealt with in the main UI thread, so wrap GPS-checking logic in a Handler
 		new Handler(Looper.getMainLooper()).post(new Runnable() {
 			public void run() {
@@ -96,36 +87,42 @@ public class PollSensorAction extends Action implements LocationListener {
 				mLocationManager = (LocationManager) PollSensorAction.this.context.getSystemService(Context.LOCATION_SERVICE);
 				Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
 				if (providers.isEmpty()) {
-					/********************************************************/
-		AlertDialog dialog = new AlertDialog.Builder(PollSensorAction.this.context).create();
-		dialog.setTitle(PollSensorAction.this.context.getString(R.string.no_gps_title));
-		dialog.setMessage(PollSensorAction.this.context.getString(R.string.no_gps_message));
-        DialogInterface.OnClickListener changeSettingsListener = new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int i) {
-                if (i == DialogInterface.BUTTON1) { 
-               		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-               		PollSensorAction.this.context.startActivity(intent);
-                }
-            }
-        };
-        
-        dialog.setCancelable(true);
-        dialog.setButton(PollSensorAction.this.context.getString(R.string.change_settings), changeSettingsListener);
-        dialog.setButton2(PollSensorAction.this.context.getString(R.string.cancel), changeSettingsListener);
-
-        dialog.show();
-					/********************************************************/
+					PollSensorAction.this.context.registerReceiver(
+						new ProvidersChangedHandler(), 
+						new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+					);
+			        DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
+			            public void onClick(DialogInterface dialog, int i) {
+			            	if (i == DialogInterface.BUTTON_POSITIVE) {
+			            		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			            		PollSensorAction.this.context.startActivity(intent);
+			            	}
+			            }
+			        };
+					GeoUtils.showNoGpsDialog(PollSensorAction.this.context, onChangeListener);
 				}
-				for (String provider : providers) {
-					System.out.println("[jls] in Runnable, requesting updates from " + provider);
-		            mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);            
-				}
-		        
-				// Cancel polling after maximum time is exceeded
-		        Timer timeout = new Timer();
-		        timeout.schedule(new StopPollingTask(), GeoUtils.MAXIMUM_WAIT);
+				requestLocationUpdates(providers);
 			}
 		});
+	}
+	
+	/**
+	 * Start polling for location, based on whatever providers are given, and set up a timeout after MAXIMUM_WAIT is exceeded.
+	 * @param providers Set of String objects that may contain LocationManager.GPS_PROVDER and/or LocationManager.NETWORK_PROVIDER
+	 */
+	private void requestLocationUpdates(Set<String> providers) {
+		if (providers.isEmpty()) {
+			mLocationManager.removeUpdates(PollSensorAction.this);
+			return;
+		}
+		
+		for (String provider : providers) {
+			mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);            
+		}
+		        
+		// Cancel polling after maximum time is exceeded
+        Timer timeout = new Timer();
+        timeout.schedule(new StopPollingTask(), GeoUtils.MAXIMUM_WAIT);
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
@@ -147,7 +144,6 @@ public class PollSensorAction extends Action implements LocationListener {
 	 */
 	@Override
 	public void onLocationChanged(Location location) {
-		System.out.println("[jls] onLocationChanged");
 		if (location != null) {
 			if (this.target != null) {
 				String result = GeoUtils.locationToString(location);

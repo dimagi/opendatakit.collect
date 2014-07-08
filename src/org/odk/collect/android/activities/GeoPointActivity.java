@@ -15,7 +15,6 @@
 package org.odk.collect.android.activities;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Set;
 
 import org.odk.collect.android.R;
@@ -23,7 +22,6 @@ import org.odk.collect.android.application.GeoProgressDialog;
 import org.odk.collect.android.utilities.GeoUtils;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,43 +55,6 @@ public class GeoPointActivity extends Activity implements LocationListener {
 
     }
 
-	private void showNoGpsDialog() {
-		AlertDialog dialog = new AlertDialog.Builder(this).create();
-		dialog.setTitle(getString(R.string.no_gps_title));
-		dialog.setMessage(getString(R.string.no_gps_message));
-        DialogInterface.OnClickListener changeSettingsListener = new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int i) {
-                switch (i) {
-                    case DialogInterface.BUTTON1: //Yes, get settings 
-                		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                		startActivity(intent);
-                        break;
-                    case DialogInterface.BUTTON2: //No, bail
-                    	mLocation = null;
-                    	GeoPointActivity.this.finish();
-                    	break;
-                }
-            }
-        };
-        
-
-        DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface dialog) {
-            	mLocation = null;
-            	GeoPointActivity.this.finish();
-			}
-        };
-        
-        dialog.setCancelable(true);
-        dialog.setOnCancelListener(onCancelListener);
-        dialog.setButton(getString(R.string.change_settings), changeSettingsListener);
-        dialog.setButton2(getString(R.string.cancel), changeSettingsListener);
-
-        dialog.show();
-	}
-
-
 	@Override
     protected void onPause() {
         super.onPause();
@@ -113,7 +74,30 @@ public class GeoPointActivity extends Activity implements LocationListener {
         super.onResume();
         mProviders = GeoUtils.evaluateProviders(mLocationManager);
         if (mProviders.isEmpty()) {
-            showNoGpsDialog();
+        	DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
+        		@Override
+        		public void onCancel(DialogInterface dialog) {
+        			mLocation = null;
+        			GeoPointActivity.this.finish();
+        		}
+        	};
+        	
+	        DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
+	            public void onClick(DialogInterface dialog, int i) {
+	                switch (i) {
+	                    case DialogInterface.BUTTON_POSITIVE:
+	                		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+	                		startActivity(intent);
+	                        break;
+	                    case DialogInterface.BUTTON_NEGATIVE:
+	                    	mLocation = null;
+	                    	GeoPointActivity.this.finish();
+	                    	break;
+	                }
+	            }
+	        };
+	        
+            GeoUtils.showNoGpsDialog(this, onChangeListener, onCancelListener);
         } else {
         	for (String provider : mProviders) {
 	            mLocationManager.requestLocationUpdates(provider, 0, 0, this);            
