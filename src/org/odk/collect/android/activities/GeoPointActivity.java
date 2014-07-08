@@ -51,11 +51,11 @@ public class GeoPointActivity extends Activity implements LocationListener {
         
         mProviders = GeoUtils.evaluateProviders(mLocationManager);
         
-    	setupLocationDialog();
+        setupLocationDialog();
 
     }
 
-	@Override
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -74,35 +74,35 @@ public class GeoPointActivity extends Activity implements LocationListener {
         super.onResume();
         mProviders = GeoUtils.evaluateProviders(mLocationManager);
         if (mProviders.isEmpty()) {
-        	DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
-        		@Override
-        		public void onCancel(DialogInterface dialog) {
-        			mLocation = null;
-        			GeoPointActivity.this.finish();
-        		}
-        	};
-        	
-	        DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int i) {
-	                switch (i) {
-	                    case DialogInterface.BUTTON_POSITIVE:
-	                		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	                		startActivity(intent);
-	                        break;
-	                    case DialogInterface.BUTTON_NEGATIVE:
-	                    	mLocation = null;
-	                    	GeoPointActivity.this.finish();
-	                    	break;
-	                }
-	            }
-	        };
-	        
+            DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    mLocation = null;
+                    GeoPointActivity.this.finish();
+                }
+            };
+
+            DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int i) {
+                    switch (i) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            mLocation = null;
+                            GeoPointActivity.this.finish();
+                            break;
+                    }
+                }
+            };
+            
             GeoUtils.showNoGpsDialog(this, onChangeListener, onCancelListener);
         } else {
-        	for (String provider : mProviders) {
-	            mLocationManager.requestLocationUpdates(provider, 0, 0, this);            
-        	}
-	        mLocationDialog.show();
+            for (String provider : mProviders) {
+                mLocationManager.requestLocationUpdates(provider, 0, 0, this);            
+            }
+            mLocationDialog.show();
         }
     }
 
@@ -113,24 +113,21 @@ public class GeoPointActivity extends Activity implements LocationListener {
     private void setupLocationDialog() {
         // dialog displayed while fetching gps location
         
-        OnClickListener cancelButtonListener =
-            new OnClickListener() {
-                @Override
-    	   		public void onClick(View v){
-                    mLocation = null;
-                    finish();
-    	   		}
-        	};
-        	
-        OnClickListener okButtonListener =
-    		new OnClickListener() {
-    	   		public void onClick(View v){
-                    returnLocation();
-    	   		}
-       	};
-       	
-       	mLocationDialog = new GeoProgressDialog(this, getString(R.string.found_location), getString(R.string.finding_location));
-       	
+        OnClickListener cancelButtonListener = new OnClickListener() {
+            @Override
+            public void onClick(View v){
+                mLocation = null;
+                finish();
+            }
+        };
+
+        OnClickListener okButtonListener = new OnClickListener() {
+            public void onClick(View v){
+                returnLocation();
+            }
+        };
+
+        mLocationDialog = new GeoProgressDialog(this, getString(R.string.found_location), getString(R.string.finding_location));
 
         // back button doesn't cancel
         mLocationDialog.setCancelable(false);
@@ -165,9 +162,9 @@ public class GeoPointActivity extends Activity implements LocationListener {
             }
             
             if(mLocation.getAccuracy() < acceptableThreshold){
-            	mLocationDialog.setLocationFound(true);
+                mLocationDialog.setLocationFound(true);
             } else{
-            	mLocationDialog.setLocationFound(false);
+                mLocationDialog.setLocationFound(false);
             }
         }
     }

@@ -91,14 +91,14 @@ public class PollSensorAction extends Action implements LocationListener {
 						new ProvidersChangedHandler(), 
 						new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
 					);
-			        DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
-			            public void onClick(DialogInterface dialog, int i) {
-			            	if (i == DialogInterface.BUTTON_POSITIVE) {
-			            		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-			            		PollSensorAction.this.context.startActivity(intent);
-			            	}
-			            }
-			        };
+					DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int i) {
+							if (i == DialogInterface.BUTTON_POSITIVE) {
+						 		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+								PollSensorAction.this.context.startActivity(intent);
+							}
+						}
+					};
 					GeoUtils.showNoGpsDialog(PollSensorAction.this.context, onChangeListener);
 				}
 				requestLocationUpdates(providers);
@@ -117,12 +117,12 @@ public class PollSensorAction extends Action implements LocationListener {
 		}
 		
 		for (String provider : providers) {
-			mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);            
+			mLocationManager.requestLocationUpdates(provider, 0, 0, PollSensorAction.this);
 		}
-		        
+
 		// Cancel polling after maximum time is exceeded
-        Timer timeout = new Timer();
-        timeout.schedule(new StopPollingTask(), GeoUtils.MAXIMUM_WAIT);
+		Timer timeout = new Timer();
+		timeout.schedule(new StopPollingTask(), GeoUtils.MAXIMUM_WAIT);
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

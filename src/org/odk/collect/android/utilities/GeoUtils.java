@@ -70,12 +70,12 @@ public class GeoUtils {
 		AlertDialog dialog = new AlertDialog.Builder(context).create();
 		dialog.setTitle(context.getString(R.string.no_gps_title));
 		dialog.setMessage(context.getString(R.string.no_gps_message));
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.change_settings), onChange);
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, context.getString(R.string.cancel), onChange);
-        if (onCancel != null) {
-        	dialog.setCancelable(true);
-        	dialog.setOnCancelListener(onCancel);
-        }
-        dialog.show();
+		dialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.change_settings), onChange);
+		dialog.setButton(AlertDialog.BUTTON_NEGATIVE, context.getString(R.string.cancel), onChange);
+		if (onCancel != null) {
+			dialog.setCancelable(true);
+			dialog.setOnCancelListener(onCancel);
+		}
+		dialog.show();
 	}
 }
