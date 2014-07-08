@@ -210,9 +210,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         if(i > 0) {
             dividerIndex += 2 * i - 1;
         }
-        //else {
-        //    dividerIndex += 0;
-        //}
         mView.addView(divider, getViewIndex(dividerIndex));
         dividers.add(Math.max(0, i - 1), divider);
         
@@ -436,7 +433,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 	}
 	
 	/**
-	 * Remove question based on position. 
+	 * Remove question, based on position. 
 	 * @param questionIndex Index in question list.
 	 */
 	public void removeWidget(int questionIndex){
