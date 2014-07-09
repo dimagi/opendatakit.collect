@@ -37,11 +37,13 @@ public class PollSensorExtensionParser implements IElementHandler {
 		
 		String ref = e.getAttributeValue(null, "ref");
 		if (ref != null) {
-			TreeReference targetRef = getRef(ref);
-			TreeReference auditRef = getRef(e.getAttributeValue(null, "time"));
-			p.registerActionTarget(targetRef);
-			p.registerActionTarget(auditRef);
-			action = new PollSensorAction(this.context, targetRef, auditRef);
+			IDataReference dataRef = new XPathReference(ref);
+			if (dataRef != null) {
+				dataRef = XFormParser.getAbsRef(dataRef, TreeReference.rootRef());
+			}
+			TreeReference treeRef = FormInstance.unpackReference(dataRef);
+			p.registerActionTarget(treeRef);
+			action = new PollSensorAction(this.context, treeRef);
 		}
 		else {
 			action = new PollSensorAction(this.context);
@@ -50,13 +52,4 @@ public class PollSensorExtensionParser implements IElementHandler {
 		form.registerEventListener(event, action);
 	}
 	
-	private TreeReference getRef(String attribute) {
-		IDataReference dataRef = new XPathReference(attribute);
-		if (dataRef != null) {
-			dataRef = XFormParser.getAbsRef(dataRef, TreeReference.rootRef());
-		}
-		TreeReference treeRef = FormInstance.unpackReference(dataRef);
-		return treeRef;
-	}
-
 }

@@ -7,7 +7,6 @@ package org.odk.collect.android.jr.extensions;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,7 +39,6 @@ import android.os.Looper;
 public class PollSensorAction extends Action implements LocationListener {
 	private static String name = "pollsensor";
 	private TreeReference target;
-	private TreeReference audit;
 	private Context context;
 	
 	private LocationManager mLocationManager;
@@ -67,15 +65,10 @@ public class PollSensorAction extends Action implements LocationListener {
 		this.context = c;
 	}
 	
-	public PollSensorAction(Context c, TreeReference target, TreeReference audit) {
+	public PollSensorAction(Context c, TreeReference target) {
 		super(name);
 
-		if ((target == null) != (audit == null)) {
-			throw new IllegalArgumentException("PollSensorAction requires either both target and audit or neither");
-		}
-		
 		this.target = target;
-		this.audit = audit;
 		this.context = c;
 	}
 	
@@ -135,39 +128,33 @@ public class PollSensorAction extends Action implements LocationListener {
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		target = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		audit = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		if (target != null) {
 			ExtUtil.write(out, target);
-			ExtUtil.write(out, audit);
 		}
 		else {
 			super.writeExternal(out);
 		}
 	}
 	
-	private void setNodeValue(TreeReference ref, Object value) {
-		TreeReference qualifiedReference = mContextRef == null ? ref : ref.contextualize(mContextRef);
-		EvaluationContext context = new EvaluationContext(mModel.getEvaluationContext(), qualifiedReference);
-		AbstractTreeElement node = context.resolveReference(qualifiedReference);
-		if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
-		int dataType = node.getDataType();
-		IAnswerData val = Recalculate.wrapData(value, dataType);
-		mModel.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
-	}
-
 	/**
-	 * If this action has target and audit nodes, update their values with the given location and the current time.
+	 * If this action has a target node, update its value with the given location.
 	 * @param location
 	 */
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location != null) {
 			if (target != null) {
-				setNodeValue(target, GeoUtils.locationToString(location));
-				setNodeValue(audit, new Date());
+				String result = GeoUtils.locationToString(location);
+				TreeReference qualifiedReference = mContextRef == null ? target : target.contextualize(mContextRef);
+				EvaluationContext context = new EvaluationContext(mModel.getEvaluationContext(), qualifiedReference);
+				AbstractTreeElement node = context.resolveReference(qualifiedReference);
+				if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
+				int dataType = node.getDataType();
+				IAnswerData val = Recalculate.wrapData(result, dataType);
+				mModel.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
 			}
 			
 			if (location.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
