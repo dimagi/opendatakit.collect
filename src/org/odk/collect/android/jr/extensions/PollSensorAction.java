@@ -22,6 +22,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.utilities.GeoUtils;
 
 import android.content.BroadcastReceiver;
@@ -39,7 +40,6 @@ import android.os.Looper;
 public class PollSensorAction extends Action implements LocationListener {
 	private static String name = "pollsensor";
 	private TreeReference target;
-	private Context context;
 	
 	private LocationManager mLocationManager;
 	private FormDef mModel;
@@ -60,16 +60,13 @@ public class PollSensorAction extends Action implements LocationListener {
 		}
 	}
 	
-	public PollSensorAction(Context c) {
+	public PollSensorAction() {
 		super(name);
-		this.context = c;
 	}
 	
-	public PollSensorAction(Context c, TreeReference target) {
+	public PollSensorAction(TreeReference target) {
 		super(name);
-
 		this.target = target;
-		this.context = c;
 	}
 	
 	/**
@@ -85,10 +82,11 @@ public class PollSensorAction extends Action implements LocationListener {
 		new Handler(Looper.getMainLooper()).post(new Runnable() {
 			public void run() {
 				// Start requesting GPS updates
-				mLocationManager = (LocationManager) PollSensorAction.this.context.getSystemService(Context.LOCATION_SERVICE);
+				Context context = Collect.getStaticApplicationContext();
+				mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 				Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
 				if (providers.isEmpty()) {
-					PollSensorAction.this.context.registerReceiver(
+					context.registerReceiver(
 						new ProvidersChangedHandler(), 
 						new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
 					);
@@ -96,11 +94,11 @@ public class PollSensorAction extends Action implements LocationListener {
 						public void onClick(DialogInterface dialog, int i) {
 							if (i == DialogInterface.BUTTON_POSITIVE) {
 						 		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-								PollSensorAction.this.context.startActivity(intent);
+								Collect.getStaticApplicationContext().startActivity(intent);
 							}
 						}
 					};
-					GeoUtils.showNoGpsDialog(PollSensorAction.this.context, onChangeListener);
+					GeoUtils.showNoGpsDialog(context, onChangeListener);
 				}
 				requestLocationUpdates(providers);
 			}

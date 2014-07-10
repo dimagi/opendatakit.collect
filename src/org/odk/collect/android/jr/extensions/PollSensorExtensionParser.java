@@ -16,15 +16,8 @@ import org.kxml2.kdom.Element;
 import android.content.Context;
 
 public class PollSensorExtensionParser implements IElementHandler {
-	Context context;
-	
-	public PollSensorExtensionParser(Context c) {
-		this.context = c;
-	}
-
 	/**
-	 * Handle pollsensor node, creating a new PollSensor action with the 
-	 * current context and the node that sensor data will be written to.
+	 * Handle pollsensor node, creating a new PollSensor action with the node that sensor data will be written to.
 	 * @param p Parser
 	 * @param e pollsensor Element
 	 * @param parent FormDef for the form being parsed
@@ -43,10 +36,10 @@ public class PollSensorExtensionParser implements IElementHandler {
 			}
 			TreeReference treeRef = FormInstance.unpackReference(dataRef);
 			p.registerActionTarget(treeRef);
-			action = new PollSensorAction(this.context, treeRef);
+			action = new PollSensorAction(treeRef);
 		}
 		else {
-			action = new PollSensorAction(this.context);
+			action = new PollSensorAction();
 		}
 
 		form.registerEventListener(event, action);

@@ -153,7 +153,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
                 Log.i(t, "Attempting to load from: " + formXml.getAbsolutePath());
                 fis = new FileInputStream(formXml);
                 XFormParser.registerHandler("intent", new IntentExtensionParser());
-                XFormParser.registerStructuredAction("pollsensor", new PollSensorExtensionParser(this.context));
+                XFormParser.registerStructuredAction("pollsensor", new PollSensorExtensionParser());
                 fd = XFormUtils.getFormFromInputStream(fis);
                 if (fd == null) {
                     mErrorMsg = "Error reading XForm file";
