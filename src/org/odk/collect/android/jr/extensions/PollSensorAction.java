@@ -125,16 +125,13 @@ public class PollSensorAction extends Action implements LocationListener {
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		super.readExternal(in, pf);
 		target = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		if (target != null) {
-			ExtUtil.write(out, target);
-		}
-		else {
-			super.writeExternal(out);
-		}
+		super.writeExternal(out);
+		ExtUtil.write(out, target);
 	}
 	
 	/**
