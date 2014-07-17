@@ -27,7 +27,7 @@ public class GeoUtils {
 	 * @return String in format "<latitude> <longitude> <altitude> <accuracy>"
 	 */
 	public static String locationToString(Location location) {
-		return location.getLatitude() + " " + location.getLongitude() + " " + location.getAltitude() + " " + location.getAccuracy();
+		return String.format("%s %s %s %s", location.getLatitude(), location.getLongitude(), location.getAltitude(), location.getAccuracy());
 	}
 	
 	/**

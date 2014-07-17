@@ -31,9 +31,7 @@ public class PollSensorExtensionParser implements IElementHandler {
 		String ref = e.getAttributeValue(null, "ref");
 		if (ref != null) {
 			IDataReference dataRef = new XPathReference(ref);
-			if (dataRef != null) {
-				dataRef = XFormParser.getAbsRef(dataRef, TreeReference.rootRef());
-			}
+			dataRef = XFormParser.getAbsRef(dataRef, TreeReference.rootRef());
 			TreeReference treeRef = FormInstance.unpackReference(dataRef);
 			p.registerActionTarget(treeRef);
 			action = new PollSensorAction(treeRef);
