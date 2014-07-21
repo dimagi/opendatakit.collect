@@ -104,6 +104,23 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.setGravity(Gravity.TOP);
         mView.setPadding(0, 7, 0, 0);
 
+        // Construct progress bar
+        mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
+        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
+        
+        LinearLayout.LayoutParams barLayout =
+            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+        barLayout.setMargins(15, 15, 15, 15);
+        barLayout.gravity = Gravity.BOTTOM;
+        
+        LinearLayout barView = new LinearLayout(getContext());
+        barView.setOrientation(LinearLayout.VERTICAL);
+        barView.setGravity(Gravity.BOTTOM);
+        barView.addView((View) mProgressBar);
+        mView.addView(barView, barLayout);
+
+
         mLayout =
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -162,22 +179,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             qw.setChangedListener(this);
         }
         
-        // Construct progress bar
-        mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
-        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
-        
-        LinearLayout.LayoutParams barLayout =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-        barLayout.setMargins(15, 15, 15, 15);
-        barLayout.gravity = Gravity.BOTTOM;
-        
-        LinearLayout barView = new LinearLayout(getContext());
-        barView.setOrientation(LinearLayout.VERTICAL);
-        barView.setGravity(Gravity.BOTTOM);
-        barView.addView((View) mProgressBar);
-        mView.addView(barView, barLayout);
-
         addView(mView);
     }
     
@@ -209,10 +210,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         if(i > 0) {
             dividerIndex += 2 * i - 1;
         }
-        else {
-            dividerIndex += 0;
-        }
-        mView.addView(divider,dividerIndex);
+        mView.addView(divider, getViewIndex(dividerIndex));
         dividers.add(Math.max(0, i - 1), divider);
         
         QuestionWidget qw = newQuestionWidget;
@@ -226,7 +224,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 //        }
 
         widgets.add(i, qw);
-        mView.addView((View) qw, 2 * i + mViewBannerCount, mLayout);
+        mView.addView((View) qw, getViewIndex(2 * i + mViewBannerCount), mLayout);
     	
         newQuestionWidget.setChangedListener(this);
     }
@@ -430,17 +428,34 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 
 	@Override
 	public void widgetEntryChanged() {
-
 		updateConstraintRelevancies();
 		
 	}
 	
-	public void removeWidget(int i){
-		mView.removeViewAt(i);
+	/**
+	 * Remove question, based on position. 
+	 * @param questionIndex Index in question list.
+	 */
+	public void removeWidget(int questionIndex){
+		mView.removeViewAt(getViewIndex(questionIndex));
 	}
 	
+	/**
+	 * Remove question, based on view object.
+	 * @param v View to remove
+	 */
 	public void removeWidget(View v){
 		mView.removeView(v);
+	}
+
+	/**
+	 * Translate question index to view index.
+	 * @param questionIndex Index in the list of questions.
+	 * @return Index of question's view in mView.
+	 */
+	private int getViewIndex(int questionIndex) {
+		// Account for progress bar
+		return questionIndex + 1;
 	}
     
 }
