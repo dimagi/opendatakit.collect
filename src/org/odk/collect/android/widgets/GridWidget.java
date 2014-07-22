@@ -107,7 +107,7 @@ public class GridWidget extends QuestionWidget {
 
                 String imageFilename;
                 try {
-                    imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                    imageFilename = FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(imageURI).getLocalURI());
                     final File imageFile = new File(imageFilename);
                     if (imageFile.exists()) {
                         Display display =
@@ -237,7 +237,7 @@ public class GridWidget extends QuestionWidget {
 
                 String imageFilename;
                 try {
-                    imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                    imageFilename = FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(imageURI).getLocalURI());
                     final File imageFile = new File(imageFilename);
                     if (imageFile.exists()) {
                         Display display =
@@ -411,8 +411,8 @@ public class GridWidget extends QuestionWidget {
             String errorMsg = null;
             if (imageURI != null) {
                 try {
-                    String imageFilename =
-                        ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                    String imageFilename = 
+                            FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(imageURI).getLocalURI());
                     final File imageFile = new File(imageFilename);
                     if (imageFile.exists()) {
                         Display display =

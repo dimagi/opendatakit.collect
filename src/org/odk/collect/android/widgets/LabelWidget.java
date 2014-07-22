@@ -75,7 +75,7 @@ public class LabelWidget extends QuestionWidget {
                 if (imageURI != null) {
                     try {
                         String imageFilename =
-                            ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                                FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(imageURI).getLocalURI());
                         final File imageFile = new File(imageFilename);
                         if (imageFile.exists()) {
                             Bitmap b = null;
