@@ -126,12 +126,12 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
     }
     
     
-    protected void addAnswerFilter(LengthFilter lengthFilter) {
+    protected void addAnswerFilter(InputFilter filter) {
 		//Let's add a filter
 		InputFilter[] currentFilters = mAnswer.getFilters();
 		InputFilter[] newFilters = new InputFilter[currentFilters.length + 1];
 		System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
-		newFilters[currentFilters.length] = lengthFilter;
+		newFilters[currentFilters.length] = filter;
 		
 		mAnswer.setFilters(newFilters);
 	}

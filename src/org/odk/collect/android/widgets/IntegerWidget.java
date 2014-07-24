@@ -22,6 +22,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.listeners.WidgetChangedListener;
+import org.odk.collect.android.utilities.IntegerSizeFilter;
 
 import android.content.Context;
 import android.text.InputFilter;
@@ -57,6 +58,7 @@ public class IntegerWidget extends StringWidget {
         // only allows numbers and no periods
         mAnswer.setKeyListener(new DigitsKeyListener(true, false));
 
+        addAnswerFilter(new IntegerSizeFilter());
         
         //We might have 
         
