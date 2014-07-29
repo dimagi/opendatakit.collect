@@ -20,6 +20,8 @@ import java.util.Set;
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.GeoProgressDialog;
 import org.odk.collect.android.utilities.GeoUtils;
+import org.odk.collect.android.listeners.TimerListener;
+import org.odk.collect.android.utilities.ODKTimer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,13 +35,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class GeoPointActivity extends Activity implements LocationListener {
+public class GeoPointActivity extends Activity implements LocationListener, TimerListener {
     private GeoProgressDialog mLocationDialog;
     private LocationManager mLocationManager;
     private Location mLocation;
     private Set<String> mProviders;
-    
+
     private int acceptableThreshold = 1600;
+    private int millisToWait = 60000; //allow to accept location after 60 seconds
+
+	private ODKTimer mTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +58,15 @@ public class GeoPointActivity extends Activity implements LocationListener {
         
         setupLocationDialog();
 
-    }
+		long mLong = savedInstanceState.getLong("millisRemaining",-1);
+		if(mLong > 0){
+			mTimer = new ODKTimer(mLong, this);
+		}else{
+			mTimer = new ODKTimer(millisToWait, this);
+		}
+		mTimer.start();
+
+	}
 
     @Override
     protected void onPause() {
@@ -203,5 +216,16 @@ public class GeoPointActivity extends Activity implements LocationListener {
                 break;
         }
     }
+
+	@Override
+	public void notifyTimerFinished() {
+		mLocationDialog.setLocationFound(true);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		savedInstanceState.putLong("millisRemaining",mTimer.getMillisUntilFinished());
+		super.onSaveInstanceState(savedInstanceState);  
+	}
 
 }
