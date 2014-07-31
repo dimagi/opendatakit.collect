@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import org.odk.collect.android.R;
+import org.odk.collect.android.utilities.GeoUtils;
 import org.odk.collect.android.widgets.GeoPointWidget;
 
 import android.content.Context;
@@ -52,9 +53,6 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     private boolean mGPSOn = false;
     private boolean mNetworkOn = false;
     
-    private static double LOCATION_ACCURACY = 5;
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,10 +138,7 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     private void returnLocation() {
         if (mLocation != null) {
             Intent i = new Intent();
-            i.putExtra(
-                FormEntryActivity.LOCATION_RESULT,
-                mLocation.getLatitude() + " " + mLocation.getLongitude() + " "
-                        + mLocation.getAltitude() + " " + mLocation.getAccuracy());
+            i.putExtra(FormEntryActivity.LOCATION_RESULT, GeoUtils.locationToString(mLocation));
             setResult(RESULT_OK, i);
         }
         finish();
@@ -198,7 +193,7 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
 
                 mMapController.animateTo(mGeoPoint);
 
-                if (mLocation.getAccuracy() <= LOCATION_ACCURACY) {
+                if (mLocation.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
                     returnLocation();
                 }
             }
