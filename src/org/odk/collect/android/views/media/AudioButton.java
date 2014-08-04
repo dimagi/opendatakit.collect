@@ -44,8 +44,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     		
     		@Override
         	public MediaEntity getCurrMedia() {
-        		return new MediaEntity(URI, this.mp, residingViewId, 
-            			currentState);
+        		return null;
         	}
 
         	@Override
@@ -310,8 +309,10 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
 
     public void endPlaying() {
-    	controller.releaseCurrentMediaEntity();
-    	setStateToReady();
+		if (!currentState.equals(MediaState.Playing)) {
+    		controller.releaseCurrentMediaEntity();
+    		setStateToReady();
+		}
     }
 
     public void pausePlaying() {

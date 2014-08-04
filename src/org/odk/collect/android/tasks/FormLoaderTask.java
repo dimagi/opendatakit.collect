@@ -43,6 +43,8 @@ import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.jr.extensions.CalendaredDateFormatHandler;
 import org.odk.collect.android.jr.extensions.IntentExtensionParser;
+import org.odk.collect.android.jr.extensions.PollSensorAction;
+import org.odk.collect.android.jr.extensions.PollSensorExtensionParser;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
 import org.odk.collect.android.logic.FormController;
@@ -151,6 +153,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
                 Log.i(t, "Attempting to load from: " + formXml.getAbsolutePath());
                 fis = new FileInputStream(formXml);
                 XFormParser.registerHandler("intent", new IntentExtensionParser());
+                XFormParser.registerStructuredAction("pollsensor", new PollSensorExtensionParser());
                 fd = XFormUtils.getFormFromInputStream(fis);
                 if (fd == null) {
                     mErrorMsg = "Error reading XForm file";

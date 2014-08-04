@@ -4,4 +4,7 @@ bin/
 gen/
 .classpath
 .project
+
+*.swp
 *.orig
+.hg*

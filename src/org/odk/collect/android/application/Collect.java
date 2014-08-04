@@ -26,6 +26,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.utilities.AgingCredentialsProvider;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -51,6 +52,7 @@ public class Collect extends Application {
 	private HttpContext localContext = null;
 	private static Collect singleton = null;
 
+	private static Context context;
 
 	public static Collect getInstance() {
 		return singleton;
@@ -126,6 +128,24 @@ public class Collect extends Application {
 		singleton = this;
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		super.onCreate();
+	}
+	
+	/**
+	 * Set application context. While Collect is itself a subclass of Context,
+	 * in a static context, onCreate may never have been called, making it useless for
+	 * actions like starting activities.
+	 * @param c
+	 */
+	public static void setStaticApplicationContext(Context c) {
+		context = c;
+	}
+
+	/**
+	 * Get application context.
+	 * @return
+	 */
+	public static Context getStaticApplicationContext() {
+		return context;
 	}
 
 }
