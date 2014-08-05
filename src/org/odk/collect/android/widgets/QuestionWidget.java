@@ -241,6 +241,7 @@ public abstract class QuestionWidget extends LinearLayout {
 	    //subview that was requested.
 	    if(mFrameHeight == -1){
 	    	child.requestRectangleOnScreen(vitalPortion);
+	    	return;
 	    }	    
 	    
 	    //If the whole view fits, just request that we display the whole thing.
