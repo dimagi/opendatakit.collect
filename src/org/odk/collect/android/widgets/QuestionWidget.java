@@ -433,7 +433,7 @@ public abstract class QuestionWidget extends LinearLayout {
     
     public static void expand(final View v) {
         v.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        final int targtetHeight = v.getMeasuredHeight();
+        final int targetHeight = v.getMeasuredHeight();
 
         v.getLayoutParams().height = 0;
         v.setVisibility(View.VISIBLE);
@@ -443,7 +443,7 @@ public abstract class QuestionWidget extends LinearLayout {
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 v.getLayoutParams().height = interpolatedTime == 1
                         ? LayoutParams.WRAP_CONTENT
-                        : (int)(targtetHeight * interpolatedTime);
+                        : (int)(targetHeight * interpolatedTime);
                 v.requestLayout();
             }
 
@@ -454,7 +454,7 @@ public abstract class QuestionWidget extends LinearLayout {
         };
 
         // 1dp/ms
-        a.setDuration((int)(targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        a.setDuration((int)(targetHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
     }
 
