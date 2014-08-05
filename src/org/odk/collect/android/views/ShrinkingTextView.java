@@ -190,6 +190,10 @@ public class ShrinkingTextView extends TextView {
             mDeltaHeight = endHeight - startHeight;
         }
 
+        /*
+         * (non-Javadoc)
+         * @see android.view.animation.Animation#applyTransformation(float, android.view.animation.Transformation)
+         */
         @Override
         protected void applyTransformation(float interpolatedTime, Transformation t) {
         	//ShrinkingTextView.this.setHeight((int) (mStartHeight + mDeltaHeight * interpolatedTime));
@@ -197,6 +201,10 @@ public class ShrinkingTextView extends TextView {
         	ShrinkingTextView.this.requestLayout();
         }
 
+        /*
+         * (non-Javadoc)
+         * @see android.view.animation.Animation#willChangeBounds()
+         */
         @Override
         public boolean willChangeBounds() {
             return true;

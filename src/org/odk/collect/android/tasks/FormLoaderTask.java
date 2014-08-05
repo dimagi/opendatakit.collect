@@ -111,6 +111,9 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
 
 
     /**
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+     * 
      * Initialize {@link FormEntryController} with {@link FormDef} from binary or from XML. If given
      * an instance, it will be used to fill the {@link FormDef}.
      */
@@ -357,6 +360,10 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+     */
     @Override
     protected void onPostExecute(FECWrapper wrapper) {
         synchronized (this) {

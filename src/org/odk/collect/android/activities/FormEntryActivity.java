@@ -225,7 +225,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
-    /** Called when the activity is first created. */
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
+     */
     @Override
     @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
@@ -480,6 +483,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
     public static final String TITLE_FRAGMENT_TAG = "odk_title_fragment";
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -504,6 +511,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onActivityResult(int, int, android.content.Intent)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -844,6 +855,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.removeItem(MENU_LANGUAGES);
@@ -871,6 +886,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -957,6 +976,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -968,6 +991,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         /*
@@ -987,7 +1014,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onRetainCustomNonConfigurationInstance()
+     * 
      * If we're loading, then we pass the loading thread to our next instance.
      */
     @Override
@@ -1147,6 +1177,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 if(mFormController.isFormReadOnly()) {
                 	button.setText(StringUtils.getStringRobust(this, R.string.exit));
                     button.setOnClickListener(new OnClickListener() {
+                    	/*
+                    	 * (non-Javadoc)
+                    	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+                    	 */
                         @Override
                         public void onClick(View v) {
                         	finishReturnInstance();
@@ -1156,6 +1190,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 } else {
                 	button.setText(StringUtils.getStringRobust(this, R.string.quit_entry));
                     button.setOnClickListener(new OnClickListener() {
+                    	/*
+                    	 * (non-Javadoc)
+                    	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+                    	 */
                         @Override
                         public void onClick(View v) {
                             // Form is marked as 'saved' here.
@@ -1210,6 +1248,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#dispatchTouchEvent(android.view.MotionEvent)
+     */
     @SuppressLint("NewApi")
     @Override
     public boolean dispatchTouchEvent(MotionEvent mv) {
@@ -1494,6 +1536,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         mAlertDialog = new AlertDialog.Builder(this).create();
         mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
         DialogInterface.OnClickListener repeatListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
@@ -1542,6 +1588,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         mAlertDialog.setTitle(StringUtils.getStringRobust(this, R.string.error_occured));
         mAlertDialog.setMessage(errorMsg);
         DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
@@ -1573,6 +1623,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         mAlertDialog.setTitle(StringUtils.getStringRobust(this, R.string.delete_repeat_ask));
         mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.delete_repeat_confirm, name));
         DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
@@ -1628,6 +1682,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     .setTitle(StringUtils.getStringRobust(this, R.string.quit_application, mFormController.getFormTitle()))
                     .setNeutralButton(StringUtils.getStringRobust(this, R.string.do_not_exit),
                         new DialogInterface.OnClickListener() {
+                    		/*
+                    		 * (non-Javadoc)
+                    		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                    		 */
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
@@ -1635,6 +1693,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
                             }
                         }).setItems(items, new DialogInterface.OnClickListener() {
+                        /*
+                         * (non-Javadoc)
+                         * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                         */
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
@@ -1816,6 +1878,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
         DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
 
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
@@ -1853,6 +1919,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             new AlertDialog.Builder(this)
                     .setSingleChoiceItems(languages, selected,
                         new DialogInterface.OnClickListener() {
+                    		/*
+                    		 * (non-Javadoc)
+                    		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                    		 */
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 // Update the language in the content provider when selecting a new
@@ -1880,6 +1950,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     .setTitle(StringUtils.getStringRobust(this, R.string.change_language))
                     .setNegativeButton(StringUtils.getStringRobust(this, R.string.do_not_change),
                         new DialogInterface.OnClickListener() {
+                    		/*
+                    		 * (non-Javadoc)
+                    		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                    		 */
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                             }
@@ -1888,7 +1962,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int)
+     * 
      * We use Android's dialog management for loading/saving progress dialogs
      */
     @Override
@@ -1898,6 +1975,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 mProgressDialog = new ProgressDialog(this);
                 DialogInterface.OnClickListener loadingButtonListener =
                     new DialogInterface.OnClickListener() {
+                	/*
+                	 * (non-Javadoc)
+                	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                	 */
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -1918,6 +1999,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 mProgressDialog = new ProgressDialog(this);
                 DialogInterface.OnClickListener savingButtonListener =
                     new DialogInterface.OnClickListener() {
+                		/*
+                		 * (non-Javadoc)
+                		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                		 */
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -1949,6 +2034,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onPause()
+     */
     @Override
     protected void onPause() {
         dismissDialogs();
@@ -1959,6 +2048,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -2001,6 +2094,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -2034,6 +2131,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onDestroy()
+     */
     @Override
     protected void onDestroy() {
         if (mFormLoaderTask != null) {
@@ -2060,25 +2161,40 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.animation.Animation.AnimationListener#onAnimationEnd(android.view.animation.Animation)
+     */
     @Override
     public void onAnimationEnd(Animation arg0) {
         mBeenSwiped = false;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.animation.Animation.AnimationListener#onAnimationRepeat(android.view.animation.Animation)
+     */
     @Override
     public void onAnimationRepeat(Animation animation) {
         // Added by AnimationListener interface.
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.animation.Animation.AnimationListener#onAnimationStart(android.view.animation.Animation)
+     */
     @Override
     public void onAnimationStart(Animation animation) {
         // Added by AnimationListener interface.
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.FormLoaderListener#loadingComplete(org.odk.collect.android.logic.FormController)
+     * 
      * loadingComplete() is called by FormLoaderTask once it has finished loading a form.
      */
     @SuppressLint("NewApi")
@@ -2138,7 +2254,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.FormLoaderListener#loadingError(java.lang.String)
+     * 
      * called by the FormLoaderTask if something goes wrong.
      */
     @Override
@@ -2152,7 +2271,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.FormSavedListener#savingComplete(int)
+     * 
      * Called by SavetoDiskTask if everything saves correctly.
      */
     @Override
@@ -2288,12 +2410,20 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.GestureDetector.OnGestureListener#onDown(android.view.MotionEvent)
+     */
     @Override
     public boolean onDown(MotionEvent e) {
         return false;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.GestureDetector.OnGestureListener#onFling(android.view.MotionEvent, android.view.MotionEvent, float, float)
+     */
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         // Looks for user swipes. If the user has swiped, move to the appropriate screen.
@@ -2322,11 +2452,19 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.GestureDetector.OnGestureListener#onLongPress(android.view.MotionEvent)
+     */
     @Override
     public void onLongPress(MotionEvent e) {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.GestureDetector.OnGestureListener#onScroll(android.view.MotionEvent, android.view.MotionEvent, float, float)
+     */
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         // The onFling() captures the 'up' event so our view thinks it gets long pressed.
@@ -2336,23 +2474,39 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.GestureDetector.OnGestureListener#onShowPress(android.view.MotionEvent)
+     */
     @Override
     public void onShowPress(MotionEvent e) {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.GestureDetector.OnGestureListener#onSingleTapUp(android.view.MotionEvent)
+     */
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
         return false;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.AdvanceToNextListener#advance()
+     */
     @Override
     public void advance() {
         next();
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.WidgetChangedListener#widgetEntryChanged()
+     */
 	@Override
 	public void widgetEntryChanged() {
 		updateFormRelevencies();

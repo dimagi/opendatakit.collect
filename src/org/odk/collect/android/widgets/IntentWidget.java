@@ -70,6 +70,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
 
         // launch barcode capture intent on click
         mGetBarcodeButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 mWaitingForData = true;
@@ -107,6 +111,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         mStringAnswer.setText(null);
@@ -114,6 +122,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
@@ -125,7 +137,9 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
      * Allows answer to be set externally in {@Link FormEntryActivity}.
      */
     @Override
@@ -135,6 +149,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -144,12 +162,20 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
+     */
     @Override
     public boolean isWaitingForBinaryData() {
         return mWaitingForData;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mStringAnswer.setOnLongClickListener(l);
@@ -157,6 +183,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

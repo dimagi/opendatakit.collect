@@ -63,6 +63,10 @@ public class FormsProvider extends ContentProvider {
         }
 
 
+        /*
+         * (non-Javadoc)
+         * @see org.odk.collect.android.database.ODKSQLiteOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
+         */
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + FORMS_TABLE_NAME + " (" 
@@ -84,6 +88,10 @@ public class FormsProvider extends ContentProvider {
         }
 
 
+        /*
+         * (non-Javadoc)
+         * @see org.odk.collect.android.database.ODKSQLiteOpenHelper#onUpgrade(android.database.sqlite.SQLiteDatabase, int, int)
+         */
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(t, "Upgrading database from version " + oldVersion + " to " + newVersion
@@ -96,6 +104,10 @@ public class FormsProvider extends ContentProvider {
     private DatabaseHelper mDbHelper;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#onCreate()
+     */
     @Override
     public boolean onCreate() {
         mDbHelper = new DatabaseHelper(DATABASE_NAME);
@@ -103,6 +115,10 @@ public class FormsProvider extends ContentProvider {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
+     */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
@@ -133,6 +149,10 @@ public class FormsProvider extends ContentProvider {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#getType(android.net.Uri)
+     */
     @Override
     public String getType(Uri uri) {
         switch (sUriMatcher.match(uri)) {
@@ -148,6 +168,10 @@ public class FormsProvider extends ContentProvider {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
+     */
     @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
         // Validate the requested uri
@@ -236,6 +260,9 @@ public class FormsProvider extends ContentProvider {
 
 
     /**
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+     * 
      * This method removes the entry from the content provider, and also removes any associated
      * files. files: form.xml, [formmd5].formdef, formname-media {directory}
      */
@@ -299,6 +326,10 @@ public class FormsProvider extends ContentProvider {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
+     */
     @Override
     public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
