@@ -200,9 +200,9 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
                 button.setChecked(false);
             }
         }
-        listener.advance();
-
         widgetEntryChanged();
+        
+        listener.advance();
     }
 
 
