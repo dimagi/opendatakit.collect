@@ -211,6 +211,7 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
         
         String formMediaPath = c.getString(c.getColumnIndex(FormsColumns.FORM_MEDIA_PATH));
         
+        ReferenceManager._().addSessionRootTranslator(new RootTranslator("jr://graphs/", "jr://file/commcare/install/"));
         if(formMediaPath != null) {
 	        ReferenceManager._().addSessionRootTranslator(
 		            new RootTranslator("jr://images/", formMediaPath));

@@ -1,11 +1,25 @@
 package org.odk.collect.android.widgets;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.Reference;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.kxml2.io.KXmlParser;
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.WidgetChangedListener;
@@ -14,6 +28,7 @@ import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ShrinkingTextView;
 import org.odk.collect.android.views.media.MediaLayout;
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -202,6 +217,7 @@ public abstract class QuestionWidget extends LinearLayout {
         String imageURI = p.getImageText();
         String audioURI = p.getAudioText();
         String videoURI = p.getSpecialFormQuestionText("video");
+        String graphURI = p.getSpecialFormQuestionText("graph");
         String qrCodeContent = p.getSpecialFormQuestionText("qrcode");
 
         // shown when image is clicked
@@ -230,6 +246,45 @@ public abstract class QuestionWidget extends LinearLayout {
 
         if (p.getLongText() == null) {
             mQuestionText.setVisibility(GONE);
+        }
+
+        if (graphURI != null) {
+        	try {
+				Reference graphReference = ReferenceManager._().DeriveReference(graphURI);
+				InputStream is = graphReference.getStream();
+				KXmlParser parser = new KXmlParser();
+				parser.setInput(is,"UTF-8");
+				parser.setFeature(KXmlParser.FEATURE_PROCESS_NAMESPACES, true);
+				parser.next();
+				String graphType = parser.getAttributeValue(null, "type");
+				TextView textView = new TextView(getContext());
+				textView.setText(graphType + " graph goes here");
+				addView(textView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 200));
+
+	        	/*AndroidCommCarePlatform platform = CommCareApplication._().getCommCarePlatform();
+	        	ResourceTable global = platform.getGlobalResourceTable();
+	        	Resource r = global.getResourceWithId("my_graph");*/
+	
+	        	/*LinearLayout mGraphView = new LinearLayout(getContext());
+	        	mGraphView.setId(4244125);
+	        	XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
+	        	XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+	        	XYSeries mCurrentSeries = new XYSeries("Sample Data");
+	        	mDataset.addSeries(mCurrentSeries);
+	        	XYSeriesRenderer mCurrentRenderer = new XYSeriesRenderer();
+	        	mRenderer.addSeriesRenderer(mCurrentRenderer);
+	        	mCurrentSeries.add(1, 2);
+	        	mCurrentSeries.add(3, 2);
+	        	mCurrentSeries.add(4, 5);
+	        	GraphicalView mChart = ChartFactory.getCubeLineChartView(getContext(), mDataset, mRenderer, 0.3f);
+	        	mGraphView.addView(mChart);*/
+			} catch (InvalidReferenceException e) {
+				e.printStackTrace();
+			} catch(IOException e) {
+				e.printStackTrace();
+			} catch (XmlPullParserException e) {
+				e.printStackTrace();
+			}
         }
 
         // Create the layout for audio, image, text
