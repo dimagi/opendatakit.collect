@@ -84,11 +84,7 @@ public class ResizingImageView extends ImageView {
 		// event when double tap occurs
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
-			float x = e.getX();
-			float y = e.getY();
-
 			setFullScreen();
-
 			return true;
 		}
 	}
