@@ -57,8 +57,10 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         mProviders = GeoUtils.evaluateProviders(mLocationManager);
         
         setupLocationDialog();
-
-		long mLong = savedInstanceState.getLong("millisRemaining",-1);
+        long mLong = -1;
+        if(savedInstanceState != null){
+        	mLong = savedInstanceState.getLong("millisRemaining",-1);
+        }
 		if(mLong > 0){
 			mTimer = new ODKTimer(mLong, this);
 		}else{
