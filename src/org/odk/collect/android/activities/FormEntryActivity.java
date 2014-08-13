@@ -27,12 +27,10 @@ import javax.crypto.spec.SecretKeySpec;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -62,7 +60,6 @@ import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -103,6 +100,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -111,6 +109,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -198,7 +197,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private Animation mInAnimation;
     private Animation mOutAnimation;
 
-    private RelativeLayout mRelativeLayout;
+    private ViewGroup mViewPane;
     private View mCurrentView;
 
     private AlertDialog mAlertDialog;
@@ -263,9 +262,30 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             return;
         }
 
-        setContentView(R.layout.form_entry);
+        setContentView(R.layout.screen_form_entry);
+        
+        ImageButton nextButton = (ImageButton)this.findViewById(R.id.nav_btn_next);
+        ImageButton prevButton = (ImageButton)this.findViewById(R.id.nav_btn_prev);
+        
+        nextButton.setOnClickListener(new OnClickListener() {
 
-        mRelativeLayout = (RelativeLayout) findViewById(R.id.rl);
+			@Override
+			public void onClick(View v) {
+				FormEntryActivity.this.showNextView();
+			}
+        	
+        });
+        
+        prevButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				FormEntryActivity.this.showPreviousView();
+			}
+        	
+        });
+
+        mViewPane = (ViewGroup)findViewById(R.id.form_entry_pane);
 
         mBeenSwiped = false;
         mAlertDialog = null;
@@ -736,20 +756,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
     /**
-     * Update progress bar's max and value, based on mCurrentView.
-     */
-    public void updateProgressBar() {
-        if(!(mCurrentView instanceof ODKView)){
-            throw new RuntimeException("Tried to update progress bar not on ODKView");
-        }
-        updateProgressBar((ODKView) mCurrentView);
-    }
-
-    /**
-     * Update progress bar's max and value.
+     * Update progress bar's max and value, and the various buttons and navigation cues
+     * associated with navigation
+     * 
      * @param odkv ODKView to update
      */
-    public void updateProgressBar(ODKView odkv) {
+    public void updateNavigationCues() {
+    	ProgressBar progressBar = (ProgressBar)this.findViewById(R.id.nav_prog_bar);
+    	
         int totalQuestions = 0;
         int completedQuestions = 0;
 
@@ -762,6 +776,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         boolean onCurrentScreen = false;
         FormIndex currentScreenExit = null;
+        
+        //TODO: We can probably evaluate this with a FormIndex walk that _doesn't_
+        //affect this form's index.
         while (event != FormEntryController.EVENT_END_OF_FORM) {
             int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
 
@@ -795,10 +812,29 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             }
             event = mFormController.stepToNextEvent(false);
         }
+        
+        ImageButton nextButton = (ImageButton)this.findViewById(R.id.nav_btn_next);
+        ImageButton prevButton = (ImageButton)this.findViewById(R.id.nav_btn_prev);
 
         // Set form back to correct state & actually update bar
         mFormController.jumpToIndex(currentFormIndex);
-        odkv.updateProgressBar(completedQuestions, totalQuestions);
+        
+        if(completedQuestions == 0) {
+        	prevButton.setImageResource(R.drawable.icon_exit);
+        } else {
+        	prevButton.setImageResource(R.drawable.icon_back);
+        }
+        
+        if(totalQuestions == completedQuestions) {
+        	nextButton.setImageResource(R.drawable.icon_done);
+        	progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar_full));
+        } else {
+        	nextButton.setImageResource(R.drawable.icon_next);
+        	progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar));
+        }
+        
+        progressBar.setMax(totalQuestions);
+        progressBar.setProgress(completedQuestions);
     }
 
 	/**
@@ -1200,7 +1236,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
                 
-                updateProgressBar(odkv);
+                updateNavigationCues();
                 
                 return odkv;
             default:
@@ -1399,7 +1435,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         	if(animateLastView) {
         		mCurrentView.startAnimation(mOutAnimation);
         	}
-            mRelativeLayout.removeView(mCurrentView);
+        	mViewPane.removeView(mCurrentView);
         }
 
         mInAnimation.setAnimationListener(this);
@@ -1408,7 +1444,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 
         mCurrentView = next;
-        mRelativeLayout.addView(mCurrentView, lp);
+        mViewPane.addView(mCurrentView, lp);
 
         mCurrentView.startAnimation(mInAnimation);
         if (mCurrentView instanceof ODKView)
@@ -2135,6 +2171,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
          */
 
         refreshCurrentView();
+        updateNavigationCues();
     }
 
 
@@ -2356,7 +2393,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	@Override
 	public void widgetEntryChanged() {
 		updateFormRelevencies();
-		updateProgressBar();
+		updateNavigationCues();
 	}
 
 }

@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewParent;
 import android.view.View.OnLongClickListener;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -49,9 +48,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
     private ArrayList<QuestionWidget> widgets;
-    private ArrayList<View> dividers;
-    private ProgressBar mProgressBar;
-    
+    private ArrayList<View> dividers;    
     private int mQuestionFontsize;
 
     public final static String FIELD_LIST = "field-list";
@@ -103,22 +100,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.setOrientation(LinearLayout.VERTICAL);
         mView.setGravity(Gravity.TOP);
         mView.setPadding(0, 7, 0, 0);
-
-        // Construct progress bar
-        mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
-        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
-        
-        LinearLayout.LayoutParams barLayout =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-        barLayout.setMargins(15, 15, 15, 15);
-        barLayout.gravity = Gravity.BOTTOM;
-        
-        LinearLayout barView = new LinearLayout(getContext());
-        barView.setOrientation(LinearLayout.VERTICAL);
-        barView.setGravity(Gravity.BOTTOM);
-        barView.addView((View) mProgressBar);
-        mView.addView(barView, barLayout);
 
 
         mLayout =
@@ -281,16 +262,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 			wcListener.widgetEntryChanged();
 		}
 	}
-
-    /**
-     * Update progress bar
-     * @param progress Current value
-     * @param max Progress bar will be given range 0..max
-     */
-    public void updateProgressBar(int progress, int max) {
-        mProgressBar.setMax(max);
-        mProgressBar.setProgress(progress);
-    }
 
     /**
      * // * Add a TextView containing the hierarchy of groups to which the question belongs. //

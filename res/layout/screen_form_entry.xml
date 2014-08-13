@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <FrameLayout
+        android:id="@+id/form_entry_header_pane"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/form_entry_pane"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_above="@+id/nav_pane"
+        android:layout_below="@id/form_entry_header_pane">
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@id/nav_pane"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/border_top_black"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
+
+        <ImageButton
+            android:id="@+id/nav_btn_prev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dp"
+            android:background="@null"
+            android:padding="2dp"
+            android:src="@drawable/icon_exit" />
+
+        <ProgressBar
+            android:id="@+id/nav_prog_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/nav_btn_prev"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/nav_btn_next"
+            android:layout_toRightOf="@id/nav_btn_prev"
+            android:indeterminate="false"
+            android:indeterminateOnly="false"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/progressbar" />
+
+        <ImageButton
+            android:id="@id/nav_btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="5dp"
+            android:background="@null"
+            android:padding="2dp"
+            android:src="@drawable/icon_next" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
