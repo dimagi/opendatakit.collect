@@ -14,7 +14,7 @@ License for the specific language governing permissions and limitations under
 the License.
 -->
 <resources>
-    
+    <dimen name="select_padding">15dp</dimen>
     <dimen name="nav_border_depth">2dp</dimen>
     
     

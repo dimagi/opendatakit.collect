@@ -22,11 +22,14 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.views.media.MediaLayout;
 
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -67,7 +70,7 @@ public class SelectMultiWidget extends QuestionWidget {
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
                 // no checkbox group so id by answer + offset
-                CheckBox c = new CheckBox(getContext());
+                final CheckBox c = new CheckBox(getContext());
 
                 // when clicked, check for readonly before toggling
                 c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -89,6 +92,10 @@ public class SelectMultiWidget extends QuestionWidget {
                 c.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
                 c.setFocusable(!prompt.isReadOnly());
                 c.setEnabled(!prompt.isReadOnly());
+                
+                int padding = (int)Math.floor(context.getResources().getDimension(R.dimen.select_padding));
+                
+                c.setPadding(0, 0, padding, 0);
                 for (int vi = 0; vi < ve.size(); vi++) {
                     // match based on value, not key
                     if (mItems.get(i).getValue().equals(ve.elementAt(vi).getValue())) {
@@ -118,6 +125,16 @@ public class SelectMultiWidget extends QuestionWidget {
                 MediaLayout mediaLayout = new MediaLayout(getContext());
                 mediaLayout.setAVT(c, audioURI, imageURI, videoURI, bigImageURI);
                 addView(mediaLayout);
+                
+                mediaLayout.setPadding(0, padding, 0, padding);
+                
+                mediaLayout.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+	                	c.performClick();
+					}
+                });
 
                 // Last, add the dividing line between elements (except for the last element)
                 ImageView divider = new ImageView(getContext());

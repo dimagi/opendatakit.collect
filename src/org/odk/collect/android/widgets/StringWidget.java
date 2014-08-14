@@ -187,9 +187,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         if (event.isAltPressed() == true) {
             return false;
         }
-        if(hasListener){
-        	widgetChangedListener.widgetEntryChanged();
-        }
+        widgetEntryChanged();
         return super.onKeyDown(keyCode, event);
     }
 
@@ -211,6 +209,11 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
 		//revert to default editor behavior
 		setFocus(getContext());
         mAnswer.setImeOptions(EditorInfo.IME_ACTION_UNSPECIFIED);
+	}
+	
+	@Override
+	public void acceptFocus() {
+		mAnswer.performClick();
 	}
 
 	@Override

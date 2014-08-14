@@ -236,11 +236,12 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int newHeight = MeasureSpec.getSize(heightMeasureSpec);
+		int newWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int oldHeight = this.getMeasuredHeight();
 		
 		if(oldHeight == 0 || Math.abs(((newHeight * 1.0 - oldHeight) / oldHeight)) > .2) {
 			for(QuestionWidget qw : this.widgets) { 
-				qw.updateHelpSize(newHeight / 4);
+				qw.updateFrameSize(newWidth, newHeight);
 			}
 		}
 		
