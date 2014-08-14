@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
+    android:layout_height="match_parent">
+    
     <FrameLayout
         android:id="@+id/form_entry_header_pane"
         android:layout_width="match_parent"
@@ -17,6 +17,19 @@
         android:layout_below="@id/form_entry_header_pane">
     </FrameLayout>
 
+    <ImageView
+        android:id="@+id/nav_badge_border_drawer"
+        android:layout_width="@dimen/badge_circum_outer"
+        android:layout_height="@dimen/badge_overlap"
+        android:layout_alignLeft="@+id/nav_badge"
+        android:layout_alignTop="@id/nav_badge"
+        android:scaleType="matrix"
+        android:src="@drawable/badge_border"
+        android:visibility="invisible" >
+
+    </ImageView>
+    
+    
     <RelativeLayout
         android:id="@id/nav_pane"
         android:layout_width="wrap_content"
@@ -62,6 +75,21 @@
             android:src="@drawable/icon_next" />
 
     </RelativeLayout>
-
+    
+    <TextView
+        android:id="@id/nav_badge"
+        android:layout_width="@dimen/badge_circum_outer"
+        android:layout_height="@dimen/badge_circum_outer"
+        android:layout_above="@id/nav_pane"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/nav_badge"
+        android:layout_marginBottom="@dimen/badge_offset"
+        android:layout_marginRight="@dimen/badge_offset_side"
+        android:background="@drawable/badge_background"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="3"
+        android:textColor="@drawable/white"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
 </RelativeLayout>

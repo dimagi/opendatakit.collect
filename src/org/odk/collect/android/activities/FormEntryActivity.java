@@ -770,9 +770,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // Step through form and count questions
         FormIndex currentFormIndex = mFormController.getFormIndex();
         int event = mFormController.getEvent();
+        
         while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
             event = mFormController.stepToPreviousEvent();
         }
+        
+        int answeredOnScreen = 0;
+        int requiredOnScreen = 0;
         
         boolean onCurrentScreen = false;
         FormIndex currentScreenExit = null;
@@ -800,7 +804,17 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // Future questions are never complete.
                 if (onCurrentScreen) {
                     for (FormEntryPrompt prompt : prompts) {
-                      if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                    	boolean isAnswered = prompt.getAnswerValue() != null;
+                    	
+                    	if(prompt.isRequired()) {
+                    		requiredOnScreen++;
+                        	
+                        	if(isAnswered) {
+                        		answeredOnScreen++;
+                        	}
+                    	}
+                    	
+                      if (isAnswered || prompt.getDataType() == Constants.DATATYPE_NULL) {
                           completedQuestions++;
                       }
                   }
@@ -808,6 +822,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 else if (comparison < 0) {
                     // For previous questions, consider all "complete"
                     completedQuestions += prompts.length;
+                    //TODO: This doesn't properly capture state to determine whether we will end up out of the form if we hit back!
+                    //Need to test _until_ we get a question that is relevant, then we can skip the relevancy tests
                 }
             }
             event = mFormController.stepToNextEvent(false);
@@ -835,6 +851,28 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         progressBar.setMax(totalQuestions);
         progressBar.setProgress(completedQuestions);
+        
+        
+        //We should probably be doing this based on the widgets, maybe, not the model? Hard to call.
+        updateBadgeInfo(requiredOnScreen, answeredOnScreen);
+    }
+    
+    private void updateBadgeInfo(int requiredOnScreen, int answeredOnScreen) {
+    	View badgeBorder = this.findViewById(R.id.nav_badge_border_drawer);
+    	TextView badge = (TextView)this.findViewById(R.id.nav_badge);
+    	
+    	//If we don't need this stuff, just bail
+    	if(requiredOnScreen <= 1) {
+    		//Hide all badge related items
+    		badgeBorder.setVisibility(View.INVISIBLE);
+    		badge.setVisibility(View.INVISIBLE);
+    		return;
+    	}
+  		//Otherwise, update badge stuff
+		badgeBorder.setVisibility(View.VISIBLE);
+		badge.setVisibility(View.VISIBLE);
+		
+		badge.setText(requiredOnScreen - answeredOnScreen);
     }
 
 	/**
