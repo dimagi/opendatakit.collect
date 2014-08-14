@@ -15,7 +15,7 @@
 -->
 
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">	
-   <item android:top="2dp" android:left="2dp" android:bottom="2dp" android:right="2dp">
+   <item android:top="@dimen/nav_border_depth" android:left="@dimen/nav_border_depth" android:bottom="@dimen/nav_border_depth" android:right="@dimen/nav_border_depth">
 	   <shape
 	    xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:shape="oval">
@@ -23,9 +23,11 @@
 		   <solid 
 		       android:color="#BF3D3D"/>
 	
+		   <!--Note that the following don't really matter, since the 
+		   drawable fills its container when it's set as a background -->
 		   <size 
-		       android:width="@dimen/badge_circum"
-		       android:height="@dimen/badge_circum"/>
+		       android:width="@dimen/badge_circum_outer"
+		       android:height="@dimen/badge_circum_outer"/>
 		</shape>
 	</item>
 </layer-list>

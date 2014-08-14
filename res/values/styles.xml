@@ -19,15 +19,12 @@ the License.
     
     
        <dimen name="badge_circum_outer">22dp</dimen>
+       <dimen name="badge_circum_border">20dp</dimen>
+       
        <dimen name="badge_offset">-17dp</dimen>
        <!--
-             badge_circum_outer + badge_offset  + (badge_circum_outer - badge_circum)
+             badge_circum_outer + badge_offset  + border_depth
         -->
        <dimen name="badge_overlap">7dp</dimen>
-       
-       <!--
-             badge_circum_outer - nav_border_depth  
-        -->
-       <dimen name="badge_circum">20dp</dimen>
        <dimen name="badge_offset_side">8dp</dimen>    
 </resources>

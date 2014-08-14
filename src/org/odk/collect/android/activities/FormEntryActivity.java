@@ -72,6 +72,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -841,6 +842,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         	prevButton.setImageResource(R.drawable.icon_back);
         }
         
+        //Apparently in Android 2.3 setting the drawable resource for the progress bar 
+        //causes it to lose it bounds. It's a bit cheaper to keep them around than it
+        //is to invalidate the view, though.
+        Rect bounds = progressBar.getProgressDrawable().getBounds(); //Save the drawable bound
+
         if(totalQuestions == completedQuestions) {
         	nextButton.setImageResource(R.drawable.icon_done);
         	progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar_full));
@@ -848,6 +854,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         	nextButton.setImageResource(R.drawable.icon_next);
         	progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar));
         }
+        
+        progressBar.getProgressDrawable().setBounds(bounds);  //Set the bounds to the saved value
         
         progressBar.setMax(totalQuestions);
         progressBar.setProgress(completedQuestions);
@@ -872,7 +880,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 		badgeBorder.setVisibility(View.VISIBLE);
 		badge.setVisibility(View.VISIBLE);
 		
-		badge.setText(requiredOnScreen - answeredOnScreen);
+		badge.setText(String.valueOf(requiredOnScreen - answeredOnScreen));
     }
 
 	/**
