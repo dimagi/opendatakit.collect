@@ -191,7 +191,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         if(i > 0) {
             dividerIndex += 2 * i - 1;
         }
-        mView.addView(divider, getViewIndex(dividerIndex));
+        mView.addView(divider, dividerIndex);
         dividers.add(Math.max(0, i - 1), divider);
         
         QuestionWidget qw = newQuestionWidget;
@@ -205,7 +205,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 //        }
 
         widgets.add(i, qw);
-        mView.addView((View) qw, getViewIndex(2 * i + mViewBannerCount), mLayout);
+        mView.addView((View) qw, 2 * i + mViewBannerCount, mLayout);
     	
         newQuestionWidget.setChangedListener(this);
     }
@@ -409,7 +409,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 	 * @param questionIndex Index in question list.
 	 */
 	public void removeWidget(int questionIndex){
-		mView.removeViewAt(getViewIndex(questionIndex));
+		mView.removeViewAt(questionIndex);
 	}
 	
 	/**
@@ -419,15 +419,4 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 	public void removeWidget(View v){
 		mView.removeView(v);
 	}
-
-	/**
-	 * Translate question index to view index.
-	 * @param questionIndex Index in the list of questions.
-	 * @return Index of question's view in mView.
-	 */
-	private int getViewIndex(int questionIndex) {
-		// Account for progress bar
-		return questionIndex + 1;
-	}
-    
 }
