@@ -880,7 +880,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 		badgeBorder.setVisibility(View.VISIBLE);
 		badge.setVisibility(View.VISIBLE);
 		
-		badge.setText(String.valueOf(requiredOnScreen - answeredOnScreen));
+		if(requiredOnScreen - answeredOnScreen == 0) {
+			//Unicode checkmark
+			badge.setText("\u2713");
+			badge.setBackgroundResource(R.drawable.badge_background_complete);
+		} else {
+			badge.setBackgroundResource(R.drawable.badge_background);
+			badge.setText(String.valueOf(requiredOnScreen - answeredOnScreen));
+		}
     }
 
 	/**
