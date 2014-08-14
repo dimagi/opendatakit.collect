@@ -41,5 +41,6 @@ the License.
     <color name="bright_blue_grad_end">#ff1e559e</color>
     <color name="grey_grad_start">#ff8e9caf</color>
     <color name="grey_grad_end">#ff70829a</color>
+    <color name="very_light_blue">#AAE3ECFF</color>
 
 </resources>

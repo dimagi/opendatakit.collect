@@ -101,6 +101,8 @@ public class ApkUtils {
 				   //nothing
 			   } catch (SecurityException e) {
 				   
+			   } catch (RuntimeException e){
+				   
 			   } catch(Exception e) {
 			   }
 		   }

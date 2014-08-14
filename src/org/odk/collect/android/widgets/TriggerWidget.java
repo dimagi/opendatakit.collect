@@ -24,6 +24,7 @@ import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -53,6 +54,8 @@ public class TriggerWidget extends QuestionWidget {
         super(context, prompt);
         mPrompt = prompt;
         mInteractive = interactive;
+        
+        int padding = (int)Math.floor(context.getResources().getDimension(R.dimen.select_padding));
 
         this.setOrientation(LinearLayout.VERTICAL);
 
@@ -61,6 +64,8 @@ public class TriggerWidget extends QuestionWidget {
         mTriggerButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         // mActionButton.setPadding(20, 20, 20, 20);
         mTriggerButton.setEnabled(!prompt.isReadOnly());
+        
+        mTriggerButton.setPadding(0, padding, 0, padding);
 
         mTriggerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +75,7 @@ public class TriggerWidget extends QuestionWidget {
                 } else {
                     mStringAnswer.setText(null);
                 }
+            	TriggerWidget.this.widgetEntryChanged();
             }
         });
 
