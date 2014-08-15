@@ -2082,7 +2082,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 mSaveToDiskTask.cancel(false);
             }
         }
-        if (mNoGPSReceiver == null) {
+        if (mNoGPSReceiver != null) {
         	unregisterReceiver(mNoGPSReceiver);
         }
 
