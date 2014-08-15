@@ -90,15 +90,11 @@ public class PollSensorAction extends Action implements LocationListener {
 						new ProvidersChangedHandler(), 
 						new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
 					);
-					DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int i) {
-							if (i == DialogInterface.BUTTON_POSITIVE) {
-						 		Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-								Collect.getStaticApplicationContext().startActivity(intent);
-							}
-						}
-					};
-					GeoUtils.showNoGpsDialog(context, onChangeListener);
+					
+					// This thread can't take action on the UI, so instead send a message that actual activities
+					// notice and then display a dialog asking user to enable location access
+					Intent noGPSIntent = new Intent(GeoUtils.ACTION_CHECK_GPS_ENABLED);
+					context.sendStickyBroadcast(noGPSIntent);
 				}
 				requestLocationUpdates(providers);
 			}

@@ -54,6 +54,7 @@ import org.odk.collect.android.tasks.FormLoaderTask;
 import org.odk.collect.android.tasks.SaveToDiskTask;
 import org.odk.collect.android.utilities.Base64Wrapper;
 import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.GeoUtils;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ODKView;
 import org.odk.collect.android.views.ResizingImageView;
@@ -68,15 +69,18 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -219,6 +223,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private static String mHeaderString;
     
     public boolean hasSaved = false;
+    
+    private BroadcastReceiver mNoGPSReceiver;
 
     enum AnimationType {
         LEFT, RIGHT, FADE
@@ -230,6 +236,28 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
+
+		// See if this form needs GPS to be turned on
+		mNoGPSReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				context.removeStickyBroadcast(intent);
+				LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+				Set<String> providers = GeoUtils.evaluateProviders(manager);
+				if (providers.isEmpty()) {
+					DialogInterface.OnClickListener onChangeListener = new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int i) {
+							if (i == DialogInterface.BUTTON_POSITIVE) {
+								Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+								startActivity(intent);
+							}
+						}
+					};
+					GeoUtils.showNoGpsDialog(FormEntryActivity.this, onChangeListener);
+				}
+			}
+		};
+		registerReceiver(mNoGPSReceiver, new IntentFilter(GeoUtils.ACTION_CHECK_GPS_ENABLED));
         
 	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 	    	String fragmentClass = this.getIntent().getStringExtra("odk_title_fragment");
@@ -2053,6 +2081,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             if (mSaveToDiskTask.getStatus() == AsyncTask.Status.FINISHED) {
                 mSaveToDiskTask.cancel(false);
             }
+        }
+        if (mNoGPSReceiver != null) {
+        	unregisterReceiver(mNoGPSReceiver);
         }
 
         super.onDestroy();

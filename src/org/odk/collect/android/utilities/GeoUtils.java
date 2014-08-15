@@ -20,6 +20,8 @@ import android.location.LocationManager;
 public class GeoUtils {
 	public static final double ACCEPTABLE_ACCURACY = 5;	// Good enough accuracy to stop pinging the GPS
 	public static final int MAXIMUM_WAIT = 300 * 1000;	// For passive collection, milliseconds to wait for GPS before giving up
+	
+	public static final String ACTION_CHECK_GPS_ENABLED = "org.odk.collect.android.utilities.GeoUtils.check";
 
 	/**
 	 * Format location in a string for user display.
