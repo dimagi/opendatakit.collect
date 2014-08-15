@@ -223,6 +223,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private static String mHeaderString;
     
     public boolean hasSaved = false;
+    
+    private BroadcastReceiver mNoGPSReceiver;
 
     enum AnimationType {
         LEFT, RIGHT, FADE
@@ -236,7 +238,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         super.onCreate(savedInstanceState);        
 
 		// See if this form needs GPS to be turned on
-		BroadcastReceiver noGPSReceiver = new BroadcastReceiver() {
+		mNoGPSReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				context.removeStickyBroadcast(intent);
@@ -255,7 +257,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 				}
 			}
 		};
-		registerReceiver(noGPSReceiver, new IntentFilter(GeoUtils.ACTION_CHECK_GPS_ENABLED));
+		registerReceiver(mNoGPSReceiver, new IntentFilter(GeoUtils.ACTION_CHECK_GPS_ENABLED));
         
 	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 	    	String fragmentClass = this.getIntent().getStringExtra("odk_title_fragment");
@@ -2079,6 +2081,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             if (mSaveToDiskTask.getStatus() == AsyncTask.Status.FINISHED) {
                 mSaveToDiskTask.cancel(false);
             }
+        }
+        if (mNoGPSReceiver == null) {
+        	unregisterReceiver(mNoGPSReceiver);
         }
 
         super.onDestroy();
