@@ -776,6 +776,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             event = mFormController.stepToPreviousEvent();
         }
         
+        //keep track of whether there is a question that exists before the current screen
+        boolean relevantBeforeCurrentScreen = false;
+        boolean isFirstScreen = false;
+        
         int answeredOnScreen = 0;
         int requiredOnScreen = 0;
         
@@ -799,13 +803,30 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             
             if (event == FormEntryController.EVENT_QUESTION) {
                 FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                
+            	
+            	//Figure out whether we're on the last screen
+            	if(!relevantBeforeCurrentScreen && !isFirstScreen) {
+            		
+            		//We got to the current screen without finding a relevant question, 
+            		//I guess we're on the first one.
+            		if(onCurrentScreen && !relevantBeforeCurrentScreen) {
+            			isFirstScreen = true;
+            		} else {
+            			//We're using the built in steps (and they take relevancy into account)
+            			//so if there are prompts they have to be relevant
+            			relevantBeforeCurrentScreen = true;
+            		}
+            	}
+            	
+                
                 totalQuestions += prompts.length;
                 // Current questions are complete only if they're answered.
                 // Past questions are always complete.
                 // Future questions are never complete.
                 if (onCurrentScreen) {
                     for (FormEntryPrompt prompt : prompts) {
-                    	boolean isAnswered = prompt.getAnswerValue() != null;
+                    	boolean isAnswered = prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL;
                     	
                     	if(prompt.isRequired()) {
                     		requiredOnScreen++;
@@ -815,7 +836,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         	}
                     	}
                     	
-                      if (isAnswered || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                      if (isAnswered) {
                           completedQuestions++;
                       }
                   }
@@ -836,7 +857,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // Set form back to correct state & actually update bar
         mFormController.jumpToIndex(currentFormIndex);
         
-        if(completedQuestions == 0) {
+        if(!relevantBeforeCurrentScreen) {
         	prevButton.setImageResource(R.drawable.icon_exit);
         } else {
         	prevButton.setImageResource(R.drawable.icon_back);
