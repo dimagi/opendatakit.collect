@@ -272,7 +272,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 			@Override
 			public void onClick(View v) {
-				FormEntryActivity.this.showNextView();
+				if(!"done".equals(v.getTag())) {
+					FormEntryActivity.this.showNextView();
+				} else {
+					FormEntryActivity.this.triggerUserFormComplete();
+				}
 			}
         	
         });
@@ -281,7 +285,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 			@Override
 			public void onClick(View v) {
-				FormEntryActivity.this.showPreviousView();
+				if(!"quit".equals(v.getTag())) {
+					FormEntryActivity.this.showPreviousView();
+				} else {
+					FormEntryActivity.this.triggerUserQuitInput();
+				}
 			}
         	
         });
@@ -789,6 +797,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         //TODO: We can probably evaluate this with a FormIndex walk that _doesn't_
         //affect this form's index.
         while (event != FormEntryController.EVENT_END_OF_FORM) {
+            String toPrint = mFormController.getFormIndex().toString() + " [" + event+ "]";
+        	
             int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
 
             if (comparison == 0) {
@@ -848,6 +858,21 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     //Need to test _until_ we get a question that is relevant, then we can skip the relevancy tests
                 }
             }
+            
+            else if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
+            	//If we've already passed the current screen, this repeat
+            	//junction is coming up in the future and we will need to know
+            	//about it
+            	if(currentScreenExit != null) {
+            		totalQuestions++;
+            	} else {
+            		//Otherwise we already passed it and it no longer affects the count
+            	}
+            }
+            
+            System.out.println(toPrint + ": (" + completedQuestions + " / " + totalQuestions + ")");
+            
+            
             event = mFormController.stepToNextEvent(false);
         }
         
@@ -859,8 +884,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         if(!relevantBeforeCurrentScreen) {
         	prevButton.setImageResource(R.drawable.icon_exit);
+        	prevButton.setTag("quit");
         } else {
         	prevButton.setImageResource(R.drawable.icon_back);
+        	prevButton.setTag("back");
         }
         
         //Apparently in Android 2.3 setting the drawable resource for the progress bar 
@@ -870,9 +897,17 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
         if(totalQuestions == completedQuestions) {
         	nextButton.setImageResource(R.drawable.icon_done);
+        	
+        	//TODO: _really_? This doesn't seem right
+            nextButton.setTag("done");
+        	
         	progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar_full));
         } else {
         	nextButton.setImageResource(R.drawable.icon_next);
+        	
+        	//TODO: _really_? This doesn't seem right
+            nextButton.setTag("next");
+        	
         	progressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar));
         }
         
@@ -1238,18 +1273,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     returnFilter
                 });
 
-                String saveName = mFormController.getFormTitle();
-                if (getContentResolver().getType(getIntent().getData()) == InstanceColumns.CONTENT_ITEM_TYPE) {
-                    Uri instanceUri = getIntent().getData();
-                    Cursor instance = managedQuery(instanceUri, null, null, null, null);
-                    if (instance.getCount() == 1) {
-                        instance.moveToFirst();
-                        saveName =
-                            instance.getString(instance
-                                    .getColumnIndex(InstanceColumns.DISPLAY_NAME));
-                    }
-                }
-
+                String saveName = getDefaultFormTitle();
+                
                 saveAs.setText(saveName);
 
                 // Create 'save' button
@@ -2111,19 +2136,53 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
     }
 
+    /**
+     * Call when the user provides input that they want to quit the form
+     */
+    private void triggerUserQuitInput() {
+    	//If we're just reviewing a read only form, don't worry about saving
+    	//or what not, just quit
+        if(mFormController.isFormReadOnly()) {
+        	//It's possible we just want to "finish" here, but
+        	//I don't really wanna break any c compatibility
+        	finishReturnInstance();
+        } else {
+        	createQuitDialog();
+        }
+    }
+    
+    /**
+     * Get the default title for ODK's "Form title" field
+     *  
+     * @return
+     */
+    private String getDefaultFormTitle() {
+        String saveName = mFormController.getFormTitle();
+        if (getContentResolver().getType(getIntent().getData()) == InstanceColumns.CONTENT_ITEM_TYPE) {
+            Uri instanceUri = getIntent().getData();
+            Cursor instance = managedQuery(instanceUri, null, null, null, null);
+            if (instance.getCount() == 1) {
+                instance.moveToFirst();
+                saveName =
+                    instance.getString(instance
+                            .getColumnIndex(InstanceColumns.DISPLAY_NAME));
+            }
+        }
+        return saveName;
+    }
+    
+    /**
+     * Call when the user is ready to save and return the current form as complete 
+     */
+    private void triggerUserFormComplete() {
+        saveDataToDisk(EXIT, true, getDefaultFormTitle());
+    }
+    
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-            	//If we're just reviewing a read only form, don't worry about saving
-            	//or what not, just quit
-                if(mFormController.isFormReadOnly()) {
-                	//It's possible we just want to "finish" here, but
-                	//I don't really wanna break any c compatibility
-                	finishReturnInstance();
-                } else {
-                	createQuitDialog();
-                }
+            	triggerUserQuitInput();
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 if (event.isAltPressed() && !mBeenSwiped) {
