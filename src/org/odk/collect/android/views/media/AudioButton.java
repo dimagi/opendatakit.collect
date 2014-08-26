@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.odk.collect.android.R;
+import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -243,7 +244,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
         String audioFilename = "";
         try {
-            audioFilename = ReferenceManager._().DeriveReference(URI).getLocalURI();
+            audioFilename = FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(URI).getLocalURI());
         } catch (InvalidReferenceException e) {
             Log.e(t, "Invalid reference exception");
             e.printStackTrace();

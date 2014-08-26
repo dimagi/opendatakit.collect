@@ -126,7 +126,7 @@ public class MediaLayout extends RelativeLayout {
                     String videoFilename = "";
                     try {
                         videoFilename =
-                            ReferenceManager._().DeriveReference(videoURI).getLocalURI();
+                            FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(videoURI).getLocalURI());
                     } catch (InvalidReferenceException e) {
                         Log.e(t, "Invalid reference exception");
                         e.printStackTrace();
@@ -244,7 +244,7 @@ public class MediaLayout extends RelativeLayout {
                 
                 //If we didn't get an image yet, try for a norm
 
-                final String imageFilename = ReferenceManager._().DeriveReference(imageURI).getLocalURI();
+                final String imageFilename = FileUtils.getEncodedFilePath(ReferenceManager._().DeriveReference(imageURI).getLocalURI());
                 final File imageFile = new File(imageFilename);
                 if (imageFile.exists()) {
                     Bitmap b = null;

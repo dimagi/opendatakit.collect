@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -366,5 +367,10 @@ public class FileUtils {
     
     public static double getFileSize(File mf){
     	return mf.length()/(1024);
+    }
+
+    public static String getEncodedFilePath(String filePath) {
+        File mediaFile = new File(filePath);
+        return mediaFile.getParent() + File.separatorChar + android.net.Uri.encode(mediaFile.getName(), "UTF-8");
     }
 }
