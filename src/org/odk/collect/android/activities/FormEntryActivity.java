@@ -27,12 +27,10 @@ import javax.crypto.spec.SecretKeySpec;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -63,7 +61,6 @@ import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -116,7 +113,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -609,18 +605,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // get gp of chosen file
                 String sourceImagePath = null;
                 Uri selectedImage = intent.getData();
-                if (selectedImage.toString().startsWith("file")) {
-                    sourceImagePath = selectedImage.toString().substring(6);
-                } else {
-                    String[] projection = {
-                        Images.Media.DATA
-                    };
-                    Cursor cursor = managedQuery(selectedImage, projection, null, null, null);
-                    startManagingCursor(cursor);
-                    int column_index = cursor.getColumnIndexOrThrow(Images.Media.DATA);
-                    cursor.moveToFirst();
-                    sourceImagePath = cursor.getString(column_index);
-                }
+                
+                sourceImagePath = FileUtils.getPath(this, selectedImage);
 
                 // Copy file to sdcard
                 String mInstanceFolder1 =
