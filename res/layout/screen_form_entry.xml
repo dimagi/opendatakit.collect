@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="5dp"
-            android:background="@null"
+            android:background="@drawable/selector_button_press"
             android:padding="2dp"
             android:src="@drawable/icon_exit" />
 
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="5dp"
-            android:background="@null"
+            android:background="@drawable/selector_button_press"
             android:padding="2dp"
             android:src="@drawable/icon_next" />
 

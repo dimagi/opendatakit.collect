@@ -791,13 +791,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         int answeredOnScreen = 0;
         int requiredOnScreen = 0;
         
+        int relevantAfterCurrentScreen = 0;
+        
         boolean onCurrentScreen = false;
         FormIndex currentScreenExit = null;
         
         //TODO: We can probably evaluate this with a FormIndex walk that _doesn't_
         //affect this form's index.
         while (event != FormEntryController.EVENT_END_OF_FORM) {
-            String toPrint = mFormController.getFormIndex().toString() + " [" + event+ "]";
+            //String toPrint = mFormController.getFormIndex().toString() + " [" + event+ "]";
         	
             int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
 
@@ -827,6 +829,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             			//so if there are prompts they have to be relevant
             			relevantBeforeCurrentScreen = true;
             		}
+            	}
+            	
+            	if(!onCurrentScreen && currentScreenExit != null) {
+            		relevantAfterCurrentScreen += prompts.length;
             	}
             	
                 
@@ -865,12 +871,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             	//about it
             	if(currentScreenExit != null) {
             		totalQuestions++;
+            		relevantAfterCurrentScreen++;
+
             	} else {
             		//Otherwise we already passed it and it no longer affects the count
             	}
             }
             
-            System.out.println(toPrint + ": (" + completedQuestions + " / " + totalQuestions + ")");
+            //System.out.println(toPrint + ": (" + completedQuestions + " / " + totalQuestions + ")");
             
             
             event = mFormController.stepToNextEvent(false);
@@ -895,7 +903,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         //is to invalidate the view, though.
         Rect bounds = progressBar.getProgressDrawable().getBounds(); //Save the drawable bound
 
-        if(totalQuestions == completedQuestions) {
+        if(relevantAfterCurrentScreen == 0 && (requiredOnScreen == answeredOnScreen || requiredOnScreen < 1)) {
         	nextButton.setImageResource(R.drawable.icon_done);
         	
         	//TODO: _really_? This doesn't seem right
@@ -1483,7 +1491,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             
             //check if we're at the beginning and not doing the whole "First screen" thing
             if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
-            		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, true)) {
+            		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, false)) {
             	//If so, we can't go all the way back here, so we've gotta hit the last index that was valid
             	mFormController.jumpToIndex(lastValidIndex);
             	
