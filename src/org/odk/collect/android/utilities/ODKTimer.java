@@ -23,6 +23,7 @@ public class ODKTimer extends CountDownTimer{
 
 	@Override
 	public void onFinish() {
+		mUntilFinished = 0;
 		mTimerListener.notifyTimerFinished();
 	}
 

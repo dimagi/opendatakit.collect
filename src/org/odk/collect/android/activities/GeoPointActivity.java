@@ -40,7 +40,6 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     private LocationManager mLocationManager;
     private Location mLocation;
     private Set<String> mProviders;
-    private Location mLastLocation;
 
     private int millisToWait = 60000; //allow to accept location after 60 seconds
 
@@ -169,8 +168,6 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     public void onLocationChanged(Location location) {
         mLocation = location;
         if (mLocation != null) {
-        	mLastLocation = location;
-        	
             mLocationDialog.setMessage(getString(R.string.location_provider_accuracy,
                 mLocation.getProvider(), truncateDouble(mLocation.getAccuracy())));
 
@@ -181,7 +178,10 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
             
             // If location isn't great but might be acceptable, notify
             // the user and let them decide whether or not to record it
-            mLocationDialog.setLocationFound(mLocation.getAccuracy() < GeoUtils.ACCEPTABLE_ACCURACY);
+            mLocationDialog.setLocationFound(
+            	mLocation.getAccuracy() < GeoUtils.ACCEPTABLE_ACCURACY
+            	|| mTimer.getMillisUntilFinished() == 0
+            );
         }
     }
 
@@ -222,7 +222,7 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
 
 	@Override
 	public void notifyTimerFinished() {
-		onLocationChanged(mLastLocation);
+		onLocationChanged(mLocation);
 	}
 
 	@Override
