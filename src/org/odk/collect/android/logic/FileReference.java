@@ -75,10 +75,10 @@ public class FileReference implements Reference {
     }
 
 
-	@Override
-	public Reference[] probeAlternativeReferences() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Reference[] probeAlternativeReferences() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

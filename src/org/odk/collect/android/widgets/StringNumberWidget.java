@@ -40,7 +40,7 @@ public class StringNumberWidget extends StringWidget {
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
         if(!secret) {
-        	mAnswer.setSingleLine(false);
+            mAnswer.setSingleLine(false);
         }
 
         mAnswer.setKeyListener(new DigitsKeyListener(true, true) {
@@ -62,21 +62,21 @@ public class StringNumberWidget extends StringWidget {
         //This might be redundant, but I assume that it's about there being a difference
         //between a display value somewhere. We should double check
         if (prompt.getAnswerValue() != null) {
-	        String curAnswer = getCurrentAnswer().getValue().toString().trim();
-	        try {
-	        	mAnswer.setText(curAnswer);
-	        } catch (Exception NumberFormatException) {
-	            
-	        }
+            String curAnswer = getCurrentAnswer().getValue().toString().trim();
+            try {
+                mAnswer.setText(curAnswer);
+            } catch (Exception NumberFormatException) {
+                
+            }
         }
 
     }
     
     @Override
     protected void setTextInputType(EditText mAnswer) {
-    	if(secret) {
-        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
-        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(secret) {
+            mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+            mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 

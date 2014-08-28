@@ -13,25 +13,25 @@ import android.os.CountDownTimer;
 
 public class ODKTimer extends CountDownTimer{
 
-	TimerListener mTimerListener;
-	long mUntilFinished;
+    TimerListener mTimerListener;
+    long mUntilFinished;
 
-	public ODKTimer(long millisInFuture, TimerListener tl) {
-		super(millisInFuture, 1000);
-		mTimerListener = tl;
-	}
+    public ODKTimer(long millisInFuture, TimerListener tl) {
+        super(millisInFuture, 1000);
+        mTimerListener = tl;
+    }
 
-	@Override
-	public void onFinish() {
-		mTimerListener.notifyTimerFinished();
-	}
+    @Override
+    public void onFinish() {
+        mTimerListener.notifyTimerFinished();
+    }
 
-	@Override
-	public void onTick(long millisUntilFinished) {
-		mUntilFinished = millisUntilFinished;
-	}
-	
-	public long getMillisUntilFinished(){
-		return mUntilFinished;
-	}
+    @Override
+    public void onTick(long millisUntilFinished) {
+        mUntilFinished = millisUntilFinished;
+    }
+    
+    public long getMillisUntilFinished(){
+        return mUntilFinished;
+    }
 }

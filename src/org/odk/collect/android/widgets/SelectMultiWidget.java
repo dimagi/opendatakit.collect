@@ -130,10 +130,10 @@ public class SelectMultiWidget extends QuestionWidget {
                 
                 mediaLayout.setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-	                	c.performClick();
-					}
+                    @Override
+                    public void onClick(View v) {
+                        c.performClick();
+                    }
                 });
 
                 // Last, add the dividing line between elements (except for the last element)

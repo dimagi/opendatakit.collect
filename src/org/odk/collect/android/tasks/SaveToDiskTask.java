@@ -79,7 +79,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
 
 
     public SaveToDiskTask(Uri mUri, Boolean saveAndExit, Boolean markCompleted, String updatedName, Context context, Uri instanceContentUri, SecretKeySpec symetricKey) {
-    	this.mUri = mUri;
+        this.mUri = mUri;
         mSave = saveAndExit;
         mMarkCompleted = markCompleted;
         mInstanceName = updatedName;
@@ -105,7 +105,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
         FormEntryActivity.mFormController.postProcessInstance();
 
         if (exportData(mMarkCompleted)) {
-        	return mSave ? SAVED_AND_EXIT : SAVED;
+            return mSave ? SAVED_AND_EXIT : SAVED;
         }
 
         return SAVE_ERROR;
@@ -162,24 +162,24 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
                 // Entry didn't exist, so create it.
                 Cursor c = null;
                 try {
-                	c = context.getContentResolver().query(mUri, null, null, null, null);
-	                c.moveToFirst();
-	                String jrformid = c.getString(c.getColumnIndex(FormsColumns.JR_FORM_ID));
-	                String formname = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
-	                String submissionUri = c.getString(c.getColumnIndex(FormsColumns.SUBMISSION_URI));
-	
-	                values.put(InstanceColumns.INSTANCE_FILE_PATH, FormEntryActivity.mInstancePath);
-	                values.put(InstanceColumns.SUBMISSION_URI, submissionUri);
-	                if (mInstanceName != null) {
-	                    values.put(InstanceColumns.DISPLAY_NAME, mInstanceName);
-	                } else {
-	                    values.put(InstanceColumns.DISPLAY_NAME, formname);
-	                }
-	                values.put(InstanceColumns.JR_FORM_ID, jrformid);
+                    c = context.getContentResolver().query(mUri, null, null, null, null);
+                    c.moveToFirst();
+                    String jrformid = c.getString(c.getColumnIndex(FormsColumns.JR_FORM_ID));
+                    String formname = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
+                    String submissionUri = c.getString(c.getColumnIndex(FormsColumns.SUBMISSION_URI));
+    
+                    values.put(InstanceColumns.INSTANCE_FILE_PATH, FormEntryActivity.mInstancePath);
+                    values.put(InstanceColumns.SUBMISSION_URI, submissionUri);
+                    if (mInstanceName != null) {
+                        values.put(InstanceColumns.DISPLAY_NAME, mInstanceName);
+                    } else {
+                        values.put(InstanceColumns.DISPLAY_NAME, formname);
+                    }
+                    values.put(InstanceColumns.JR_FORM_ID, jrformid);
                 } finally {
-                	if ( c != null ) {
-                		c.close();
-                	}
+                    if ( c != null ) {
+                        c.close();
+                    }
                 }
                 mUri = context.getContentResolver().insert(instanceContentUri, values);
             }
@@ -235,11 +235,11 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             File submissionXml = new File(instanceXml.getParentFile(), "submission.xml");
             // write out submission.xml -- the data to actually submit to aggregate
             try {
-				exportXmlFile(payload, createFileOutputStream(submissionXml.getAbsolutePath()));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Something is blocking acesss to the file at " + submissionXml.getAbsolutePath());
-			}
+                exportXmlFile(payload, createFileOutputStream(submissionXml.getAbsolutePath()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Something is blocking acesss to the file at " + submissionXml.getAbsolutePath());
+            }
             
             // see if the form is encrypted and we can encrypt it...
             EncryptedFormInformation formInfo = EncryptionUtils.getEncryptedFormInformation(mUri, FormEntryActivity.mFormController.getSubmissionMetadata(), context, instanceContentUri);
@@ -252,7 +252,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
                 }
                 isEncrypted = true;
             }
-        	
+            
             // At this point, we have:
             // 1. the saved original instanceXml, 
             // 2. all the plaintext attachments
@@ -266,68 +266,68 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
             
             updateInstanceDatabase(false, canEditAfterCompleted);
 
-	        if (  !canEditAfterCompleted ) {
-	            // AT THIS POINT, there is no going back.  We are committed
-	            // to returning "success" (true) whether or not we can 
-	            // rename "submission.xml" to instanceXml and whether or 
-	            // not we can delete the plaintext media files.
-	        	//
-	        	// Handle the fall-out for a failed "submission.xml" rename
-	        	// in the InstanceUploader task.  Leftover plaintext media
-	        	// files are handled during form deletion.
-	
-	            // delete the restore Xml file.
-	            if ( !instanceXml.delete() ) {
-	                Log.e(t, "Error deleting " + instanceXml.getAbsolutePath() 
-	                		+ " prior to renaming submission.xml");
-	                return true;
-	            }
-	
-	            // rename the submission.xml to be the instanceXml
-	            if ( !submissionXml.renameTo(instanceXml) ) {
-	                Log.e(t, "Error renaming submission.xml to " + instanceXml.getAbsolutePath());
-	                return true;
-	            }
-	        	
-	            // if encrypted, delete all plaintext files
-	            // (anything not named instanceXml or anything not ending in .enc)
-	            if ( isEncrypted ) {
-	                if ( !EncryptionUtils.deletePlaintextFiles(instanceXml) ) {
-	                    Log.e(t, "Error deleting plaintext files for " + instanceXml.getAbsolutePath());
-	                }
-	            }
-	        }
+            if (  !canEditAfterCompleted ) {
+                // AT THIS POINT, there is no going back.  We are committed
+                // to returning "success" (true) whether or not we can 
+                // rename "submission.xml" to instanceXml and whether or 
+                // not we can delete the plaintext media files.
+                //
+                // Handle the fall-out for a failed "submission.xml" rename
+                // in the InstanceUploader task.  Leftover plaintext media
+                // files are handled during form deletion.
+    
+                // delete the restore Xml file.
+                if ( !instanceXml.delete() ) {
+                    Log.e(t, "Error deleting " + instanceXml.getAbsolutePath() 
+                            + " prior to renaming submission.xml");
+                    return true;
+                }
+    
+                // rename the submission.xml to be the instanceXml
+                if ( !submissionXml.renameTo(instanceXml) ) {
+                    Log.e(t, "Error renaming submission.xml to " + instanceXml.getAbsolutePath());
+                    return true;
+                }
+                
+                // if encrypted, delete all plaintext files
+                // (anything not named instanceXml or anything not ending in .enc)
+                if ( isEncrypted ) {
+                    if ( !EncryptionUtils.deletePlaintextFiles(instanceXml) ) {
+                        Log.e(t, "Error deleting plaintext files for " + instanceXml.getAbsolutePath());
+                    }
+                }
+            }
         }
         return true;
     }
     
     public OutputStream createFileOutputStream(String path) throws FileNotFoundException {
-    	return createFileOutputStream(new File(path));
+        return createFileOutputStream(new File(path));
     }
     
     private OutputStream createFileOutputStream(File path) throws FileNotFoundException {
-    	FileOutputStream fos = new FileOutputStream(path);
-    	if(symetricKey == null) {
-    		return fos;
-    	} else {
-    		try {
-    			Cipher cipher = Cipher.getInstance("AES");
-    			cipher.init(Cipher.ENCRYPT_MODE, symetricKey);
-				return new CipherOutputStream(fos, cipher);
-				
-				//All of these exceptions imply a bad platform and should be irrecoverable (Don't ever
-				//write out data if the key isn't good, or the crypto isn't available)
-			} catch (InvalidKeyException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			} catch (NoSuchPaddingException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
-    	}
+        FileOutputStream fos = new FileOutputStream(path);
+        if(symetricKey == null) {
+            return fos;
+        } else {
+            try {
+                Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.ENCRYPT_MODE, symetricKey);
+                return new CipherOutputStream(fos, cipher);
+                
+                //All of these exceptions imply a bad platform and should be irrecoverable (Don't ever
+                //write out data if the key isn't good, or the crypto isn't available)
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e.getMessage());
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e.getMessage());
+            } catch (NoSuchPaddingException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e.getMessage());
+            }
+        }
     }
 
 

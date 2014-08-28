@@ -16,31 +16,31 @@ import org.kxml2.kdom.Element;
 import android.content.Context;
 
 public class PollSensorExtensionParser implements IElementHandler {
-	/**
-	 * Handle pollsensor node, creating a new PollSensor action with the node that sensor data will be written to.
-	 * @param p Parser
-	 * @param e pollsensor Element
-	 * @param parent FormDef for the form being parsed
-	 */
-	@Override
-	public void handle(XFormParser p, Element e, Object parent) {
-		String event = e.getAttributeValue(null, "event");
-		FormDef form = (FormDef) parent;
-		PollSensorAction action;
-		
-		String ref = e.getAttributeValue(null, "ref");
-		if (ref != null) {
-			IDataReference dataRef = new XPathReference(ref);
-			dataRef = XFormParser.getAbsRef(dataRef, TreeReference.rootRef());
-			TreeReference treeRef = FormInstance.unpackReference(dataRef);
-			p.registerActionTarget(treeRef);
-			action = new PollSensorAction(treeRef);
-		}
-		else {
-			action = new PollSensorAction();
-		}
+    /**
+     * Handle pollsensor node, creating a new PollSensor action with the node that sensor data will be written to.
+     * @param p Parser
+     * @param e pollsensor Element
+     * @param parent FormDef for the form being parsed
+     */
+    @Override
+    public void handle(XFormParser p, Element e, Object parent) {
+        String event = e.getAttributeValue(null, "event");
+        FormDef form = (FormDef) parent;
+        PollSensorAction action;
+        
+        String ref = e.getAttributeValue(null, "ref");
+        if (ref != null) {
+            IDataReference dataRef = new XPathReference(ref);
+            dataRef = XFormParser.getAbsRef(dataRef, TreeReference.rootRef());
+            TreeReference treeRef = FormInstance.unpackReference(dataRef);
+            p.registerActionTarget(treeRef);
+            action = new PollSensorAction(treeRef);
+        }
+        else {
+            action = new PollSensorAction();
+        }
 
-		form.registerEventListener(event, action);
-	}
-	
+        form.registerEventListener(event, action);
+    }
+    
 }

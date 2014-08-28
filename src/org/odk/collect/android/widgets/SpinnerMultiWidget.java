@@ -103,9 +103,9 @@ public class SpinnerMultiWidget extends QuestionWidget {
                                 }
                             }
                             
-                        	if(hasListener){
-                        		widgetChangedListener.widgetEntryChanged();
-                        	}
+                            if(hasListener){
+                                widgetChangedListener.widgetEntryChanged();
+                            }
                             
                         }
                     });
@@ -117,9 +117,9 @@ public class SpinnerMultiWidget extends QuestionWidget {
                         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                             selections[which] = isChecked;
                             
-                        	if(hasListener){
-                        		widgetChangedListener.widgetEntryChanged();
-                        	}
+                            if(hasListener){
+                                widgetChangedListener.widgetEntryChanged();
+                            }
                             
                         }
                     });

@@ -38,9 +38,9 @@ import android.widget.EditText;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class IntegerWidget extends StringWidget {
-	
-	//1 for int. 0 for long?
-	int number_type;
+    
+    //1 for int. 0 for long?
+    int number_type;
 
     public IntegerWidget(Context context, FormEntryPrompt prompt, boolean secret, int num_type) {
         super(context, prompt, secret);
@@ -52,7 +52,7 @@ public class IntegerWidget extends StringWidget {
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
         if(!secret) {
-        	mAnswer.setSingleLine(false);
+            mAnswer.setSingleLine(false);
         }
 
         // only allows numbers and no periods
@@ -69,70 +69,70 @@ public class IntegerWidget extends StringWidget {
         }
         
         if (getCurrentAnswer() != null){
-        	if(number_type==1){
-        		Integer i = (Integer) getCurrentAnswer().getValue();
-        		if (i != null) {
+            if(number_type==1){
+                Integer i = (Integer) getCurrentAnswer().getValue();
+                if (i != null) {
                     mAnswer.setText(i.toString());
                 }
-        	}
-        	else{
-        		Long i= (Long) getCurrentAnswer().getValue();
-        		if (i != null) {
+            }
+            else{
+                Long i= (Long) getCurrentAnswer().getValue();
+                if (i != null) {
                     mAnswer.setText(i.toString());
                 }
-        	}
+            }
         }
     }
     
     
     @Override
     protected int guessMaxStringLength(FormEntryPrompt prompt) throws UnpivotableExpressionException{
-    	int existingGuess = Integer.MAX_VALUE;
-    	try {
-    		existingGuess = super.guessMaxStringLength(prompt);
-    	} catch (UnpivotableExpressionException e) {
-    		
-    	}
-    	try {
-			//Awful. Need factory for this
-			IntegerRangeHint hint = new IntegerRangeHint();
-			prompt.requestConstraintHint(hint);
-			
-			IntegerData maxexample = hint.getMax();
-			IntegerData minexample = hint.getMin();
-			
-			if(minexample != null) {
-				//If we didn't constrain the input to be 0 or more, don't bother
-				if(((Integer)minexample.getValue()).intValue() < 0) {
-					throw new UnpivotableExpressionException(); 
-				}
-			} else {
-				//could be negative. Not worth it
-				throw new UnpivotableExpressionException();
-			}
-			
-			if(maxexample != null) {
-				int max = ((Integer)maxexample.getValue()).intValue();
-				if(!hint.isMaxInclusive()) {
-					max -= 1;
-				}
-				return Math.min(existingGuess, String.valueOf(max).length());
-			}					
-		} catch(Exception e) {
+        int existingGuess = Integer.MAX_VALUE;
+        try {
+            existingGuess = super.guessMaxStringLength(prompt);
+        } catch (UnpivotableExpressionException e) {
+            
+        }
+        try {
+            //Awful. Need factory for this
+            IntegerRangeHint hint = new IntegerRangeHint();
+            prompt.requestConstraintHint(hint);
+            
+            IntegerData maxexample = hint.getMax();
+            IntegerData minexample = hint.getMin();
+            
+            if(minexample != null) {
+                //If we didn't constrain the input to be 0 or more, don't bother
+                if(((Integer)minexample.getValue()).intValue() < 0) {
+                    throw new UnpivotableExpressionException(); 
+                }
+            } else {
+                //could be negative. Not worth it
+                throw new UnpivotableExpressionException();
+            }
+            
+            if(maxexample != null) {
+                int max = ((Integer)maxexample.getValue()).intValue();
+                if(!hint.isMaxInclusive()) {
+                    max -= 1;
+                }
+                return Math.min(existingGuess, String.valueOf(max).length());
+            }                    
+        } catch(Exception e) {
 
-		}
+        }
         if(number_type==1){
-        	return Math.min(existingGuess, 9);
+            return Math.min(existingGuess, 9);
         } else {
-        	return Math.min(existingGuess, 15);
+            return Math.min(existingGuess, 15);
         }
     }
     
     @Override
     protected void setTextInputType(EditText mAnswer) {
-    	if(secret) {
-        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
-        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(secret) {
+            mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+            mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 
@@ -144,12 +144,12 @@ public class IntegerWidget extends StringWidget {
             return null;
         } else {
             try {
-            	if(number_type==1){
-            		return new IntegerData(Integer.parseInt(s));
-            	}
-            	else{
-            		return new LongData(Long.parseLong(s));
-            	}
+                if(number_type==1){
+                    return new IntegerData(Integer.parseInt(s));
+                }
+                else{
+                    return new LongData(Long.parseLong(s));
+                }
             } catch (Exception NumberFormatException) {
                 return null;
             }

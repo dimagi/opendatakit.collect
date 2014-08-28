@@ -76,7 +76,7 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
                 buttons.add(rb);
 
                 if (mItems.get(i).getValue().equals(s)) {
-                	rb.setChecked(true);
+                    rb.setChecked(true);
                 }
                 
                 //Move to be below the above setters. Not sure if that will cause
@@ -105,10 +105,10 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
                 
                 mediaLayout.setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-	                	rb.performClick();
-					}
+                    @Override
+                    public void onClick(View v) {
+                        rb.performClick();
+                    }
                 });
                 addView(mediaLayout);
 
@@ -155,7 +155,7 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
 
     @Override
     public void setFocus(Context context) {
-    	onUserInteracton();
+        onUserInteracton();
     }
 
 
@@ -171,10 +171,10 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-    	onUserInteracton();
-    	
-    	widgetEntryChanged();
-    	
+        onUserInteracton();
+        
+        widgetEntryChanged();
+        
         if (!isChecked) {
             // If it got unchecked, we don't care.
             return;

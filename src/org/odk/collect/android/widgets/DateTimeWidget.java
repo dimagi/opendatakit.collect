@@ -77,12 +77,12 @@ public class DateTimeWidget extends QuestionWidget implements OnTimeChangedListe
                     c.set(year, month, 1);
                     int max = c.getActualMaximum(Calendar.DAY_OF_MONTH);
                     if (day > max) {
-	                    //If the day has fallen out of spec, set it to the correct max
+                        //If the day has fallen out of spec, set it to the correct max
                         mDatePicker.updateDate(year, month, max);
                     } else {
                         if(!(mDatePicker.getDayOfMonth() == day && mDatePicker.getMonth() == month && mDatePicker.getYear() == year)) {
-	                    	//CTS: No reason to change the day if it's already correct?
-	                        mDatePicker.updateDate(year, month, day);
+                            //CTS: No reason to change the day if it's already correct?
+                            mDatePicker.updateDate(year, month, day);
                         }
                     }
                 }
@@ -129,7 +129,7 @@ public class DateTimeWidget extends QuestionWidget implements OnTimeChangedListe
         }
         
         if(hasListener){
-        	widgetChangedListener.widgetEntryChanged();
+            widgetChangedListener.widgetEntryChanged();
         }
     }
 
@@ -149,8 +149,8 @@ public class DateTimeWidget extends QuestionWidget implements OnTimeChangedListe
 
     @Override
     public IAnswerData getAnswer() {
-    	mDatePicker.clearFocus();
-    	mTimePicker.clearFocus();
+        mDatePicker.clearFocus();
+        mTimePicker.clearFocus();
         DateTime ldt =
             new DateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1,
                     mDatePicker.getDayOfMonth(), mTimePicker.getCurrentHour(),
@@ -183,10 +183,10 @@ public class DateTimeWidget extends QuestionWidget implements OnTimeChangedListe
         mTimePicker.cancelLongPress();
     }
 
-	@Override
-	public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-		widgetEntryChanged();
-		
-	}
+    @Override
+    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+        widgetEntryChanged();
+        
+    }
 
 }

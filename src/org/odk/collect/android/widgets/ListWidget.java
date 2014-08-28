@@ -45,7 +45,7 @@ import android.widget.TextView;
  * @author Jeff Beorse (jeff@beorse.net)
  */
 public class ListWidget extends QuestionWidget implements OnCheckedChangeListener {
-	int buttonIdBase;
+    int buttonIdBase;
     protected final static int TEXTSIZE = 21;
     private static final String t = "ListWidget";
 

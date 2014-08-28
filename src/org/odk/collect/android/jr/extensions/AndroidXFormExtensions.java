@@ -20,34 +20,34 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class AndroidXFormExtensions implements XFormExtension {
-	Hashtable<String, IntentCallout> intents = new Hashtable<String, IntentCallout>(); 
-	
-	public AndroidXFormExtensions() {
-		
-	}
-	
-	public void registerIntent(String id, IntentCallout callout) {
-		intents.put(id, callout);
-	}
-	
-	public IntentCallout getIntent(String id, FormDef form) {
-		IntentCallout callout = intents.get(id);
-		if(callout == null) {
-			throw new IllegalArgumentException("No registered intent callout for id : " + id);
-		}
-		callout.attachToForm(form);
-		return callout;
-	}
+    Hashtable<String, IntentCallout> intents = new Hashtable<String, IntentCallout>(); 
+    
+    public AndroidXFormExtensions() {
+        
+    }
+    
+    public void registerIntent(String id, IntentCallout callout) {
+        intents.put(id, callout);
+    }
+    
+    public IntentCallout getIntent(String id, FormDef form) {
+        IntentCallout callout = intents.get(id);
+        if(callout == null) {
+            throw new IllegalArgumentException("No registered intent callout for id : " + id);
+        }
+        callout.attachToForm(form);
+        return callout;
+    }
 
-	@Override
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		intents = (Hashtable<String, IntentCallout>)ExtUtil.read(in, new ExtWrapMap(String.class, IntentCallout.class), pf);
-	}
+    @Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        intents = (Hashtable<String, IntentCallout>)ExtUtil.read(in, new ExtWrapMap(String.class, IntentCallout.class), pf);
+    }
 
-	@Override
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out,  new ExtWrapMap(intents));
-	}
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out,  new ExtWrapMap(intents));
+    }
 
-	
+    
 }

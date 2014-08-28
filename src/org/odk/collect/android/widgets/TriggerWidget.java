@@ -75,7 +75,7 @@ public class TriggerWidget extends QuestionWidget {
                 } else {
                     mStringAnswer.setText(null);
                 }
-            	TriggerWidget.this.widgetEntryChanged();
+                TriggerWidget.this.widgetEntryChanged();
             }
         });
 
@@ -95,9 +95,9 @@ public class TriggerWidget extends QuestionWidget {
         }
 
         if(mInteractive) {
-	        // finish complex layout
-	        this.addView(mTriggerButton);
-	        // this.addView(mStringAnswer);
+            // finish complex layout
+            this.addView(mTriggerButton);
+            // this.addView(mStringAnswer);
         }
     }
 
@@ -111,9 +111,9 @@ public class TriggerWidget extends QuestionWidget {
 
     @Override
     public IAnswerData getAnswer() {
-    	if(!mInteractive) {
-    		return new StringData(mOK);
-    	}
+        if(!mInteractive) {
+            return new StringData(mOK);
+        }
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
