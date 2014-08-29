@@ -105,21 +105,25 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.setPadding(0, 7, 0, 0);
 
         // Construct progress bar
-        mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
-        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
-        
-        LinearLayout.LayoutParams barLayout =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-        barLayout.setMargins(15, 15, 15, 15);
-        barLayout.gravity = Gravity.BOTTOM;
-        
-        LinearLayout barView = new LinearLayout(getContext());
-        barView.setOrientation(LinearLayout.VERTICAL);
-        barView.setGravity(Gravity.BOTTOM);
-        barView.addView((View) mProgressBar);
-        mView.addView(barView, barLayout);
-
+        if (
+           PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext())
+           .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
+        ) {
+            mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
+            mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
+            
+            LinearLayout.LayoutParams barLayout =
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+            barLayout.setMargins(15, 15, 15, 15);
+            barLayout.gravity = Gravity.BOTTOM;
+            
+            LinearLayout barView = new LinearLayout(getContext());
+            barView.setOrientation(LinearLayout.VERTICAL);
+            barView.setGravity(Gravity.BOTTOM);
+            barView.addView((View) mProgressBar);
+            mView.addView(barView, barLayout);
+        }
 
         mLayout =
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
@@ -289,8 +293,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * @param max Progress bar will be given range 0..max
      */
     public void updateProgressBar(int progress, int max) {
-        mProgressBar.setMax(max);
-        mProgressBar.setProgress(progress);
+        if (mProgressBar != null) {
+            mProgressBar.setMax(max);
+            mProgressBar.setProgress(progress);
+        }
     }
 
     /**

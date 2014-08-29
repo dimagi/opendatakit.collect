@@ -82,6 +82,12 @@
 			android:defaultValue="false"/>
 		
 		<CheckBoxPreference
+			android:id="@+id/progress_bar"
+			android:key="progress_bar"
+			android:title="@string/preference_progress_bar"
+			android:defaultValue="true"/>
+		
+		<CheckBoxPreference
 			android:id="@+id/odk_show_start_screen"
 			android:key="odk_show_entry_screen"
 			android:title="@string/preference_form_entry_start_hide"

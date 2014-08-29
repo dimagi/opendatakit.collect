@@ -116,7 +116,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -778,6 +777,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * @param odkv ODKView to update
      */
     public void updateProgressBar(ODKView odkv) {
+        if (
+           !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+           .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
+        ) {
+            return;
+        }
+        
         int totalQuestions = 0;
         int completedQuestions = 0;
 
