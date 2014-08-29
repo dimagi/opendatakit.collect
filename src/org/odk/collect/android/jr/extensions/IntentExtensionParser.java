@@ -9,7 +9,9 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.IElementHandler;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathTypeMismatchException;
 import org.kxml2.kdom.Element;
 
 /**
@@ -40,7 +42,11 @@ public class IntentExtensionParser implements IElementHandler {
 				if(child.getName().equals(EXTRA)) {
 					String key = child.getAttributeValue(null, "key");
 					String ref = child.getAttributeValue(null, "ref");
-					extras.put(key, (TreeReference)new XPathReference(ref).getReference());
+					try{
+						extras.put(key, (TreeReference)new XPathReference(ref).getReference());
+					} catch(XPathTypeMismatchException xptm){
+						throw new XFormParseException("Error parsing Intent Extra: " + xptm.getMessage());
+					}
 				} else if(child.getName().equals(RESPONSE)) {
 					String key = child.getAttributeValue(null, "key");
 					String ref = child.getAttributeValue(null, "ref");
