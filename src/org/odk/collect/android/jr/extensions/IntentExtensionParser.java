@@ -53,7 +53,7 @@ public class IntentExtensionParser implements IElementHandler {
 					} 
 				}
 				catch(XPathException xptm){
-					throw new XFormParseException("Error parsing Intent Extra: " + xptm.getMessage());
+					throw new XFormParseException("Error parsing Intent Extra: " + xptm.getMessage(), e);
 				}
 			}
 		}
