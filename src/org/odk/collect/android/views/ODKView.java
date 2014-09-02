@@ -466,7 +466,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 	 */
 	private int getViewIndex(int questionIndex) {
 		// Account for progress bar
-	    if (!PreferenceManager.getDefaultSharedPreferences(mContext)
+	    if (PreferenceManager.getDefaultSharedPreferences(mContext)
 	            .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)) {
 	        return questionIndex + 1;
 	    }
