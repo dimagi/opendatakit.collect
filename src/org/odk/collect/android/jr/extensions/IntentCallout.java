@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.odk.collect.android.jr.extensions;
 
 import java.io.DataInputStream;
@@ -151,6 +148,10 @@ public class IntentCallout implements Externalizable {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+     */
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         className = ExtUtil.readString(in);
@@ -158,6 +159,10 @@ public class IntentCallout implements Externalizable {
         responses = (Hashtable<String, TreeReference>)ExtUtil.read(in, new ExtWrapMap(String.class, TreeReference.class), pf);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, className);

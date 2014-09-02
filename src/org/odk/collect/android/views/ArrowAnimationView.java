@@ -60,6 +60,10 @@ public class ArrowAnimationView extends View {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View#onDraw(android.graphics.Canvas)
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

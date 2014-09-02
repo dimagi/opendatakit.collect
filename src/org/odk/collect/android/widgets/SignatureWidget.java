@@ -90,6 +90,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
         mSignButton.setLayoutParams(params);
         // launch capture intent on click
         mSignButton.setOnClickListener(new View.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
             @Override
             public void onClick(View v) {
                 launchSignatureActivity();
@@ -134,6 +138,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
             mImageView.setPadding(10, 10, 10, 10);
             mImageView.setAdjustViewBounds(true);
             mImageView.setOnClickListener(new View.OnClickListener() {
+                /*
+                 * (non-Javadoc)
+                 * @see android.view.View.OnClickListener#onClick(android.view.View)
+                 */
                 @Override
                 public void onClick(View v) {
     
@@ -190,6 +198,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         // remove the file
@@ -202,6 +214,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         if (mBinaryName != null) {
@@ -212,6 +228,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
+     */
     @Override
     public void setBinaryData(Object answer) {
         // you are replacing an answer. delete the previous image using the
@@ -245,6 +265,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
         setWaitingForBinaryData();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -254,6 +278,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
+     */
     @Override
     public boolean isWaitingForBinaryData() {
         return mWaitingForData;
@@ -267,6 +295,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
         mWaitingForData = false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mSignButton.setOnLongClickListener(l);
@@ -276,6 +308,10 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

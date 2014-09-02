@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.odk.collect.android.jr.extensions;
 
 import java.io.DataInputStream;
@@ -39,11 +36,19 @@ public class AndroidXFormExtensions implements XFormExtension {
         return callout;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+     */
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         intents = (Hashtable<String, IntentCallout>)ExtUtil.read(in, new ExtWrapMap(String.class, IntentCallout.class), pf);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.write(out,  new ExtWrapMap(intents));

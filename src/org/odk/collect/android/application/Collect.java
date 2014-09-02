@@ -122,6 +122,10 @@ public class Collect extends Application {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Application#onCreate()
+     */
     @Override
     public void onCreate() {
         Log.i("Collect", "Collect created");
@@ -147,5 +151,4 @@ public class Collect extends Application {
     public static Context getStaticApplicationContext() {
         return context;
     }
-
 }

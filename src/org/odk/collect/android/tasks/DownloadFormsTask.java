@@ -81,6 +81,10 @@ public class DownloadFormsTask extends
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+     */
     @Override
     protected HashMap<String, String> doInBackground(ArrayList<FormDetails>... values) {
         ArrayList<FormDetails> toDownload = values[0];
@@ -492,6 +496,10 @@ public class DownloadFormsTask extends
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+     */
     @Override
     protected void onPostExecute(HashMap<String, String> value) {
         synchronized (this) {
@@ -502,6 +510,10 @@ public class DownloadFormsTask extends
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onProgressUpdate(java.lang.Object[])
+     */
     @Override
     protected void onProgressUpdate(String... values) {
         synchronized (this) {

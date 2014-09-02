@@ -45,6 +45,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     private final static String t = "CLASSNAME";
     private final static int TEXTSIZE = 21;
+    
+    private Context mContext;
 
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
@@ -95,6 +97,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
                 settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
 
         mQuestionFontsize = new Integer(question_font).intValue();
+        
+        mContext = context;
 
         widgets = new ArrayList<QuestionWidget>();
         dividers = new ArrayList<View>();
@@ -105,21 +109,25 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.setPadding(0, 7, 0, 0);
 
         // Construct progress bar
-        mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
-        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
-        
-        LinearLayout.LayoutParams barLayout =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-        barLayout.setMargins(15, 15, 15, 15);
-        barLayout.gravity = Gravity.BOTTOM;
-        
-        LinearLayout barView = new LinearLayout(getContext());
-        barView.setOrientation(LinearLayout.VERTICAL);
-        barView.setGravity(Gravity.BOTTOM);
-        barView.addView((View) mProgressBar);
-        mView.addView(barView, barLayout);
-
+        if (
+           PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext())
+           .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
+        ) {
+            mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
+            mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
+            
+            LinearLayout.LayoutParams barLayout =
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+            barLayout.setMargins(15, 15, 15, 15);
+            barLayout.gravity = Gravity.BOTTOM;
+            
+            LinearLayout barView = new LinearLayout(getContext());
+            barView.setOrientation(LinearLayout.VERTICAL);
+            barView.setGravity(Gravity.BOTTOM);
+            barView.addView((View) mProgressBar);
+            mView.addView(barView, barLayout);
+        }
 
         mLayout =
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
@@ -289,8 +297,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * @param max Progress bar will be given range 0..max
      */
     public void updateProgressBar(int progress, int max) {
-        mProgressBar.setMax(max);
-        mProgressBar.setProgress(progress);
+        if (mProgressBar != null) {
+            mProgressBar.setMax(max);
+            mProgressBar.setProgress(progress);
+        }
     }
 
     /**
@@ -404,6 +414,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View#setOnFocusChangeListener(android.view.View.OnFocusChangeListener)
+     */
     @Override
     public void setOnFocusChangeListener(OnFocusChangeListener l) {
         for (int i = 0; i < widgets.size(); i++) {
@@ -413,12 +427,20 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View.OnLongClickListener#onLongClick(android.view.View)
+     */
     @Override
     public boolean onLongClick(View v) {
         return false;
     }
     
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();
@@ -427,6 +449,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.WidgetChangedListener#widgetEntryChanged()
+     */
     @Override
     public void widgetEntryChanged() {
         updateConstraintRelevancies();
@@ -456,7 +482,11 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      */
     private int getViewIndex(int questionIndex) {
         // Account for progress bar
-        return questionIndex + 1;
+        if (PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)) {
+            return questionIndex + 1;
+        }
+        return questionIndex;
     }
     
 }

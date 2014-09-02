@@ -1,7 +1,3 @@
-/**
- * XForms Action extension to periodically poll a sensor and optionally save its value.
- * @author jschweers
- */
 package org.odk.collect.android.jr.extensions;
 
 import java.io.DataInputStream;
@@ -37,6 +33,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+/**
+ * XForms Action extension to periodically poll a sensor and optionally save its value.
+ * @author jschweers
+ */
 public class PollSensorAction extends Action implements LocationListener {
     private static String name = "pollsensor";
     private TreeReference target;
@@ -46,6 +46,10 @@ public class PollSensorAction extends Action implements LocationListener {
     private TreeReference mContextRef;
 
     private class ProvidersChangedHandler extends BroadcastReceiver {
+        /*
+         * (non-Javadoc)
+         * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+         */
         @Override
         public void onReceive(Context context, Intent intent) {
             Set<String> providers = GeoUtils.evaluateProviders(mLocationManager);
@@ -54,6 +58,10 @@ public class PollSensorAction extends Action implements LocationListener {
     }
     
     private class StopPollingTask extends TimerTask {
+        /*
+         * (non-Javadoc)
+         * @see java.util.TimerTask#run()
+         */
         @Override
         public void run() {
             mLocationManager.removeUpdates(PollSensorAction.this);
@@ -131,6 +139,9 @@ public class PollSensorAction extends Action implements LocationListener {
     }
     
     /**
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onLocationChanged(android.location.Location)
+     * 
      * If this action has a target node, update its value with the given location.
      * @param location
      */
@@ -154,12 +165,24 @@ public class PollSensorAction extends Action implements LocationListener {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+     */
     @Override
     public void onProviderDisabled(String provider) { }
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     */
     @Override
     public void onProviderEnabled(String provider) { }
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
+     */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) { }
 }

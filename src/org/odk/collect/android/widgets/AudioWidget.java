@@ -83,6 +83,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
 
         // launch capture intent on click
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(android.provider.MediaStore.Audio.Media.RECORD_SOUND_ACTION);
@@ -111,6 +115,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
         
         // launch capture intent on click
         mChooseButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
@@ -137,6 +145,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
 
         // on play, launch the appropriate viewer
         mPlayButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent("android.intent.action.VIEW");
@@ -187,6 +199,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         // remove the file
@@ -197,6 +213,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         if (mBinaryName != null) {
@@ -228,6 +248,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
+     */
     @Override
     public void setBinaryData(Object binaryuri) {
         // when replacing an answer. remove the current media.
@@ -266,6 +290,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -275,12 +303,20 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
+     */
     @Override
     public boolean isWaitingForBinaryData() {
         return mWaitingForData;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mCaptureButton.setOnLongClickListener(l);
@@ -289,6 +325,10 @@ public class AudioWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

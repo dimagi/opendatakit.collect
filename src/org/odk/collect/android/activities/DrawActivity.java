@@ -83,6 +83,10 @@ public class DrawActivity extends Activity {
     private String alertTitleString;
     private AlertDialog alertDialog;
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -96,6 +100,10 @@ public class DrawActivity extends Activity {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,6 +206,10 @@ public class DrawActivity extends Activity {
 
         btnFinished = (Button) findViewById(R.id.btnFinishDraw);
         btnFinished.setOnClickListener(new View.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
             @Override
             public void onClick(View v) {
 
@@ -206,6 +218,10 @@ public class DrawActivity extends Activity {
         });
         btnReset = (Button) findViewById(R.id.btnResetDraw);
         btnReset.setOnClickListener(new View.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
             @Override
             public void onClick(View v) {
                 Reset();
@@ -213,6 +229,10 @@ public class DrawActivity extends Activity {
         });
         btnCancel = (Button) findViewById(R.id.btnCancelDraw);
         btnCancel.setOnClickListener(new View.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
             @Override
             public void onClick(View v) {
 
@@ -272,11 +292,19 @@ public class DrawActivity extends Activity {
         this.finish();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onConfigurationChanged(android.content.res.Configuration)
+     */
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -316,6 +344,10 @@ public class DrawActivity extends Activity {
         .setTitle(alertTitleString)
         .setNeutralButton(getString(R.string.do_not_exit),
                 new DialogInterface.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+             */
             @Override
             public void onClick(DialogInterface dialog, int id) {
 
@@ -325,6 +357,10 @@ public class DrawActivity extends Activity {
             }
         })
         .setItems(items, new DialogInterface.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+             */
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
@@ -396,12 +432,20 @@ public class DrawActivity extends Activity {
             }
         }
 
+        /*
+         * (non-Javadoc)
+         * @see android.view.View#onSizeChanged(int, int, int, int)
+         */
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
             resetImage(w, h);
         }
 
+        /*
+         * (non-Javadoc)
+         * @see android.view.View#onDraw(android.graphics.Canvas)
+         */
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(R.drawable.grey);
@@ -441,6 +485,10 @@ public class DrawActivity extends Activity {
             mCurrentPath.reset();
         }
 
+        /*
+         * (non-Javadoc)
+         * @see android.view.View#onTouchEvent(android.view.MotionEvent)
+         */
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX();
@@ -464,5 +512,4 @@ public class DrawActivity extends Activity {
         }
 
     }
-
 }

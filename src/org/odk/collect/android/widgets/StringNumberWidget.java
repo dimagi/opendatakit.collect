@@ -44,6 +44,10 @@ public class StringNumberWidget extends StringWidget {
         }
 
         mAnswer.setKeyListener(new DigitsKeyListener(true, true) {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.text.method.DigitsKeyListener#getAcceptedChars()
+        	 */
             @Override
             protected char[] getAcceptedChars() {
                 char[] accepted = {
@@ -72,6 +76,10 @@ public class StringNumberWidget extends StringWidget {
 
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#setTextInputType(android.widget.EditText)
+     */
     @Override
     protected void setTextInputType(EditText mAnswer) {
         if(secret) {
@@ -80,6 +88,10 @@ public class StringNumberWidget extends StringWidget {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mAnswer.getText().toString();

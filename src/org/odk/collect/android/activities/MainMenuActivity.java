@@ -57,6 +57,10 @@ public class MainMenuActivity extends Activity {
 
     // private static boolean DO_NOT_EXIT = false;
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,10 @@ public class MainMenuActivity extends Activity {
         mEnterDataButton = (Button) findViewById(R.id.enter_data);
         mEnterDataButton.setText(getString(R.string.enter_data_button));
         mEnterDataButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), FormChooserList.class);
@@ -88,6 +96,10 @@ public class MainMenuActivity extends Activity {
         mReviewDataButton = (Button) findViewById(R.id.review_data);
         mReviewDataButton.setText(getString(R.string.review_data_button));
         mReviewDataButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), InstanceChooserList.class);
@@ -99,6 +111,10 @@ public class MainMenuActivity extends Activity {
         mSendDataButton = (Button) findViewById(R.id.send_data);
         mSendDataButton.setText(getString(R.string.send_data_button));
         mSendDataButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), InstanceUploaderList.class);
@@ -110,6 +126,10 @@ public class MainMenuActivity extends Activity {
         mGetFormsButton = (Button) findViewById(R.id.get_forms);
         mGetFormsButton.setText(getString(R.string.get_forms));
         mGetFormsButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), FormDownloadList.class);
@@ -122,6 +142,10 @@ public class MainMenuActivity extends Activity {
         mManageFilesButton = (Button) findViewById(R.id.manage_forms);
         mManageFilesButton.setText(getString(R.string.manage_files));
         mManageFilesButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), FileManagerTabs.class);
@@ -131,6 +155,10 @@ public class MainMenuActivity extends Activity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -140,6 +168,10 @@ public class MainMenuActivity extends Activity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -149,6 +181,10 @@ public class MainMenuActivity extends Activity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -166,6 +202,10 @@ public class MainMenuActivity extends Activity {
         mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
         mAlertDialog.setMessage(errorMsg);
         DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
