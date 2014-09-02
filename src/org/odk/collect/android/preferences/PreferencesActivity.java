@@ -70,6 +70,7 @@ public class PreferencesActivity extends PreferenceActivity implements
     
     public static String KEY_SHOW_START_SCREEN = "odk_show_entry_screen";
     public static String KEY_HELP_MODE_TRAY = "help_mode_tray";
+    public static String KEY_PROGRESS_BAR = "progress_bar";
     
 
     public static String KEY_AUTH = "auth";
