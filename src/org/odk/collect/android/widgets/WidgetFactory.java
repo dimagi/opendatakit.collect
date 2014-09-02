@@ -31,12 +31,12 @@ import android.util.Log;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class WidgetFactory {
-	
-	FormDef form;
-	
-	public WidgetFactory(FormDef form) {
-		this.form = form;
-	}
+    
+    FormDef form;
+    
+    public WidgetFactory(FormDef form) {
+        this.form = form;
+    }
 
     /**
      * Returns the appropriate QuestionWidget for the given FormEntryPrompt.
@@ -49,36 +49,36 @@ public class WidgetFactory {
         String appearance = fep.getAppearanceHint();
         switch (fep.getControlType()) {
             case Constants.CONTROL_INPUT:
-            	if(appearance != null && appearance.startsWith("intent:")) {
-            		String intentId = appearance.substring("intent:".length());
-            		IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId, form);
-            		//Hm, so what do we do if no callout is found? Error? For now, fail fast
-            		if(ic == null) {
-            			throw new RuntimeException("No intent callout could be found for requested id " + intentId + "!");
-            		}
-            		//NOTE: No path specific stuff for now
-            		Intent i = ic.generate(form.getEvaluationContext());
-            		questionWidget = new IntentWidget(context, fep, i, ic);
-            		break;
-            	}
+                if(appearance != null && appearance.startsWith("intent:")) {
+                    String intentId = appearance.substring("intent:".length());
+                    IntentCallout ic = form.getExtension(AndroidXFormExtensions.class).getIntent(intentId, form);
+                    //Hm, so what do we do if no callout is found? Error? For now, fail fast
+                    if(ic == null) {
+                        throw new RuntimeException("No intent callout could be found for requested id " + intentId + "!");
+                    }
+                    //NOTE: No path specific stuff for now
+                    Intent i = ic.generate(form.getEvaluationContext());
+                    questionWidget = new IntentWidget(context, fep, i, ic);
+                    break;
+                }
             case Constants.CONTROL_SECRET:
                 switch (fep.getDataType()) {
                     case Constants.DATATYPE_DATE_TIME:
                         questionWidget = new DateTimeWidget(context, fep);
                         break;
                     case Constants.DATATYPE_DATE:
-                    	if(appearance != null && appearance.toLowerCase().equals("ethiopian")){
-                    		questionWidget = new EthiopianDateWidget(context, fep);
-                    	} else {
-                    		questionWidget = new DateWidget(context, fep);
-                    	}
+                        if(appearance != null && appearance.toLowerCase().equals("ethiopian")){
+                            questionWidget = new EthiopianDateWidget(context, fep);
+                        } else {
+                            questionWidget = new DateWidget(context, fep);
+                        }
                         break;
                     case Constants.DATATYPE_TIME:
                         questionWidget = new TimeWidget(context, fep);
                         break;
                     case Constants.DATATYPE_LONG:
-                    	questionWidget = new IntegerWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, 2);
-                    	break;
+                        questionWidget = new IntegerWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET, 2);
+                        break;
                     case Constants.DATATYPE_DECIMAL:
                         questionWidget = new DecimalWidget(context, fep, fep.getControlType() == Constants.CONTROL_SECRET);
                         break;
@@ -104,11 +104,11 @@ public class WidgetFactory {
                 }
                 break;
             case Constants.CONTROL_IMAGE_CHOOSE:
-            	if (appearance != null && appearance.equals("signature")) {
+                if (appearance != null && appearance.equals("signature")) {
                     questionWidget = new SignatureWidget(context, fep);
-            	} else {
+                } else {
                 questionWidget = new ImageWidget(context, fep);
-            	}
+                }
                 break;
             case Constants.CONTROL_AUDIO_CAPTURE:
                 questionWidget = new AudioWidget(context, fep);
@@ -185,7 +185,7 @@ public class WidgetFactory {
                 }
                 break;
             case Constants.CONTROL_TRIGGER:
-            	boolean mInteractive = appearance == null  || !appearance.equals("minimal");
+                boolean mInteractive = appearance == null  || !appearance.equals("minimal");
                 questionWidget = new TriggerWidget(context, fep, mInteractive);
                 break;
             default:

@@ -104,26 +104,26 @@ public class PreferencesActivity extends PreferenceActivity implements
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.general_preferences));
 
         if(Collect.getInstance() != null) {
-	        setupSplashPathPreference();
-	        setupSelectedGoogleAccountPreference();
-	
-	        updateServerUrl();
-	
-	        updateUsername();
-	        updatePassword();
-	
-	        updateFormListUrl();
-	        updateSubmissionUrl();
-	
-	        updateSplashPath();
-	        
-	        updateProtocol();
-	        updateSelectedGoogleAccount();
-	        updateGoogleCollectionEffort();
+            setupSplashPathPreference();
+            setupSelectedGoogleAccountPreference();
+    
+            updateServerUrl();
+    
+            updateUsername();
+            updatePassword();
+    
+            updateFormListUrl();
+            updateSubmissionUrl();
+    
+            updateSplashPath();
+            
+            updateProtocol();
+            updateSelectedGoogleAccount();
+            updateGoogleCollectionEffort();
         } else {
-        	//If there's no collect instance we're running in a library, so we should
-        	//hide everything that's irrelevant
-        	this.getPreferenceScreen().removePreference(this.findPreference(KEY_SERVER_PREFS));
+            //If there's no collect instance we're running in a library, so we should
+            //hide everything that's irrelevant
+            this.getPreferenceScreen().removePreference(this.findPreference(KEY_SERVER_PREFS));
         }
         updateFontSize();
         updateShowStart();
@@ -231,20 +231,20 @@ public class PreferencesActivity extends PreferenceActivity implements
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
         
         if(Collect.getInstance() != null) {
-        	
-	        updateServerUrl();
-	
-	        updateUsername();
-	        updatePassword();
-	
-	        updateFormListUrl();
-	        updateSubmissionUrl();
-	
-	        updateSplashPath();
-	
-	        updateProtocol();
-	        updateSelectedGoogleAccount();
-	        updateGoogleCollectionEffort();
+            
+            updateServerUrl();
+    
+            updateUsername();
+            updatePassword();
+    
+            updateFormListUrl();
+            updateSubmissionUrl();
+    
+            updateSplashPath();
+    
+            updateProtocol();
+            updateSelectedGoogleAccount();
+            updateGoogleCollectionEffort();
         }
         updateFontSize();
         updateShowStart();
@@ -328,7 +328,7 @@ public class PreferencesActivity extends PreferenceActivity implements
         } else if (key.equals(KEY_FONT_SIZE)) {
             updateFontSize();
         } else if(key.equals(KEY_SHOW_START_SCREEN)) {
-        	updateShowStart();
+            updateShowStart();
         }
     }
 

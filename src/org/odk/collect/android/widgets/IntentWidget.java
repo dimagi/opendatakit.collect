@@ -78,12 +78,12 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
             public void onClick(View v) {
                 mWaitingForData = true;
                 try {
-                	//Set Data
-                	String data = mStringAnswer.getText().toString();
-                	if(data != null && data != "") {
-                		intent.putExtra(IntentCallout.INTENT_RESULT_VALUE, data);
-                	}
-                	
+                    //Set Data
+                    String data = mStringAnswer.getText().toString();
+                    if(data != null && data != "") {
+                        intent.putExtra(IntentCallout.INTENT_RESULT_VALUE, data);
+                    }
+                    
                     ((Activity) getContext()).startActivityForResult(intent,
                         FormEntryActivity.INTENT_CALLOUT);
                 } catch (ActivityNotFoundException e) {
@@ -195,9 +195,9 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
     
     public IntentCallout getIntentCallout() {
-    	//TODO: This is really not great, but the alternative
-    	//is doubling up all of this code in the ODKView, which
-    	//is silly. It's not generalizable
-    	return ic;
+        //TODO: This is really not great, but the alternative
+        //is doubling up all of this code in the ODKView, which
+        //is silly. It's not generalizable
+        return ic;
     }
 }

@@ -44,7 +44,7 @@ import android.widget.TextView;
  * @author Jeff Beorse (jeff@beorse.net)
  */
 public class ListMultiWidget extends QuestionWidget {
-	int buttonIdBase;
+    int buttonIdBase;
     private final static int CHECKBOX_ID = 100;
     protected final static int TEXTSIZE = 21;
     private static final String t = "ListMultiWidget";

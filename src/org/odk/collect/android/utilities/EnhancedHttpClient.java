@@ -28,15 +28,15 @@ import org.apache.http.params.HttpParams;
  *
  */
 public class EnhancedHttpClient extends DefaultHttpClient {
-	public EnhancedHttpClient(HttpParams params) {
-		super(params);
-	}
+    public EnhancedHttpClient(HttpParams params) {
+        super(params);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.apache.http.impl.client.DefaultHttpClient#createAuthSchemeRegistry()
-	 */
-	@Override
+    /*
+     * (non-Javadoc)
+     * @see org.apache.http.impl.client.DefaultHttpClient#createAuthSchemeRegistry()
+     */
+    @Override
     protected AuthSchemeRegistry createAuthSchemeRegistry() {
         AuthSchemeRegistry registry = new AuthSchemeRegistry();
         registry.register(

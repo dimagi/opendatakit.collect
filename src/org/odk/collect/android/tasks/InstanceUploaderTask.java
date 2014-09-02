@@ -94,7 +94,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
      * @return false if credentials are required and we should terminate immediately.
      */
     private boolean uploadOneSubmission(String urlString, String id, String instanceFilePath, 
-    			Uri toUpdate, HttpClient httpclient, HttpContext localContext, Map<URI, URI> uriRemap) {
+                Uri toUpdate, HttpClient httpclient, HttpContext localContext, Map<URI, URI> uriRemap) {
 
         ContentValues cv = new ContentValues();
         URI u = null;
@@ -508,36 +508,36 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
 
         Cursor c = null;
         try {
-        	c = Collect.getInstance().getContentResolver()
+            c = Collect.getInstance().getContentResolver()
                     .query(InstanceColumns.CONTENT_URI, null, selection, selectionArgs, null);
 
-	        if (c.getCount() > 0) {
-	            c.moveToPosition(-1);
-	            while (c.moveToNext()) {
-	                if (isCancelled()) {
-	                    return mResults;
-	                }
-	                publishProgress(c.getPosition() + 1, c.getCount());
-	                String instance = c.getString(c.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
-	                String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
-	                Uri toUpdate = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, id);
-	
-	                int subIdx = c.getColumnIndex(InstanceColumns.SUBMISSION_URI);
-	                String urlString = c.isNull(subIdx) ? null : c.getString(subIdx);
-	                if (urlString == null) {
-	                    SharedPreferences settings =
-	                        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-	                    urlString = settings.getString(PreferencesActivity.KEY_SERVER_URL, null);
-	                    String submissionUrl =
-	                        settings.getString(PreferencesActivity.KEY_SUBMISSION_URL, "/submission");
-	                    urlString = urlString + submissionUrl;
-	                }
-	
-	                if ( !uploadOneSubmission(urlString, id, instance, toUpdate, httpclient, localContext, uriRemap) ) {
-	                	return null; // get credentials...
-	                }
-	            }
-	        }
+            if (c.getCount() > 0) {
+                c.moveToPosition(-1);
+                while (c.moveToNext()) {
+                    if (isCancelled()) {
+                        return mResults;
+                    }
+                    publishProgress(c.getPosition() + 1, c.getCount());
+                    String instance = c.getString(c.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
+                    String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
+                    Uri toUpdate = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, id);
+    
+                    int subIdx = c.getColumnIndex(InstanceColumns.SUBMISSION_URI);
+                    String urlString = c.isNull(subIdx) ? null : c.getString(subIdx);
+                    if (urlString == null) {
+                        SharedPreferences settings =
+                            PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
+                        urlString = settings.getString(PreferencesActivity.KEY_SERVER_URL, null);
+                        String submissionUrl =
+                            settings.getString(PreferencesActivity.KEY_SUBMISSION_URL, "/submission");
+                        urlString = urlString + submissionUrl;
+                    }
+    
+                    if ( !uploadOneSubmission(urlString, id, instance, toUpdate, httpclient, localContext, uriRemap) ) {
+                        return null; // get credentials...
+                    }
+                }
+            }
         } finally {
             if (c != null) {
                 c.close();

@@ -120,11 +120,11 @@ public class InstanceChooserList extends ListActivity {
                 c.getString(c.getColumnIndex(InstanceColumns.CAN_EDIT_WHEN_COMPLETE));
 
             boolean canEdit = status.equals(InstanceProviderAPI.STATUS_INCOMPLETE)
-                	           || Boolean.parseBoolean(strCanEditWhenComplete);
+                               || Boolean.parseBoolean(strCanEditWhenComplete);
             if (!canEdit) {
-            	createErrorDialog(getString(R.string.cannot_edit_completed_form),
-                    	          DO_NOT_EXIT);
-            	return;
+                createErrorDialog(getString(R.string.cannot_edit_completed_form),
+                                  DO_NOT_EXIT);
+                return;
             }
             // caller wants to view/edit a form, so launch formentryactivity
             startActivity(new Intent(Intent.ACTION_EDIT, instanceUri));

@@ -257,17 +257,17 @@ public class InstanceProvider extends ContentProvider {
             case INSTANCES:                
                 Cursor del = null;
                 try {
-                	del = this.query(uri, null, where, whereArgs, null);
-	                del.moveToPosition(-1);
-	                while (del.moveToNext()) {
-	                    String instanceFile = del.getString(del.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
-	                    String instanceDir = (new File(instanceFile)).getParent();
-	                    deleteFileOrDir(instanceDir);
-	                }
+                    del = this.query(uri, null, where, whereArgs, null);
+                    del.moveToPosition(-1);
+                    while (del.moveToNext()) {
+                        String instanceFile = del.getString(del.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
+                        String instanceDir = (new File(instanceFile)).getParent();
+                        deleteFileOrDir(instanceDir);
+                    }
                 } finally {
-                	if ( del != null ) {
-                		del.close();
-                	}
+                    if ( del != null ) {
+                        del.close();
+                    }
                 }
                 count = db.delete(INSTANCES_TABLE_NAME, where, whereArgs);
                 break;
@@ -277,18 +277,18 @@ public class InstanceProvider extends ContentProvider {
 
                 Cursor c = null;
                 try {
-                	c = this.query(uri, null, where, whereArgs, null);
-	                // This should only ever return 1 record.  I hope.
-	                c.moveToPosition(-1);
-	                while (c.moveToNext()) {
-	                    String instanceFile = c.getString(c.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
-	                    String instanceDir = (new File(instanceFile)).getParent();
-	                    deleteFileOrDir(instanceDir);           
-	                }
+                    c = this.query(uri, null, where, whereArgs, null);
+                    // This should only ever return 1 record.  I hope.
+                    c.moveToPosition(-1);
+                    while (c.moveToNext()) {
+                        String instanceFile = c.getString(c.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
+                        String instanceDir = (new File(instanceFile)).getParent();
+                        deleteFileOrDir(instanceDir);           
+                    }
                 } finally {
-                	if ( c != null ) {
-                		c.close();
-                	}
+                    if ( c != null ) {
+                        c.close();
+                    }
                 }
                 
                 count =

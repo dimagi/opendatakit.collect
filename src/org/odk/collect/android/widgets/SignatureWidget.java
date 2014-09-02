@@ -56,133 +56,133 @@ import android.widget.Toast;
  *
  */
 public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
-	private final static String t = "SignatureWidget";
+    private final static String t = "SignatureWidget";
 
-	private Button mSignButton;
-	private String mBinaryName;
-	private String mInstanceFolder;
-	private ImageView mImageView;
+    private Button mSignButton;
+    private String mBinaryName;
+    private String mInstanceFolder;
+    private ImageView mImageView;
     private boolean mWaitingForData;
 
-	private TextView mErrorTextView;
+    private TextView mErrorTextView;
 
-	public SignatureWidget(Context context, FormEntryPrompt prompt) {
-		super(context, prompt);
+    public SignatureWidget(Context context, FormEntryPrompt prompt) {
+        super(context, prompt);
 
         mInstanceFolder =
                 FormEntryActivity.mInstancePath.substring(0,
                     FormEntryActivity.mInstancePath.lastIndexOf("/") + 1);
 
-		setOrientation(LinearLayout.VERTICAL);
+        setOrientation(LinearLayout.VERTICAL);
 
-		TableLayout.LayoutParams params = new TableLayout.LayoutParams();
-		params.setMargins(7, 5, 7, 5);
+        TableLayout.LayoutParams params = new TableLayout.LayoutParams();
+        params.setMargins(7, 5, 7, 5);
 
-		mErrorTextView = new TextView(context);
-		mErrorTextView.setText("Selected file is not a valid image");
+        mErrorTextView = new TextView(context);
+        mErrorTextView.setText("Selected file is not a valid image");
 
-		// setup Blank Image Button
-		mSignButton = new Button(getContext());
-		mSignButton.setText(getContext().getString(R.string.sign_button));
-		mSignButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-		mSignButton.setPadding(20, 20, 20, 20);
-		mSignButton.setEnabled(!prompt.isReadOnly());
-		mSignButton.setLayoutParams(params);
-		// launch capture intent on click
-		mSignButton.setOnClickListener(new View.OnClickListener() {
-			/*
-			 * (non-Javadoc)
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
-			@Override
-			public void onClick(View v) {
-				launchSignatureActivity();
-			}
-		});
+        // setup Blank Image Button
+        mSignButton = new Button(getContext());
+        mSignButton.setText(getContext().getString(R.string.sign_button));
+        mSignButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+        mSignButton.setPadding(20, 20, 20, 20);
+        mSignButton.setEnabled(!prompt.isReadOnly());
+        mSignButton.setLayoutParams(params);
+        // launch capture intent on click
+        mSignButton.setOnClickListener(new View.OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
+            @Override
+            public void onClick(View v) {
+                launchSignatureActivity();
+            }
+        });
 
 
-		// finish complex layout
-		addView(mSignButton);
-		addView(mErrorTextView);
+        // finish complex layout
+        addView(mSignButton);
+        addView(mErrorTextView);
 
-		// and hide the sign button if read-only
-		if ( prompt.isReadOnly() ) {
-			mSignButton.setVisibility(View.GONE);
-		}
-		mErrorTextView.setVisibility(View.GONE);
+        // and hide the sign button if read-only
+        if ( prompt.isReadOnly() ) {
+            mSignButton.setVisibility(View.GONE);
+        }
+        mErrorTextView.setVisibility(View.GONE);
 
-		// retrieve answer from data model and update ui
-		mBinaryName = prompt.getAnswerText();
+        // retrieve answer from data model and update ui
+        mBinaryName = prompt.getAnswerText();
 
-		// Only add the imageView if the user has signed
-		if (mBinaryName != null) {
-			mImageView = new ImageView(getContext());
-			Display display =
-					((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
-					.getDefaultDisplay();
-			int screenWidth = display.getWidth();
-			int screenHeight = display.getHeight();
+        // Only add the imageView if the user has signed
+        if (mBinaryName != null) {
+            mImageView = new ImageView(getContext());
+            Display display =
+                    ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                    .getDefaultDisplay();
+            int screenWidth = display.getWidth();
+            int screenHeight = display.getHeight();
 
-			File f = new File(mInstanceFolder + File.separator + mBinaryName);
+            File f = new File(mInstanceFolder + File.separator + mBinaryName);
 
-			if (f.exists()) {
-				Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f, screenHeight, screenWidth);
-				if (bmp == null) {
-					mErrorTextView.setVisibility(View.VISIBLE);
-				}
-				mImageView.setImageBitmap(bmp);
-			} else {
-				mImageView.setImageBitmap(null);
-			}
+            if (f.exists()) {
+                Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f, screenHeight, screenWidth);
+                if (bmp == null) {
+                    mErrorTextView.setVisibility(View.VISIBLE);
+                }
+                mImageView.setImageBitmap(bmp);
+            } else {
+                mImageView.setImageBitmap(null);
+            }
 
-			mImageView.setPadding(10, 10, 10, 10);
-			mImageView.setAdjustViewBounds(true);
-			mImageView.setOnClickListener(new View.OnClickListener() {
-				/*
-				 * (non-Javadoc)
-				 * @see android.view.View.OnClickListener#onClick(android.view.View)
-				 */
-				@Override
-				public void onClick(View v) {
-	
-					launchSignatureActivity();
-				}
-			});
+            mImageView.setPadding(10, 10, 10, 10);
+            mImageView.setAdjustViewBounds(true);
+            mImageView.setOnClickListener(new View.OnClickListener() {
+                /*
+                 * (non-Javadoc)
+                 * @see android.view.View.OnClickListener#onClick(android.view.View)
+                 */
+                @Override
+                public void onClick(View v) {
+    
+                    launchSignatureActivity();
+                }
+            });
 
-			addView(mImageView);
-		}
+            addView(mImageView);
+        }
 
-	}
+    }
 
-	private void launchSignatureActivity() {
-		mErrorTextView.setVisibility(View.GONE);
-		Intent i = new Intent(getContext(), DrawActivity.class);
-		i.putExtra(DrawActivity.OPTION, DrawActivity.OPTION_SIGNATURE);
-		// copy...
-		//mBinaryName would be a preexisting signature that is getting displayed when the activity starts
-		if ( mBinaryName != null ) {
-			File f = new File(mInstanceFolder + File.separator + mBinaryName);
-			i.putExtra(DrawActivity.REF_IMAGE, Uri.fromFile(f));
-		}
-		//path to output the signature file to
-		i.putExtra(DrawActivity.EXTRA_OUTPUT, 
-				Uri.fromFile(new File(Collect.TMPFILE_PATH)));
+    private void launchSignatureActivity() {
+        mErrorTextView.setVisibility(View.GONE);
+        Intent i = new Intent(getContext(), DrawActivity.class);
+        i.putExtra(DrawActivity.OPTION, DrawActivity.OPTION_SIGNATURE);
+        // copy...
+        //mBinaryName would be a preexisting signature that is getting displayed when the activity starts
+        if ( mBinaryName != null ) {
+            File f = new File(mInstanceFolder + File.separator + mBinaryName);
+            i.putExtra(DrawActivity.REF_IMAGE, Uri.fromFile(f));
+        }
+        //path to output the signature file to
+        i.putExtra(DrawActivity.EXTRA_OUTPUT, 
+                Uri.fromFile(new File(Collect.TMPFILE_PATH)));
 
-		try {
-			//tells the form controller that when onActivityResult is called (when the DrawActivity)
-			//finishes, the requestCode is SIGNATURE_CAPTURE
-			((Activity)getContext()).startActivityForResult(i, FormEntryActivity.SIGNATURE_CAPTURE);
-			setWaitingForBinaryData();
-		}
-		catch (ActivityNotFoundException e) {
-			Toast.makeText(getContext(),
-					getContext().getString(R.string.activity_not_found, "signature capture"),
-					Toast.LENGTH_SHORT).show();
-			cancelWaitingForBinaryData();
-		}
-	}
+        try {
+            //tells the form controller that when onActivityResult is called (when the DrawActivity)
+            //finishes, the requestCode is SIGNATURE_CAPTURE
+            ((Activity)getContext()).startActivityForResult(i, FormEntryActivity.SIGNATURE_CAPTURE);
+            setWaitingForBinaryData();
+        }
+        catch (ActivityNotFoundException e) {
+            Toast.makeText(getContext(),
+                    getContext().getString(R.string.activity_not_found, "signature capture"),
+                    Toast.LENGTH_SHORT).show();
+            cancelWaitingForBinaryData();
+        }
+    }
 
-	private void deleteMedia() {
+    private void deleteMedia() {
         // get the file path and delete the file
         File f = new File(mInstanceFolder + "/" + mBinaryName);
         if (!f.delete()) {
@@ -195,130 +195,130 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
         /*int del = MediaUtils.deleteImageFileFromMediaProvider(mInstanceFolder + File.separator + mBinaryName);
         Log.i(t, "Deleted " + del + " rows from media content provider");
         mBinaryName = null;*/
-	}
+    }
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
-	 */
-	@Override
-	public void clearAnswer() {
-		// remove the file
-		deleteMedia();
-		mImageView.setImageBitmap(null);
-		mErrorTextView.setVisibility(View.GONE);
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
+    @Override
+    public void clearAnswer() {
+        // remove the file
+        deleteMedia();
+        mImageView.setImageBitmap(null);
+        mErrorTextView.setVisibility(View.GONE);
 
-		// reset buttons
-		mSignButton.setText(getContext().getString(R.string.sign_button));
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
-	 */
-	@Override
-	public IAnswerData getAnswer() {
-		if (mBinaryName != null) {
-			return new StringData(mBinaryName.toString());
-		} else {
-			return null;
-		}
-	}
+        // reset buttons
+        mSignButton.setText(getContext().getString(R.string.sign_button));
+    }
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
-	 */
-	@Override
-	public void setBinaryData(Object answer) {
-		// you are replacing an answer. delete the previous image using the
-		// content provider.
-		if (mBinaryName != null) {
-			deleteMedia();
-		}
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
+    @Override
+    public IAnswerData getAnswer() {
+        if (mBinaryName != null) {
+            return new StringData(mBinaryName.toString());
+        } else {
+            return null;
+        }
+    }
+
+
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
+     */
+    @Override
+    public void setBinaryData(Object answer) {
+        // you are replacing an answer. delete the previous image using the
+        // content provider.
+        if (mBinaryName != null) {
+            deleteMedia();
+        }
 
         String binaryPath = UrlUtils.getPathFromUri((Uri) answer,getContext());
-		File newImage = new File(binaryPath);
+        File newImage = new File(binaryPath);
 
-		if (newImage.exists()) {
-			// Add the new image to the Media content provider so that the
-			// viewing is fast in Android 2.0+
-			ContentValues values = new ContentValues(6);
-			values.put(Images.Media.TITLE, newImage.getName());
-			values.put(Images.Media.DISPLAY_NAME, newImage.getName());
-			values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis());
-			values.put(Images.Media.MIME_TYPE, "image/jpeg");
-			values.put(Images.Media.DATA, newImage.getAbsolutePath());
+        if (newImage.exists()) {
+            // Add the new image to the Media content provider so that the
+            // viewing is fast in Android 2.0+
+            ContentValues values = new ContentValues(6);
+            values.put(Images.Media.TITLE, newImage.getName());
+            values.put(Images.Media.DISPLAY_NAME, newImage.getName());
+            values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis());
+            values.put(Images.Media.MIME_TYPE, "image/jpeg");
+            values.put(Images.Media.DATA, newImage.getAbsolutePath());
 
-			Uri imageURI = getContext().getContentResolver().insert(
-					Images.Media.EXTERNAL_CONTENT_URI, values);
-			Log.i(t, "Inserting image returned uri = " + imageURI.toString());
+            Uri imageURI = getContext().getContentResolver().insert(
+                    Images.Media.EXTERNAL_CONTENT_URI, values);
+            Log.i(t, "Inserting image returned uri = " + imageURI.toString());
 
-			mBinaryName = newImage.getName();
-			Log.i(t, "Setting current answer to " + newImage.getName());
-		} else {
-			Log.e(t, "NO IMAGE EXISTS at: " + newImage.getAbsolutePath());
-		}
-		setWaitingForBinaryData();
-	}
+            mBinaryName = newImage.getName();
+            Log.i(t, "Setting current answer to " + newImage.getName());
+        } else {
+            Log.e(t, "NO IMAGE EXISTS at: " + newImage.getAbsolutePath());
+        }
+        setWaitingForBinaryData();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
-	 */
-	@Override
-	public void setFocus(Context context) {
-		// Hide the soft keyboard if it's showing.
-		InputMethodManager inputManager =
-				(InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
-	 */
-	@Override
-	public boolean isWaitingForBinaryData() {
-		return mWaitingForData;
-	}
-
-	public void setWaitingForBinaryData() {
-		mWaitingForData = true;
-	}
-	
-	public void cancelWaitingForBinaryData() {
-		mWaitingForData = false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
-	 */
-	@Override
-	public void setOnLongClickListener(OnLongClickListener l) {
-		mSignButton.setOnLongClickListener(l);
-		if (mImageView != null) {
-			mImageView.setOnLongClickListener(l);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
+    @Override
+    public void setFocus(Context context) {
+        // Hide the soft keyboard if it's showing.
+        InputMethodManager inputManager =
+                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
+    }
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
-	 */
-	@Override
-	public void cancelLongPress() {
-		super.cancelLongPress();
-		mSignButton.cancelLongPress();
-		if (mImageView != null) {
-			mImageView.cancelLongPress();
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
+     */
+    @Override
+    public boolean isWaitingForBinaryData() {
+        return mWaitingForData;
+    }
+
+    public void setWaitingForBinaryData() {
+        mWaitingForData = true;
+    }
+    
+    public void cancelWaitingForBinaryData() {
+        mWaitingForData = false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
+    @Override
+    public void setOnLongClickListener(OnLongClickListener l) {
+        mSignButton.setOnLongClickListener(l);
+        if (mImageView != null) {
+            mImageView.setOnLongClickListener(l);
+        }
+    }
+
+
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
+    @Override
+    public void cancelLongPress() {
+        super.cancelLongPress();
+        mSignButton.cancelLongPress();
+        if (mImageView != null) {
+            mImageView.cancelLongPress();
+        }
+    }
 
 }

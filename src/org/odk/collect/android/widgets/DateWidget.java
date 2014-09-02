@@ -48,9 +48,9 @@ public class DateWidget extends QuestionWidget {
         mDatePicker = new DatePicker(getContext());
         mDatePicker.setFocusable(!prompt.isReadOnly());
         mDatePicker.setEnabled(!prompt.isReadOnly());
-	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-	    	mDatePicker.setCalendarViewShown(false);
-	    }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mDatePicker.setCalendarViewShown(false);
+        }
         
         mDateListener = new DatePicker.OnDateChangedListener() {
         	/*
@@ -67,17 +67,17 @@ public class DateWidget extends QuestionWidget {
                     // http://code.google.com/p/android/issues/detail?id=2081
                     Calendar c = Calendar.getInstance();
                     c.set(year, month, 1);
-                    int max = c.getActualMaximum(Calendar.DAY_OF_MONTH);                    	
-	                if (day > max) {
-	                    //If the day has fallen out of spec, set it to the correct max
+                    int max = c.getActualMaximum(Calendar.DAY_OF_MONTH);                        
+                    if (day > max) {
+                        //If the day has fallen out of spec, set it to the correct max
                         mDatePicker.updateDate(year, month, max);
                     } else {
                         if(!(mDatePicker.getDayOfMonth() == day && mDatePicker.getMonth() == month && mDatePicker.getYear() == year)) {
-                        	//CTS: No reason to change the day if it's already correct
-                        	mDatePicker.updateDate(year, month, day);
-                        	
+                            //CTS: No reason to change the day if it's already correct
+                            mDatePicker.updateDate(year, month, day);
+                            
                         } else{
-                        	return;
+                            return;
                         }
                     }
                 }
@@ -127,7 +127,7 @@ public class DateWidget extends QuestionWidget {
      */
     @Override
     public IAnswerData getAnswer() {
-    	mDatePicker.clearFocus();
+        mDatePicker.clearFocus();
         DateTime ldt = new DateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1,
                     mDatePicker.getDayOfMonth(), 0, 0);
        // DateTime utc = ldt.withZone(DateTimeZone.forID("UTC"));

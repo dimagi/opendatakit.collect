@@ -22,40 +22,40 @@ import dalvik.system.DexFile;
  *
  */
 public class ApkUtils {
-	private static PrototypeFactory factory;
+    private static PrototypeFactory factory;
 
 
-	public static PrototypeFactory getPrototypeFactory(Context c) {
-		if(factory != null) {
-			return factory;
-		}
-		
-		PrefixTree tree = new PrefixTree();
-		
-		try {
-		List<String> classes = getClasses("org.javarosa", c);
-		for(String cl : classes) {
-			//Log.i("CLASS", cl);
-			tree.addString(cl);
-		}
-		
-		//TODO: This was pulled from the source, should probably have a better
-		//way to extend this utility
-		classes = getClasses("org.commcare", c);
-		for(String cl : classes) {
-			//Log.i("CLASS", cl);
-			tree.addString(cl);
-		}
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		
-		factory = new PrototypeFactory(tree);
-		return factory;
-		
-	}
-	
+    public static PrototypeFactory getPrototypeFactory(Context c) {
+        if(factory != null) {
+            return factory;
+        }
+        
+        PrefixTree tree = new PrefixTree();
+        
+        try {
+        List<String> classes = getClasses("org.javarosa", c);
+        for(String cl : classes) {
+            //Log.i("CLASS", cl);
+            tree.addString(cl);
+        }
+        
+        //TODO: This was pulled from the source, should probably have a better
+        //way to extend this utility
+        classes = getClasses("org.commcare", c);
+        for(String cl : classes) {
+            //Log.i("CLASS", cl);
+            tree.addString(cl);
+        }
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        
+        factory = new PrototypeFactory(tree);
+        return factory;
+        
+    }
+    
     /* Scans all classes accessible from the context class loader which belong to the given package and subpackages.
     *
     * @param packageName The base package
@@ -64,51 +64,51 @@ public class ApkUtils {
     * @throws IOException
     */
    @SuppressWarnings("unchecked")
-	private static List<String> getClasses(String packageName, Context c)
+    private static List<String> getClasses(String packageName, Context c)
            throws IOException 
    {
        ArrayList<String> classNames = new ArrayList<String>();
        
        String zpath = c.getApplicationInfo().sourceDir;
-	   
-	   
-	   if(zpath == null) {
-		   zpath = "/data/app/org.odk.collect.apk";
-	   }
-	   
-	   DexFile df = new DexFile(new File(zpath));
-	   for(Enumeration<String> en = df.entries() ; en.hasMoreElements() ;) {
-		   String cn = en.nextElement();
-		   if(cn.startsWith(packageName) && !cn.contains(".test.")) {
-			   try{
-				   Class prototype = Class.forName(cn);
-				   if(prototype.isInterface()) {
-					   continue;
-				   }
-				   boolean emptyc = false;
-				   for(Constructor<?> cons : prototype.getConstructors()) {
-					   if(cons.getParameterTypes().length == 0){
-						   emptyc = true;
-					   }
-				   }
-				   if(!emptyc) {
-					   continue;
-				   }
-				   if(Externalizable.class.isAssignableFrom(prototype)) {
-					   classNames.add(cn);
-				   }
-			   } catch(IllegalAccessError e) {
-				   //nothing
-			   } catch (SecurityException e) {
-				   
-			   } catch (RuntimeException e){
-				   
-			   } catch(Exception e) {
-			   }
-		   }
-	   }
-	   
-	   return classNames;
+       
+       
+       if(zpath == null) {
+           zpath = "/data/app/org.odk.collect.apk";
+       }
+       
+       DexFile df = new DexFile(new File(zpath));
+       for(Enumeration<String> en = df.entries() ; en.hasMoreElements() ;) {
+           String cn = en.nextElement();
+           if(cn.startsWith(packageName) && !cn.contains(".test.")) {
+               try{
+                   Class prototype = Class.forName(cn);
+                   if(prototype.isInterface()) {
+                       continue;
+                   }
+                   boolean emptyc = false;
+                   for(Constructor<?> cons : prototype.getConstructors()) {
+                       if(cons.getParameterTypes().length == 0){
+                           emptyc = true;
+                       }
+                   }
+                   if(!emptyc) {
+                       continue;
+                   }
+                   if(Externalizable.class.isAssignableFrom(prototype)) {
+                       classNames.add(cn);
+                   }
+               } catch(IllegalAccessError e) {
+                   //nothing
+               } catch (SecurityException e) {
+                   
+               } catch (RuntimeException e){
+                   
+               } catch(Exception e) {
+               }
+           }
+       }
+       
+       return classNames;
    }
 
 }

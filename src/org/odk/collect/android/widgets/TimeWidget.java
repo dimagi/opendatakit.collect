@@ -103,11 +103,11 @@ public class TimeWidget extends QuestionWidget implements OnTimeChangedListener 
      */
     @Override
     public IAnswerData getAnswer() {
-    	mTimePicker.clearFocus();
+        mTimePicker.clearFocus();
         // use picker time, convert to epoch date (for TZ clarity), store as utc
-    	
-    	//CTS - 8/22/2021 : Adjusted this to store as the time past the Epoch, since the app otherwise can have conflicting
-    	//timezones with the JavaRosa Time storage, which is always stored against the epoch.
+        
+        //CTS - 8/22/2021 : Adjusted this to store as the time past the Epoch, since the app otherwise can have conflicting
+        //timezones with the JavaRosa Time storage, which is always stored against the epoch.
         DateTime ldt =
             (new DateTime(0)).withTime(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute(),
                 0, 0);
@@ -154,9 +154,8 @@ public class TimeWidget extends QuestionWidget implements OnTimeChangedListener 
      * (non-Javadoc)
      * @see android.widget.TimePicker.OnTimeChangedListener#onTimeChanged(android.widget.TimePicker, int, int)
      */
-	@Override
-	public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-		this.widgetEntryChanged();
-	}
-
+    @Override
+    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+        this.widgetEntryChanged();
+    }
 }

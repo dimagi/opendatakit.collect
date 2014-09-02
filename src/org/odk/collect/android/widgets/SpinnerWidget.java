@@ -86,25 +86,25 @@ public class SpinnerWidget extends QuestionWidget {
         }
         
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-        	/*
-        	 * (non-Javadoc)
-        	 * @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)
-        	 */
+            /*
+             * (non-Javadoc)
+             * @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)
+             */
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	if(hasListener){
-            		widgetChangedListener.widgetEntryChanged();
-            	}
+                if(hasListener){
+                    widgetChangedListener.widgetEntryChanged();
+                }
             }
 
             /*
              * (non-Javadoc)
              * @see android.widget.AdapterView.OnItemSelectedListener#onNothingSelected(android.widget.AdapterView)
              */
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				//do nothing here
-			}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //do nothing here
+            }
 
         });
 

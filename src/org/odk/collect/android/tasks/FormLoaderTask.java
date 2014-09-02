@@ -66,8 +66,8 @@ import android.util.Log;
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
 public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWrapper> {
-	
-	public static InstanceInitializationFactory iif;
+    
+    public static InstanceInitializationFactory iif;
     private final static String t = "FormLoaderTask";
 
 
@@ -79,13 +79,13 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
     private Context context;
     
     public FormLoaderTask(Context context) {
-    	this(context, null, false);
+        this(context, null, false);
     }
     
     public FormLoaderTask(Context context, SecretKeySpec symetricKey, boolean readOnly) {
-    	this.context = context;
-    	this.mSymetricKey = symetricKey;
-    	this.mReadOnly = readOnly;
+        this.context = context;
+        this.mSymetricKey = symetricKey;
+        this.mReadOnly = readOnly;
     }
 
     protected class FECWrapper {
@@ -197,10 +197,10 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
                 fd.initialize(true, iif);
             }
             if(mReadOnly) {
-            	fd.getInstance().getRoot().setEnabled(false);
+                fd.getInstance().getRoot().setEnabled(false);
             }
         } catch (RuntimeException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             mErrorMsg = e.getMessage();
             return null;
         }
@@ -215,28 +215,28 @@ public class FormLoaderTask extends AsyncTask<Uri, String, FormLoaderTask.FECWra
         String formMediaPath = c.getString(c.getColumnIndex(FormsColumns.FORM_MEDIA_PATH));
         
         if(formMediaPath != null) {
-	        ReferenceManager._().addSessionRootTranslator(
-		            new RootTranslator("jr://images/", formMediaPath));
-		        ReferenceManager._().addSessionRootTranslator(
-		            new RootTranslator("jr://audio/", formMediaPath));
-		        ReferenceManager._().addSessionRootTranslator(
-		            new RootTranslator("jr://video/", formMediaPath));
+            ReferenceManager._().addSessionRootTranslator(
+                    new RootTranslator("jr://images/", formMediaPath));
+                ReferenceManager._().addSessionRootTranslator(
+                    new RootTranslator("jr://audio/", formMediaPath));
+                ReferenceManager._().addSessionRootTranslator(
+                    new RootTranslator("jr://video/", formMediaPath));
 
         } else {
-	        // This should get moved to the Application Class
-	        if (ReferenceManager._().getFactories().length == 0) {
-	            // this is /sdcard/odk
-	            ReferenceManager._().addReferenceFactory(
-	                new FileReferenceFactory(Environment.getExternalStorageDirectory() + "/odk"));
-	        }
-	
-	        // Set jr://... to point to /sdcard/odk/forms/filename-media/
-	        ReferenceManager._().addSessionRootTranslator(
-	            new RootTranslator("jr://images/", "jr://file/forms/" + formFileName + "-media/"));
-	        ReferenceManager._().addSessionRootTranslator(
-	            new RootTranslator("jr://audio/", "jr://file/forms/" + formFileName + "-media/"));
-	        ReferenceManager._().addSessionRootTranslator(
-	            new RootTranslator("jr://video/", "jr://file/forms/" + formFileName + "-media/"));
+            // This should get moved to the Application Class
+            if (ReferenceManager._().getFactories().length == 0) {
+                // this is /sdcard/odk
+                ReferenceManager._().addReferenceFactory(
+                    new FileReferenceFactory(Environment.getExternalStorageDirectory() + "/odk"));
+            }
+    
+            // Set jr://... to point to /sdcard/odk/forms/filename-media/
+            ReferenceManager._().addSessionRootTranslator(
+                new RootTranslator("jr://images/", "jr://file/forms/" + formFileName + "-media/"));
+            ReferenceManager._().addSessionRootTranslator(
+                new RootTranslator("jr://audio/", "jr://file/forms/" + formFileName + "-media/"));
+            ReferenceManager._().addSessionRootTranslator(
+                new RootTranslator("jr://video/", "jr://file/forms/" + formFileName + "-media/"));
         
         }
 

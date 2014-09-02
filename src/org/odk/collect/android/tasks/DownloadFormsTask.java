@@ -120,52 +120,52 @@ public class DownloadFormsTask extends
                             .getContentResolver()
                             .query(FormsColumns.CONTENT_URI, projection, selection, selectionArgs,
                                 null);
-	
-	                if (alreadyExists.getCount() <= 0) {
-	                    // doesn't exist, so insert it
-	                    ContentValues v = new ContentValues();
-	                    v.put(FormsColumns.FORM_FILE_PATH, dl.getAbsolutePath());
-	
-	                    HashMap<String, String> formInfo = FileUtils.parseXML(dl);
-	                    v.put(FormsColumns.DISPLAY_NAME, formInfo.get(FileUtils.TITLE));
-	                    v.put(FormsColumns.MODEL_VERSION, formInfo.get(FileUtils.MODEL));
-	                    v.put(FormsColumns.UI_VERSION, formInfo.get(FileUtils.UI));
-	                    v.put(FormsColumns.JR_FORM_ID, formInfo.get(FileUtils.FORMID));
-	                    v.put(FormsColumns.SUBMISSION_URI, formInfo.get(FileUtils.SUBMISSIONURI));
-	                    v.put(FormsColumns.BASE64_RSA_PUBLIC_KEY, formInfo.get(FileUtils.BASE64_RSA_PUBLIC_KEY));
-	                    uri =
-	                        Collect.getInstance().getContentResolver()
-	                                .insert(FormsColumns.CONTENT_URI, v);
-	                } else {
-	                    alreadyExists.moveToFirst();
-	                    uri =
-	                        Uri.withAppendedPath(FormsColumns.CONTENT_URI,
-	                            alreadyExists.getString(alreadyExists.getColumnIndex(FormsColumns._ID)));
-	                }
+    
+                    if (alreadyExists.getCount() <= 0) {
+                        // doesn't exist, so insert it
+                        ContentValues v = new ContentValues();
+                        v.put(FormsColumns.FORM_FILE_PATH, dl.getAbsolutePath());
+    
+                        HashMap<String, String> formInfo = FileUtils.parseXML(dl);
+                        v.put(FormsColumns.DISPLAY_NAME, formInfo.get(FileUtils.TITLE));
+                        v.put(FormsColumns.MODEL_VERSION, formInfo.get(FileUtils.MODEL));
+                        v.put(FormsColumns.UI_VERSION, formInfo.get(FileUtils.UI));
+                        v.put(FormsColumns.JR_FORM_ID, formInfo.get(FileUtils.FORMID));
+                        v.put(FormsColumns.SUBMISSION_URI, formInfo.get(FileUtils.SUBMISSIONURI));
+                        v.put(FormsColumns.BASE64_RSA_PUBLIC_KEY, formInfo.get(FileUtils.BASE64_RSA_PUBLIC_KEY));
+                        uri =
+                            Collect.getInstance().getContentResolver()
+                                    .insert(FormsColumns.CONTENT_URI, v);
+                    } else {
+                        alreadyExists.moveToFirst();
+                        uri =
+                            Uri.withAppendedPath(FormsColumns.CONTENT_URI,
+                                alreadyExists.getString(alreadyExists.getColumnIndex(FormsColumns._ID)));
+                    }
                 } finally {
-                	if ( alreadyExists != null ) {
-                		alreadyExists.close();
-                	}
+                    if ( alreadyExists != null ) {
+                        alreadyExists.close();
+                    }
                 }
 
                 if (fd.manifestUrl != null) {
-                	String formMediaPath = null;
-                	Cursor c = null;
-                	try {
-                		c = Collect.getInstance().getContentResolver()
+                    String formMediaPath = null;
+                    Cursor c = null;
+                    try {
+                        c = Collect.getInstance().getContentResolver()
                                 .query(uri, null, null, null, null);
-	                    if (c.getCount() > 0) {
-	                        // should be exactly 1
-	                        c.moveToFirst();
-	                        formMediaPath = c.getString(c.getColumnIndex(FormsColumns.FORM_MEDIA_PATH));
-	                    }
-                	} finally {
-                		if ( c != null ) {
-                			c.close();
-                		}
-                	}
-                	
-                	if ( formMediaPath != null ) {
+                        if (c.getCount() > 0) {
+                            // should be exactly 1
+                            c.moveToFirst();
+                            formMediaPath = c.getString(c.getColumnIndex(FormsColumns.FORM_MEDIA_PATH));
+                        }
+                    } finally {
+                        if ( c != null ) {
+                            c.close();
+                        }
+                    }
+                    
+                    if ( formMediaPath != null ) {
                         String error =
                             downloadManifestAndMediaFiles(formMediaPath, fd,
                                 count, total);
@@ -240,22 +240,22 @@ public class DownloadFormsTask extends
 
         Cursor c = null;
         try {
-        	c = Collect.getInstance().getContentResolver()
+            c = Collect.getInstance().getContentResolver()
                     .query(FormsColumns.CONTENT_URI, projection, selection, selectionArgs, null);
-	        if (c.getCount() > 0) {
-	            // Should be at most, 1
-	            c.moveToFirst();
-	
-	            // delete the file we just downloaded, because it's a duplicate
-	            f.delete();
-	
-	            // set the file returned to the file we already had
-	            f = new File(c.getString(c.getColumnIndex(FormsColumns.FORM_FILE_PATH)));
-	        }
+            if (c.getCount() > 0) {
+                // Should be at most, 1
+                c.moveToFirst();
+    
+                // delete the file we just downloaded, because it's a duplicate
+                f.delete();
+    
+                // set the file returned to the file we already had
+                f = new File(c.getString(c.getColumnIndex(FormsColumns.FORM_FILE_PATH)));
+            }
         } finally {
-        	if ( c != null ) {
-        		c.close();
-        	}
+            if ( c != null ) {
+                c.close();
+            }
         }
 
         return f;

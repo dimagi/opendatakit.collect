@@ -45,7 +45,7 @@ public class DecimalWidget extends StringWidget {
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
         if(!secret) {
-        	mAnswer.setSingleLine(false);
+            mAnswer.setSingleLine(false);
         }
 
         // only numbers are allowed
@@ -86,9 +86,9 @@ public class DecimalWidget extends StringWidget {
      */
     @Override
     protected void setTextInputType(EditText mAnswer) {
-    	if(secret) {
-        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(secret) {
+            mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 

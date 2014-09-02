@@ -78,7 +78,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
     
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory) {
-    	this(context, questionPrompts, groups, factory, null, false);
+        this(context, questionPrompts, groups, factory, null, false);
     }
 
 
@@ -86,12 +86,12 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         super(context);
         
         if(wcl !=null){
-        	hasListener = true;
-        	wcListener = wcl;
+            hasListener = true;
+            wcListener = wcl;
         }
         
         SharedPreferences settings = 
-        	 PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+             PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
         String question_font =
                 settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
@@ -137,18 +137,18 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         //Figure out if we share hint text between questions
         String hintText = null;
         if(questionPrompts.length > 1) {
-        	hintText = questionPrompts[0].getHelpText();
-	        for (FormEntryPrompt p : questionPrompts) {
-	        	//If something doesn't have hint text at all,
-	        	//bail
-	        	String curHintText = p.getHelpText();
-        		//Otherwise see if it matches
-        		if(curHintText == null || !curHintText.equals(hintText)) {
-        			//If not, we can't do this trick
-        			hintText = null;
-        			break;
-        		}
-	        }
+            hintText = questionPrompts[0].getHelpText();
+            for (FormEntryPrompt p : questionPrompts) {
+                //If something doesn't have hint text at all,
+                //bail
+                String curHintText = p.getHelpText();
+                //Otherwise see if it matches
+                if(curHintText == null || !curHintText.equals(hintText)) {
+                    //If not, we can't do this trick
+                    hintText = null;
+                    break;
+                }
+            }
         }
 
         // display which group you are in as well as the question
@@ -159,7 +159,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         boolean first = true;
         
         for (FormEntryPrompt p : questionPrompts) {
-        	
+            
             if (!first) {
                 View divider = new View(getContext());
                 divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
@@ -178,7 +178,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             
             //Suppress the hint text if we bubbled it
             if(hintText != null) {
-            	qw.hideHintText();
+                qw.hideHintText();
             }
 
             widgets.add(qw);
@@ -191,22 +191,22 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
     
     public void removeQuestionFromIndex(int i){
-    	mView.removeView((View) widgets.get(i));
-    	int dividerIndex = Math.max(i - 1, 0);
-    	mView.removeView(dividers.get(dividerIndex));
-    	widgets.remove(i);
-    	dividers.remove(dividerIndex);
+        mView.removeView((View) widgets.get(i));
+        int dividerIndex = Math.max(i - 1, 0);
+        mView.removeView(dividers.get(dividerIndex));
+        widgets.remove(i);
+        dividers.remove(dividerIndex);
     }
     
     public void removeQuestionsFromIndex(ArrayList<Integer> indexes){
-    	//Always gotta move backwards when removing, ensure that this list
-    	//goes backwards
-    	Collections.sort(indexes);
-    	Collections.reverse(indexes);
-    	
-    	for(int i=0; i< indexes.size(); i++){
-    		removeQuestionFromIndex(indexes.get(i).intValue());
-    	}
+        //Always gotta move backwards when removing, ensure that this list
+        //goes backwards
+        Collections.sort(indexes);
+        Collections.reverse(indexes);
+        
+        for(int i=0; i< indexes.size(); i++){
+            removeQuestionFromIndex(indexes.get(i).intValue());
+        }
     }
     
     public void addQuestionToIndex(QuestionWidget newQuestionWidget, int i){
@@ -228,12 +228,12 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         
         //Suppress the hint text if we bubbled it
 //        if(hintText != null) { //TODO figure this out
-//        	qw.hideHintText();
+//            qw.hideHintText();
 //        }
 
         widgets.add(i, qw);
         mView.addView((View) qw, getViewIndex(2 * i + mViewBannerCount), mLayout);
-    	
+        
         newQuestionWidget.setChangedListener(this);
     }
 
@@ -258,38 +258,38 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
     
     /* (non-Javadoc)
-	 * @see android.widget.LinearLayout#onMeasure(int, int)
-	 */
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int newHeight = MeasureSpec.getSize(heightMeasureSpec);
-		int newWidth = MeasureSpec.getSize(widthMeasureSpec);
-		int oldHeight = this.getMeasuredHeight();
-		
-		if(oldHeight == 0 || Math.abs(((newHeight * 1.0 - oldHeight) / oldHeight)) > .2) {
-			for(QuestionWidget qw : this.widgets) { 
-				qw.updateFrameSize(newWidth, newHeight);
-			}
-		}
-		
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-				
-//		double change = ((this.getMeasuredHeight() * 1.0 - gmh) / this.getMeasuredHeight()); 
-//		System.out.println("Old: " + gmh + ". New: "+ this.getMeasuredHeight() + ". CurrentHeight: " + height);
-//		
-//		if(gmh == -1 || gmh == 0 || change > .2) {
-//			//If the view size change has changed by more than 20% 
-//			if(mHelpText != null) {
-//				mHelpText.updateMaxHeight((this.getMeasuredHeight() - this.getScrollY())/ 3);
-//			}
-//		}
-	}
-	
-	private void updateConstraintRelevancies(){
-		if(hasListener){
-			wcListener.widgetEntryChanged();
-		}
-	}
+     * @see android.widget.LinearLayout#onMeasure(int, int)
+     */
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int newHeight = MeasureSpec.getSize(heightMeasureSpec);
+        int newWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int oldHeight = this.getMeasuredHeight();
+        
+        if(oldHeight == 0 || Math.abs(((newHeight * 1.0 - oldHeight) / oldHeight)) > .2) {
+            for(QuestionWidget qw : this.widgets) { 
+                qw.updateFrameSize(newWidth, newHeight);
+            }
+        }
+        
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+                
+//        double change = ((this.getMeasuredHeight() * 1.0 - gmh) / this.getMeasuredHeight()); 
+//        System.out.println("Old: " + gmh + ". New: "+ this.getMeasuredHeight() + ". CurrentHeight: " + height);
+//        
+//        if(gmh == -1 || gmh == 0 || change > .2) {
+//            //If the view size change has changed by more than 20% 
+//            if(mHelpText != null) {
+//                mHelpText.updateMaxHeight((this.getMeasuredHeight() - this.getScrollY())/ 3);
+//            }
+//        }
+    }
+    
+    private void updateConstraintRelevancies(){
+        if(hasListener){
+            wcListener.widgetEntryChanged();
+        }
+    }
 
     /**
      * Update progress bar
@@ -366,7 +366,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * @param answer
      */
     public void setBinaryData(Object answer) {
-    	
+        
         boolean set = false;
         for (QuestionWidget q : widgets) {
             if (q instanceof IBinaryWidget) {
@@ -379,8 +379,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         }
 
         if (!set) {
-        	Log.w(t, "Attempting to return data to a widget or set of widgets not looking for data");
-        	         
+            Log.w(t, "Attempting to return data to a widget or set of widgets not looking for data");
+                     
             for (QuestionWidget q : widgets) {
                 if (q instanceof IBinaryWidget) {
                     ((IBinaryWidget) q).setBinaryData(answer);
@@ -453,40 +453,40 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * (non-Javadoc)
      * @see org.odk.collect.android.listeners.WidgetChangedListener#widgetEntryChanged()
      */
-	@Override
-	public void widgetEntryChanged() {
-		updateConstraintRelevancies();
-		
-	}
-	
-	/**
-	 * Remove question, based on position. 
-	 * @param questionIndex Index in question list.
-	 */
-	public void removeWidget(int questionIndex){
-		mView.removeViewAt(getViewIndex(questionIndex));
-	}
-	
-	/**
-	 * Remove question, based on view object.
-	 * @param v View to remove
-	 */
-	public void removeWidget(View v){
-		mView.removeView(v);
-	}
+    @Override
+    public void widgetEntryChanged() {
+        updateConstraintRelevancies();
+        
+    }
+    
+    /**
+     * Remove question, based on position. 
+     * @param questionIndex Index in question list.
+     */
+    public void removeWidget(int questionIndex){
+        mView.removeViewAt(getViewIndex(questionIndex));
+    }
+    
+    /**
+     * Remove question, based on view object.
+     * @param v View to remove
+     */
+    public void removeWidget(View v){
+        mView.removeView(v);
+    }
 
-	/**
-	 * Translate question index to view index.
-	 * @param questionIndex Index in the list of questions.
-	 * @return Index of question's view in mView.
-	 */
-	private int getViewIndex(int questionIndex) {
-		// Account for progress bar
-	    if (PreferenceManager.getDefaultSharedPreferences(mContext)
-	            .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)) {
-	        return questionIndex + 1;
-	    }
-	    return questionIndex;
-	}
+    /**
+     * Translate question index to view index.
+     * @param questionIndex Index in the list of questions.
+     * @return Index of question's view in mView.
+     */
+    private int getViewIndex(int questionIndex) {
+        // Account for progress bar
+        if (PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)) {
+            return questionIndex + 1;
+        }
+        return questionIndex;
+    }
     
 }

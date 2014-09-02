@@ -44,12 +44,12 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     private int acceptableThreshold = 1600;
     private int millisToWait = 60000; //allow to accept location after 60 seconds
 
-	private ODKTimer mTimer;
+    private ODKTimer mTimer;
 
-	/*
-	 * (non-Javadoc)
-	 * @see android.app.Activity#onCreate(android.os.Bundle)
-	 */
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,16 +63,16 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         setupLocationDialog();
         long mLong = -1;
         if(savedInstanceState != null){
-        	mLong = savedInstanceState.getLong("millisRemaining",-1);
+            mLong = savedInstanceState.getLong("millisRemaining",-1);
         }
-		if(mLong > 0){
-			mTimer = new ODKTimer(mLong, this);
-		}else{
-			mTimer = new ODKTimer(millisToWait, this);
-		}
-		mTimer.start();
+        if(mLong > 0){
+            mTimer = new ODKTimer(mLong, this);
+        }else{
+            mTimer = new ODKTimer(millisToWait, this);
+        }
+        mTimer.start();
 
-	}
+    }
 
     /*
      * (non-Javadoc)
@@ -102,10 +102,10 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         mProviders = GeoUtils.evaluateProviders(mLocationManager);
         if (mProviders.isEmpty()) {
             DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
-            	/*
-            	 * (non-Javadoc)
-            	 * @see android.content.DialogInterface.OnCancelListener#onCancel(android.content.DialogInterface)
-            	 */
+                /*
+                 * (non-Javadoc)
+                 * @see android.content.DialogInterface.OnCancelListener#onCancel(android.content.DialogInterface)
+                 */
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     mLocation = null;
@@ -145,10 +145,10 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         // dialog displayed while fetching gps location
         
         OnClickListener cancelButtonListener = new OnClickListener() {
-        	/*
-        	 * (non-Javadoc)
-        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
-        	 */
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
             @Override
             public void onClick(View v){
                 mLocation = null;
@@ -259,19 +259,18 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
      * (non-Javadoc)
      * @see org.odk.collect.android.listeners.TimerListener#notifyTimerFinished()
      */
-	@Override
-	public void notifyTimerFinished() {
-		mLocationDialog.setLocationFound(true);
-	}
+    @Override
+    public void notifyTimerFinished() {
+        mLocationDialog.setLocationFound(true);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
-	 */
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putLong("millisRemaining",mTimer.getMillisUntilFinished());
-		super.onSaveInstanceState(savedInstanceState);  
-	}
-
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putLong("millisRemaining",mTimer.getMillisUntilFinished());
+        super.onSaveInstanceState(savedInstanceState);  
+    }
 }

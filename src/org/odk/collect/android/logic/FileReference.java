@@ -107,10 +107,10 @@ public class FileReference implements Reference {
      * (non-Javadoc)
      * @see org.javarosa.core.reference.Reference#probeAlternativeReferences()
      */
-	@Override
-	public Reference[] probeAlternativeReferences() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Reference[] probeAlternativeReferences() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

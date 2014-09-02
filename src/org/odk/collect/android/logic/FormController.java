@@ -75,7 +75,7 @@ public class FormController {
      */
     public static final class InstanceMetadata {
         public final String instanceId;
-    	
+        
         InstanceMetadata( String instanceId ) {
             this.instanceId = instanceId;
         }
@@ -125,7 +125,7 @@ public class FormController {
      * @return true if this form session is in read only mode
      */
     public boolean isFormReadOnly() {
-    	return mReadOnly;
+        return mReadOnly;
     }
 
 
@@ -336,8 +336,8 @@ public class FormController {
         } else {
             int event =  mFormEntryController.stepToNextEvent();
             if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
-            		this.mReadOnly) {
-            	return stepToNextEvent(stepOverGroup);
+                    this.mReadOnly) {
+                return stepToNextEvent(stepOverGroup);
             }
             return event;
         }
@@ -385,8 +385,8 @@ public class FormController {
         int event = mFormEntryController.stepToPreviousEvent();
         
         if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
-        		this.mReadOnly) {
-        	return stepToPreviousEvent();
+                this.mReadOnly) {
+            return stepToPreviousEvent();
         }
 
 
@@ -467,14 +467,14 @@ public class FormController {
      */
     public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
 
-    	//List of indices referred to by the current question
+        //List of indices referred to by the current question
         ArrayList<FormIndex> indicies = new ArrayList<FormIndex>();
         FormIndex currentIndex = mFormEntryController.getModel().getFormIndex();
 
         //If we're in a group, we will collect of the questions in this group
         if (mFormEntryController.getModel().getForm().getChild(currentIndex) instanceof GroupDef) {
-        	
-        	//Get the group at this index
+            
+            //Get the group at this index
             GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(currentIndex);
             
             // descend into group (get the index of the first child element in the group)
@@ -487,7 +487,7 @@ public class FormController {
             //assumption that the list of children and the indicdes should be the same length)
             //this might cause problems if those two things get out of sync for any reason.
             for (int i = 0; i < gd.getChildren().size(); i++) {
-            	//Add index of current child (starting at the first)
+                //Add index of current child (starting at the first)
                 indicies.add(idxChild);
                 
                 // Get the next index (but don't descend)
@@ -513,7 +513,7 @@ public class FormController {
 
                 // Otherwise check whether the index refers to a currently relevant node
                 if (mFormEntryController.getModel().isIndexRelevant(index)) {
-                	//And if so, add it to the list of questions that we'll return
+                    //And if so, add it to the list of questions that we'll return
                     questionList.add(mFormEntryController.getModel().getQuestionPrompt(index));
                 }
             }
@@ -757,18 +757,18 @@ public class FormController {
             // instance id...
             v = e.getChildrenWithName(INSTANCE_ID);
             if ( v.size() == 1 ) {
-            	instanceId = v.get(0).getValue().uncast().toString();
+                instanceId = v.get(0).getValue().uncast().toString();
             }
         }
-    	
+        
         return new InstanceMetadata(instanceId);
     }
 
 
     //CTS: Added this to protect the JR internal classes, although it's not awesome that
     //this ended up in the "logic" division. 
-	public WidgetFactory getWidgetFactory() {
-		return new WidgetFactory(mFormEntryController.getModel().getForm());
-	}
+    public WidgetFactory getWidgetFactory() {
+        return new WidgetFactory(mFormEntryController.getModel().getForm());
+    }
 
 }

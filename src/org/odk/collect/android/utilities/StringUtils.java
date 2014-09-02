@@ -16,15 +16,15 @@ public class StringUtils {
 
     
     public static String getStringRobust(Context c, int resId) {
-    	return getStringRobust(c, resId, "");
+        return getStringRobust(c, resId, "");
     }
 
     public static String getStringRobust(Context c, int resId, String args) {
-    	String resourceName = c.getResources().getResourceEntryName(resId);
-    	try {
-    		return Localization.get("odk_" + resourceName, new String[] {args});
-    	} catch(NoLocalizedTextException e) {
-    		return c.getString(resId, args);
-    	}
+        String resourceName = c.getResources().getResourceEntryName(resId);
+        try {
+            return Localization.get("odk_" + resourceName, new String[] {args});
+        } catch(NoLocalizedTextException e) {
+            return c.getString(resId, args);
+        }
     }
 }
