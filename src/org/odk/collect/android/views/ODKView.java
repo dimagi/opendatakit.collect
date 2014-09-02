@@ -45,6 +45,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     private final static String t = "CLASSNAME";
     private final static int TEXTSIZE = 21;
+    
+    private Context mContext;
 
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
@@ -95,6 +97,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
                 settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
 
         mQuestionFontsize = new Integer(question_font).intValue();
+        
+        mContext = context;
 
         widgets = new ArrayList<QuestionWidget>();
         dividers = new ArrayList<View>();
@@ -462,7 +466,11 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 	 */
 	private int getViewIndex(int questionIndex) {
 		// Account for progress bar
-		return questionIndex + 1;
+	    if (!PreferenceManager.getDefaultSharedPreferences(mContext)
+	            .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)) {
+	        return questionIndex + 1;
+	    }
+	    return questionIndex;
 	}
     
 }
