@@ -91,6 +91,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ContextThemeWrapper;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
@@ -103,6 +104,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -763,18 +765,24 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     		}
     	}
     }
+	
+	private class NavigationDetails {
+		public int totalQuestions = 0;
+		public int completedQuestions = 0;
+        public boolean relevantBeforeCurrentScreen = false;
+        public boolean isFirstScreen = false;
+        
+        public int answeredOnScreen = 0;
+        public int requiredOnScreen = 0;
+        
+        public int relevantAfterCurrentScreen = 0;
+        public FormIndex currentScreenExit = null;
 
-    /**
-     * Update progress bar's max and value, and the various buttons and navigation cues
-     * associated with navigation
-     * 
-     * @param odkv ODKView to update
-     */
-    public void updateNavigationCues() {
-    	ProgressBar progressBar = (ProgressBar)this.findViewById(R.id.nav_prog_bar);
-    	
-        int totalQuestions = 0;
-        int completedQuestions = 0;
+		
+	}
+	
+	private NavigationDetails calculateNavigationStatus() {
+		NavigationDetails details = new NavigationDetails();
 
         // Step through form and count questions
         FormIndex currentFormIndex = mFormController.getFormIndex();
@@ -785,16 +793,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         }
         
         //keep track of whether there is a question that exists before the current screen
-        boolean relevantBeforeCurrentScreen = false;
-        boolean isFirstScreen = false;
-        
-        int answeredOnScreen = 0;
-        int requiredOnScreen = 0;
-        
-        int relevantAfterCurrentScreen = 0;
-        
         boolean onCurrentScreen = false;
-        FormIndex currentScreenExit = null;
         
         //TODO: We can probably evaluate this with a FormIndex walk that _doesn't_
         //affect this form's index.
@@ -806,10 +805,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             if (comparison == 0) {
                 onCurrentScreen = true;
                 mFormController.stepToNextEvent(true);
-                currentScreenExit = mFormController.getFormIndex();
+                details.currentScreenExit = mFormController.getFormIndex();
                 mFormController.stepToPreviousEvent();
             }
-            if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
+            if (onCurrentScreen && mFormController.getFormIndex().equals(details.currentScreenExit)) {
                 onCurrentScreen = false;
             }
             
@@ -818,25 +817,25 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 
             	
             	//Figure out whether we're on the last screen
-            	if(!relevantBeforeCurrentScreen && !isFirstScreen) {
+            	if(!details.relevantBeforeCurrentScreen && !details.isFirstScreen) {
             		
             		//We got to the current screen without finding a relevant question, 
             		//I guess we're on the first one.
-            		if(onCurrentScreen && !relevantBeforeCurrentScreen) {
-            			isFirstScreen = true;
+            		if(onCurrentScreen && !details.relevantBeforeCurrentScreen) {
+            			details.isFirstScreen = true;
             		} else {
             			//We're using the built in steps (and they take relevancy into account)
             			//so if there are prompts they have to be relevant
-            			relevantBeforeCurrentScreen = true;
+            			details.relevantBeforeCurrentScreen = true;
             		}
             	}
             	
-            	if(!onCurrentScreen && currentScreenExit != null) {
-            		relevantAfterCurrentScreen += prompts.length;
+            	if(!onCurrentScreen && details.currentScreenExit != null) {
+            		details.relevantAfterCurrentScreen += prompts.length;
             	}
             	
                 
-                totalQuestions += prompts.length;
+            	details.totalQuestions += prompts.length;
                 // Current questions are complete only if they're answered.
                 // Past questions are always complete.
                 // Future questions are never complete.
@@ -845,21 +844,21 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     	boolean isAnswered = prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL;
                     	
                     	if(prompt.isRequired()) {
-                    		requiredOnScreen++;
+                    		details.requiredOnScreen++;
                         	
                         	if(isAnswered) {
-                        		answeredOnScreen++;
+                        		details.answeredOnScreen++;
                         	}
                     	}
                     	
                       if (isAnswered) {
-                          completedQuestions++;
+                    	  details.completedQuestions++;
                       }
                   }
                 }
                 else if (comparison < 0) {
                     // For previous questions, consider all "complete"
-                    completedQuestions += prompts.length;
+                	details.completedQuestions += prompts.length;
                     //TODO: This doesn't properly capture state to determine whether we will end up out of the form if we hit back!
                     //Need to test _until_ we get a question that is relevant, then we can skip the relevancy tests
                 }
@@ -869,9 +868,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             	//If we've already passed the current screen, this repeat
             	//junction is coming up in the future and we will need to know
             	//about it
-            	if(currentScreenExit != null) {
-            		totalQuestions++;
-            		relevantAfterCurrentScreen++;
+            	if(details.currentScreenExit != null) {
+            		details.totalQuestions++;
+            		details.relevantAfterCurrentScreen++;
 
             	} else {
             		//Otherwise we already passed it and it no longer affects the count
@@ -884,13 +883,29 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             event = mFormController.stepToNextEvent(false);
         }
         
-        ImageButton nextButton = (ImageButton)this.findViewById(R.id.nav_btn_next);
-        ImageButton prevButton = (ImageButton)this.findViewById(R.id.nav_btn_prev);
-
-        // Set form back to correct state & actually update bar
+        // Set form back to correct state
         mFormController.jumpToIndex(currentFormIndex);
         
-        if(!relevantBeforeCurrentScreen) {
+        return details;
+	}
+	
+	
+
+    /**
+     * Update progress bar's max and value, and the various buttons and navigation cues
+     * associated with navigation
+     * 
+     * @param odkv ODKView to update
+     */
+    public void updateNavigationCues() {
+    	ProgressBar progressBar = (ProgressBar)this.findViewById(R.id.nav_prog_bar);
+    	
+    	NavigationDetails details = calculateNavigationStatus();
+    	
+        ImageButton nextButton = (ImageButton)this.findViewById(R.id.nav_btn_next);
+        ImageButton prevButton = (ImageButton)this.findViewById(R.id.nav_btn_prev);
+        
+        if(!details.relevantBeforeCurrentScreen) {
         	prevButton.setImageResource(R.drawable.icon_exit);
         	prevButton.setTag("quit");
         } else {
@@ -903,7 +918,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         //is to invalidate the view, though.
         Rect bounds = progressBar.getProgressDrawable().getBounds(); //Save the drawable bound
 
-        if(relevantAfterCurrentScreen == 0 && (requiredOnScreen == answeredOnScreen || requiredOnScreen < 1)) {
+        if(details.relevantAfterCurrentScreen == 0 && (details.requiredOnScreen == details.answeredOnScreen || details.requiredOnScreen < 1)) {
         	nextButton.setImageResource(R.drawable.icon_done);
         	
         	//TODO: _really_? This doesn't seem right
@@ -921,12 +936,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         progressBar.getProgressDrawable().setBounds(bounds);  //Set the bounds to the saved value
         
-        progressBar.setMax(totalQuestions);
-        progressBar.setProgress(completedQuestions);
+        progressBar.setMax(details.totalQuestions);
+        progressBar.setProgress(details.completedQuestions);
         
         
         //We should probably be doing this based on the widgets, maybe, not the model? Hard to call.
-        updateBadgeInfo(requiredOnScreen, answeredOnScreen);
+        updateBadgeInfo(details.requiredOnScreen, details.answeredOnScreen);
     }
     
     private void updateBadgeInfo(int requiredOnScreen, int answeredOnScreen) {
@@ -1634,43 +1649,108 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * current group.
      */
     private void createRepeatDialog() {
-        mAlertDialog = new AlertDialog.Builder(this).create();
+    	ContextThemeWrapper wrapper = new ContextThemeWrapper(this, R.style.DialogBaseTheme);
+		AlertDialog.Builder builder = new AlertDialog.Builder(wrapper);
+		
+		View view = LayoutInflater.from(wrapper).inflate(R.layout.component_repeat_new_dialog, null);
+
+
+        mAlertDialog = new AlertDialog.Builder(wrapper).create();
+        
+        mAlertDialog.setView(view);
+        
         mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
-        DialogInterface.OnClickListener repeatListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                switch (i) {
-                    case DialogInterface.BUTTON1: // yes, repeat
-                        try {
-                            mFormController.newRepeat();
-                        } catch (XPathTypeMismatchException e) {
-                            FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
-                            return;
-                        }
-                        showNextView();
-                        break;
-                    case DialogInterface.BUTTON2: // no, no repeat
-                        showNextView();
-                        break;
+        
+        NavigationDetails details = calculateNavigationStatus();
+        
+        final boolean noExitsForm = details.relevantAfterCurrentScreen == 0;
+        
+        
+        Button back = (Button)view.findViewById(R.id.component_repeat_back);
+        
+        back.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+            	FormEntryActivity.this.showPreviousView();
+			}
+        	
+        });
+        
+        Button newButton = (Button)view.findViewById(R.id.component_repeat_new);
+
+        newButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+                try {
+                    mFormController.newRepeat();
+                } catch (XPathTypeMismatchException e) {
+                    FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
+                    return;
                 }
-            }
-        };
+                showNextView();				
+			}
+        });
+        
+        Button skip = (Button)view.findViewById(R.id.component_repeat_skip);
+        
+        skip.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+            	if(!noExitsForm) {
+            		showNextView();
+            	} else {
+            		FormEntryActivity.this.triggerUserFormComplete();
+            	}
+			}
+        	
+        });
+        
+        
+        
+        
+        back.setText(StringUtils.getStringRobust(this, R.string.repeat_go_back));
+        
+        //Load up our icons
+        Drawable backIcon = getResources().getDrawable(R.drawable.icon_back);
+        backIcon.setBounds((int) (backIcon.getIntrinsicWidth() * 0.5), 0, (int) (backIcon.getIntrinsicWidth() * 1.5), backIcon.getIntrinsicHeight());
+
+        Drawable doneIcon = getResources().getDrawable(R.drawable.icon_done);
+        doneIcon.setBounds((int) (doneIcon.getIntrinsicWidth() * 1.5), 0, (int) (doneIcon.getIntrinsicWidth() * 0.5), doneIcon.getIntrinsicHeight());
+        
+        
         if (mFormController.getLastRepeatCount() > 0) {
             mAlertDialog.setTitle(StringUtils.getStringRobust(this, R.string.leaving_repeat_ask));
             mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_another_repeat,
                 mFormController.getLastGroupText()));
-            mAlertDialog.setButton(StringUtils.getStringRobust(this, R.string.add_another), repeatListener);
-            mAlertDialog.setButton2(StringUtils.getStringRobust(this, R.string.leave_repeat_yes), repeatListener);
+            newButton.setText(StringUtils.getStringRobust(this, R.string.add_another));
+            if(!noExitsForm) {
+            	skip.setText(StringUtils.getStringRobust(this, R.string.leave_repeat_yes));
+            } else {
+            	skip.setText(StringUtils.getStringRobust(this, R.string.leave_repeat_yes_exits));
+            }
 
         } else {
             mAlertDialog.setTitle(StringUtils.getStringRobust(this, R.string.entering_repeat_ask));
             mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_repeat,
                 mFormController.getLastGroupText()));
-            mAlertDialog.setButton(StringUtils.getStringRobust(this, R.string.entering_repeat), repeatListener);
-            mAlertDialog.setButton2(StringUtils.getStringRobust(this, R.string.add_repeat_no), repeatListener);
+            newButton.setText(StringUtils.getStringRobust(this, R.string.entering_repeat));
+            if(!noExitsForm) {
+            	skip.setText(StringUtils.getStringRobust(this, R.string.add_repeat_no));
+            } else {
+            	skip.setText(StringUtils.getStringRobust(this, R.string.add_repeat_no_exits));
+            	
+            }
         }
+        
         mAlertDialog.setCancelable(false);
         mAlertDialog.show();
+
+        if(noExitsForm) {
+        	skip.setCompoundDrawables(null, null, doneIcon, null);
+        }
         mBeenSwiped = false;
     }
 

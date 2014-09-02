@@ -18,6 +18,7 @@
 <string name="add_another_repeat">Add another \"%s\" group?</string>
 <string name="add_repeat">Add a new \"%s\" group?</string>
 <string name="add_repeat_no">Do Not Add</string>
+<string name="add_repeat_no_exits">Do Not Add, I\'m Finished</string>
 <string name="advance">forward to\nnext\nprompt</string>
 <string name="altitude">Altitude</string>
 <string name="app_name">ODK Collect</string>
@@ -97,6 +98,8 @@
 <string name="jump_to_previous">Go Up</string>
 <string name="latitude">Latitude</string>
 <string name="leave_repeat_yes">Do Not Add</string>
+<string name="leave_repeat_yes_exits">Do Not Add. I\'m Finished.</string>
+<string name="repeat_go_back">Go Back</string>
 <string name="leaving_repeat">Add Group</string>
 <string name="leaving_repeat_ask">And One More Group?</string>
 <string name="list_failed_with_error">Form listing failed. %s.</string>

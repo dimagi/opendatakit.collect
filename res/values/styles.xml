@@ -26,5 +26,7 @@ the License.
              badge_circum_outer + badge_offset  + border_depth
         -->
        <dimen name="badge_overlap">7dp</dimen>
-       <dimen name="badge_offset_side">10dp</dimen>    
+       <dimen name="badge_offset_side">10dp</dimen>
+       
+       <style name="DialogBaseTheme" parent="android:Theme.Dialog"/>
 </resources>
