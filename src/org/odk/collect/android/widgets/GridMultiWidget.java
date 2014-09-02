@@ -206,6 +206,10 @@ public class GridMultiWidget extends QuestionWidget {
         addView(gridview);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         Vector<Selection> vc = new Vector<Selection>();
@@ -224,6 +228,10 @@ public class GridMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         for (int i = 0; i < mItems.size(); ++i) {
@@ -234,6 +242,10 @@ public class GridMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -342,12 +354,20 @@ public class GridMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         gridview.setOnLongClickListener(l);
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

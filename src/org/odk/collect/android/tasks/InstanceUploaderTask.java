@@ -480,8 +480,13 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
         return true;
     }
 
-    // TODO: This method is like 350 lines long, down from 400.
-    // still. ridiculous. make it smaller.
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+     * 
+     * TODO: This method is like 350 lines long, down from 400.
+     * still. ridiculous. make it smaller.
+     */
     @Override
     protected HashMap<String, String> doInBackground(Long... values) {
         mResults = new HashMap<String, String>();
@@ -543,6 +548,10 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+     */
     @Override
     protected void onPostExecute(HashMap<String, String> value) {
         synchronized (this) {
@@ -557,6 +566,10 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onProgressUpdate(java.lang.Object[])
+     */
     @Override
     protected void onProgressUpdate(Integer... values) {
         synchronized (this) {

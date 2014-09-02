@@ -126,6 +126,9 @@ public class EnhancedDigestScheme extends RFC2617Scheme {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * @see org.apache.http.impl.auth.AuthSchemeBase#processChallenge(org.apache.http.Header)
+	 * 
 	 * Processes the Digest challenge.
 	 * 
 	 * @param header

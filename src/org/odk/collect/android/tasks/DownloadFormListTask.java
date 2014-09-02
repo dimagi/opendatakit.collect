@@ -59,6 +59,10 @@ public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+     */
     @Override
     protected HashMap<String, FormDetails> doInBackground(Void... values) {
         SharedPreferences settings =
@@ -277,6 +281,10 @@ public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+     */
     @Override
     protected void onPostExecute(HashMap<String, FormDetails> value) {
         synchronized (this) {

@@ -85,6 +85,10 @@ public class IntegerWidget extends StringWidget {
     }
     
     
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#guessMaxStringLength(org.javarosa.form.api.FormEntryPrompt)
+     */
     @Override
     protected int guessMaxStringLength(FormEntryPrompt prompt) throws UnpivotableExpressionException{
     	int existingGuess = Integer.MAX_VALUE;
@@ -128,6 +132,10 @@ public class IntegerWidget extends StringWidget {
         }
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#setTextInputType(android.widget.EditText)
+     */
     @Override
     protected void setTextInputType(EditText mAnswer) {
     	if(secret) {
@@ -137,6 +145,10 @@ public class IntegerWidget extends StringWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mAnswer.getText().toString().trim();

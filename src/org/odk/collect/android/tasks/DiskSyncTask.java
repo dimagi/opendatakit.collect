@@ -43,6 +43,10 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
     DiskSyncListener mListener;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+     */
     @Override
     protected String doInBackground(Void... params) {
 
@@ -231,6 +235,10 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+     */
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);

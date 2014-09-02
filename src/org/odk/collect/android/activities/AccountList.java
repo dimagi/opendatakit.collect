@@ -14,6 +14,7 @@
 
 package org.odk.collect.android.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.accounts.*;
 import android.content.Context;
@@ -40,8 +41,9 @@ public class AccountList extends ListActivity {
     protected AccountManager accountManager;
 
 
-    /**
-     * Called to initialize the activity the first time it is run.
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,15 +52,21 @@ public class AccountList extends ListActivity {
     }
 
 
-    /**
-     * Called when the activity is resumed.
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
      */
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     public void onResume() {
         super.onResume();
         accountManager = AccountManager.get(getApplicationContext());
         final Account[] accounts = accountManager.getAccountsByType("com.google");
         this.setListAdapter(new ArrayAdapter<Account>(this, R.layout.account_chooser, accounts) {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
+        	 */
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View row;
@@ -87,10 +95,14 @@ public class AccountList extends ListActivity {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     * 
      * When the user clicks an item, authenticate against that account.
      */
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Account account = (Account) getListView().getItemAtPosition(position);
         SharedPreferences settings =

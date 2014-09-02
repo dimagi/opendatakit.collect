@@ -57,18 +57,31 @@ public class ResizingImageView extends ImageView {
 		this.bigImageURI = bigImageURI;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see android.view.View#onTouchEvent(android.view.MotionEvent)
+	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
 		scaleGestureDetector.onTouchEvent(e);
 		return gestureDetector.onTouchEvent(e);
 	}
 
+	
+	/*
+	 * (non-Javadoc)
+	 * @see android.widget.ImageView#setMaxWidth(int)
+	 */
 	@Override
 	public void setMaxWidth(int maxWidth) {
 		super.setMaxWidth(maxWidth);
 		mMaxWidth = maxWidth;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see android.widget.ImageView#setMaxHeight(int)
+	 */
 	@Override
 	public void setMaxHeight(int maxHeight) {
 		super.setMaxHeight(maxHeight);
@@ -76,7 +89,6 @@ public class ResizingImageView extends ImageView {
 	}
 
 	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
 		@Override
 		public boolean onDown(MotionEvent e) {
 			return true;
@@ -102,6 +114,29 @@ public class ResizingImageView extends ImageView {
 			}
 			return true;
 		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
+		 */
+	    @Override
+	    public boolean onDown(MotionEvent e) {
+	        return true;
+	    }
+	    /*
+	     * (non-Javadoc)
+	     * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
+	     * event when double tap occurs
+	     */
+	    @Override
+	    public boolean onDoubleTap(MotionEvent e) {
+	        float x = e.getX();
+	        float y = e.getY();
+	        
+		    onDoubleClick();
+
+	        return true;
+	    }
 	}
 
 	public void setFullScreen(){
@@ -135,6 +170,9 @@ public class ResizingImageView extends ImageView {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * @see android.widget.ImageView#onMeasure(int, int)
+	 * 
 	 * The meat and potatoes of the class. Determines what algorithm to use
 	 * to resize the image based on the KEY_RESIZE preference. Currently can be
 	 * "full", "width", or "none". Will always preserve aspect ratio. 
@@ -145,7 +183,10 @@ public class ResizingImageView extends ImageView {
 	 * 		maintaining the aspect ratio
 	 * "none" will leave the picture unchanged
 	 */
+<<<<<<< HEAD
 
+=======
+>>>>>>> document-overrides
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);

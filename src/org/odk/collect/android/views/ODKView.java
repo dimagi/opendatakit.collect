@@ -414,6 +414,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View#setOnFocusChangeListener(android.view.View.OnFocusChangeListener)
+     */
     @Override
     public void setOnFocusChangeListener(OnFocusChangeListener l) {
         for (int i = 0; i < widgets.size(); i++) {
@@ -423,12 +427,20 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View.OnLongClickListener#onLongClick(android.view.View)
+     */
     @Override
     public boolean onLongClick(View v) {
         return false;
     }
     
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();
@@ -437,6 +449,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.WidgetChangedListener#widgetEntryChanged()
+     */
 	@Override
 	public void widgetEntryChanged() {
 		updateConstraintRelevancies();

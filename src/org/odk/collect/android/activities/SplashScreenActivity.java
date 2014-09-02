@@ -37,6 +37,10 @@ public class SplashScreenActivity extends Activity {
     private static final boolean EXIT = true;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,6 +169,10 @@ public class SplashScreenActivity extends Activity {
             int count = 0;
 
 
+            /*
+             * (non-Javadoc)
+             * @see java.lang.Thread#run()
+             */
             @Override
             public void run() {
                 try {
@@ -189,6 +197,10 @@ public class SplashScreenActivity extends Activity {
         mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
         mAlertDialog.setMessage(errorMsg);
         DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {

@@ -15,15 +15,14 @@
 package org.odk.collect.android.activities;
 
 import java.io.IOException;
-
 import org.odk.collect.android.preferences.PreferencesActivity;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,14 +36,16 @@ import android.preference.PreferenceManager;
  * 
  * @author cswenson@google.com (Christopher Swenson)
  */
+@SuppressLint("NewApi")
 public class AccountInfo extends Activity {
     final static int WAITING_ID = 1;
     final static String authString = "gather";
     boolean shownDialog = false;
 
 
-    /**
-     * Activity startup.
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +53,14 @@ public class AccountInfo extends Activity {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     * 
      * When we resume, try to get an auth token.
      */
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     protected void onResume() {
         super.onResume();
         Intent intent = getIntent();
@@ -71,7 +76,12 @@ public class AccountInfo extends Activity {
      * @author cswenson@google.com (Christopher Swenson)
      */
     private class AuthTokenCallback implements AccountManagerCallback<Bundle> {
-        @Override
+    	/*
+    	 * (non-Javadoc)
+    	 * @see android.accounts.AccountManagerCallback#run(android.accounts.AccountManagerFuture)
+    	 */
+        @SuppressLint("NewApi")
+		@Override
         public void run(AccountManagerFuture<Bundle> result) {
             Bundle bundle;
             try {
@@ -134,7 +144,10 @@ public class AccountInfo extends Activity {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int)
+     * 
      * Let the user know we are waiting on the server to authenticate.
      */
     @Override

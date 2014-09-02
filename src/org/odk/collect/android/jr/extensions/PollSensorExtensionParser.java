@@ -17,6 +17,9 @@ import android.content.Context;
 
 public class PollSensorExtensionParser implements IElementHandler {
 	/**
+	 * (non-Javadoc)
+	 * @see org.javarosa.xform.parse.IElementHandler#handle(org.javarosa.xform.parse.XFormParser, org.kxml2.kdom.Element, java.lang.Object)
+	 * 
 	 * Handle pollsensor node, creating a new PollSensor action with the node that sensor data will be written to.
 	 * @param p Parser
 	 * @param e pollsensor Element
