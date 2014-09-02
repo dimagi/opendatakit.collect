@@ -148,7 +148,7 @@ public class PollSensorAction extends Action implements LocationListener {
 				mModel.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
 			}
 			
-			if (location.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
+			if (location.getAccuracy() <= GeoUtils.GOOD_ACCURACY) {
 				mLocationManager.removeUpdates(this);
 			}
 		}

@@ -41,7 +41,6 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     private Location mLocation;
     private Set<String> mProviders;
 
-    private int acceptableThreshold = 1600;
     private int millisToWait = 60000; //allow to accept location after 60 seconds
 
 	private ODKTimer mTimer;
@@ -172,15 +171,17 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
             mLocationDialog.setMessage(getString(R.string.location_provider_accuracy,
                 mLocation.getProvider(), truncateDouble(mLocation.getAccuracy())));
 
-            if (mLocation.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
+            // If location is accurate, we're done
+            if (mLocation.getAccuracy() <= GeoUtils.GOOD_ACCURACY) {
                 returnLocation();
             }
             
-            if(mLocation.getAccuracy() < acceptableThreshold){
-                mLocationDialog.setLocationFound(true);
-            } else{
-                mLocationDialog.setLocationFound(false);
-            }
+            // If location isn't great but might be acceptable, notify
+            // the user and let them decide whether or not to record it
+            mLocationDialog.setLocationFound(
+            	mLocation.getAccuracy() < GeoUtils.ACCEPTABLE_ACCURACY
+            	|| mTimer.getMillisUntilFinished() == 0
+            );
         }
     }
 
@@ -209,7 +210,7 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
             case LocationProvider.AVAILABLE:
                 if (mLocation != null) {
                     mLocationDialog.setMessage(getString(R.string.location_accuracy,
-                        mLocation.getAccuracy()));
+                        (int) mLocation.getAccuracy()));
                 }
                 break;
             case LocationProvider.OUT_OF_SERVICE:
@@ -221,7 +222,7 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
 
 	@Override
 	public void notifyTimerFinished() {
-		mLocationDialog.setLocationFound(true);
+		onLocationChanged(mLocation);
 	}
 
 	@Override
