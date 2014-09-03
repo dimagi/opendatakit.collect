@@ -91,6 +91,10 @@ public class PreferencesActivity extends PreferenceActivity implements
     private Context mContext;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,26 +104,26 @@ public class PreferencesActivity extends PreferenceActivity implements
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.general_preferences));
 
         if(Collect.getInstance() != null) {
-	        setupSplashPathPreference();
-	        setupSelectedGoogleAccountPreference();
-	
-	        updateServerUrl();
-	
-	        updateUsername();
-	        updatePassword();
-	
-	        updateFormListUrl();
-	        updateSubmissionUrl();
-	
-	        updateSplashPath();
-	        
-	        updateProtocol();
-	        updateSelectedGoogleAccount();
-	        updateGoogleCollectionEffort();
+            setupSplashPathPreference();
+            setupSelectedGoogleAccountPreference();
+    
+            updateServerUrl();
+    
+            updateUsername();
+            updatePassword();
+    
+            updateFormListUrl();
+            updateSubmissionUrl();
+    
+            updateSplashPath();
+            
+            updateProtocol();
+            updateSelectedGoogleAccount();
+            updateGoogleCollectionEffort();
         } else {
-        	//If there's no collect instance we're running in a library, so we should
-        	//hide everything that's irrelevant
-        	this.getPreferenceScreen().removePreference(this.findPreference(KEY_SERVER_PREFS));
+            //If there's no collect instance we're running in a library, so we should
+            //hide everything that's irrelevant
+            this.getPreferenceScreen().removePreference(this.findPreference(KEY_SERVER_PREFS));
         }
         updateFontSize();
         updateShowStart();
@@ -139,6 +143,10 @@ public class PreferencesActivity extends PreferenceActivity implements
                 }
 
 
+                /*
+                 * (non-Javadoc)
+                 * @see android.preference.Preference.OnPreferenceClickListener#onPreferenceClick(android.preference.Preference)
+                 */
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     // if you have a value, you can clear it or select new.
@@ -155,12 +163,20 @@ public class PreferencesActivity extends PreferenceActivity implements
                         builder.setTitle(getString(R.string.change_splash_path));
                         builder.setNeutralButton(getString(R.string.cancel),
                             new DialogInterface.OnClickListener() {
+                        		/*
+                        		 * (non-Javadoc)
+                        		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                        		 */
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.dismiss();
                                 }
                             });
                         builder.setItems(items, new DialogInterface.OnClickListener() {
+                        	/*
+                        	 * (non-Javadoc)
+                        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                        	 */
                             @Override
                             public void onClick(DialogInterface dialog, int item) {
                                 if (items[item].equals(getString(R.string.select_another_image))) {
@@ -193,6 +209,10 @@ public class PreferencesActivity extends PreferenceActivity implements
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -201,32 +221,40 @@ public class PreferencesActivity extends PreferenceActivity implements
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
     @Override
     protected void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
         
         if(Collect.getInstance() != null) {
-        	
-	        updateServerUrl();
-	
-	        updateUsername();
-	        updatePassword();
-	
-	        updateFormListUrl();
-	        updateSubmissionUrl();
-	
-	        updateSplashPath();
-	
-	        updateProtocol();
-	        updateSelectedGoogleAccount();
-	        updateGoogleCollectionEffort();
+            
+            updateServerUrl();
+    
+            updateUsername();
+            updatePassword();
+    
+            updateFormListUrl();
+            updateSubmissionUrl();
+    
+            updateSplashPath();
+    
+            updateProtocol();
+            updateSelectedGoogleAccount();
+            updateGoogleCollectionEffort();
         }
         updateFontSize();
         updateShowStart();
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.preference.PreferenceActivity#onActivityResult(int, int, android.content.Intent)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -262,6 +290,10 @@ public class PreferencesActivity extends PreferenceActivity implements
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(KEY_PROTOCOL)) {
@@ -296,7 +328,7 @@ public class PreferencesActivity extends PreferenceActivity implements
         } else if (key.equals(KEY_FONT_SIZE)) {
             updateFontSize();
         } else if(key.equals(KEY_SHOW_START_SCREEN)) {
-        	updateShowStart();
+            updateShowStart();
         }
     }
 
@@ -435,6 +467,10 @@ public class PreferencesActivity extends PreferenceActivity implements
 
         mSelectedGoogleAccountPreference
                 .setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                	/*
+                	 * (non-Javadoc)
+                	 * @see android.preference.Preference.OnPreferenceClickListener#onPreferenceClick(android.preference.Preference)
+                	 */
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
                         Intent i = new Intent(getApplicationContext(), AccountList.class);

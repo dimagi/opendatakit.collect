@@ -39,6 +39,10 @@ public class TwoItemMultipleChoiceView extends RelativeLayout implements Checkab
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.widget.Checkable#isChecked()
+     */
     @Override
     public boolean isChecked() {
         CheckBox c = (CheckBox) findViewById(R.id.checkbox);
@@ -46,6 +50,10 @@ public class TwoItemMultipleChoiceView extends RelativeLayout implements Checkab
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.widget.Checkable#setChecked(boolean)
+     */
     @Override
     public void setChecked(boolean checked) {
         CheckBox c = (CheckBox) findViewById(R.id.checkbox);
@@ -53,6 +61,10 @@ public class TwoItemMultipleChoiceView extends RelativeLayout implements Checkab
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.widget.Checkable#toggle()
+     */
     @Override
     public void toggle() {
         CheckBox c = (CheckBox) findViewById(R.id.checkbox);

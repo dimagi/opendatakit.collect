@@ -64,23 +64,23 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         
         //Let's see if we can figure out a constraint for this string
         try {
-        	addAnswerFilter(new InputFilter.LengthFilter(guessMaxStringLength(prompt)));
-		} catch (UnpivotableExpressionException e) {
-			//expected if there isn't a constraint that does this
-		}
+            addAnswerFilter(new InputFilter.LengthFilter(guessMaxStringLength(prompt)));
+        } catch (UnpivotableExpressionException e) {
+            //expected if there isn't a constraint that does this
+        }
         
         this.secret = secret;
         
         if(!secret) {
-        	// capitalize the first letter of the sentence
-        	mAnswer.setKeyListener(new TextKeyListener(Capitalize.SENTENCES, false));
+            // capitalize the first letter of the sentence
+            mAnswer.setKeyListener(new TextKeyListener(Capitalize.SENTENCES, false));
         }
         setTextInputType(mAnswer);
 
         // needed to make long read only text scroll
         mAnswer.setHorizontallyScrolling(false);
         if(!secret) {
-        	mAnswer.setSingleLine(false);
+            mAnswer.setSingleLine(false);
         }
 
         if (prompt != null) {
@@ -111,44 +111,52 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
      * @throws UnpivotableExpressionException
      */
     protected int guessMaxStringLength(FormEntryPrompt prompt) throws UnpivotableExpressionException{
-    	StringLengthRangeHint hint = new StringLengthRangeHint();
-		prompt.requestConstraintHint(hint);
-		if(hint.getMax() != null) {
-			//We can!
-			int length  = ((String)hint.getMax().getValue()).length();
-			if(!hint.isMaxInclusive()) {
-				length -= 1;
-			}
-			
-			return length;
-		}
-		throw new UnpivotableExpressionException();
+        StringLengthRangeHint hint = new StringLengthRangeHint();
+        prompt.requestConstraintHint(hint);
+        if(hint.getMax() != null) {
+            //We can!
+            int length  = ((String)hint.getMax().getValue()).length();
+            if(!hint.isMaxInclusive()) {
+                length -= 1;
+            }
+            
+            return length;
+        }
+        throw new UnpivotableExpressionException();
     }
     
     
     protected void addAnswerFilter(InputFilter filter) {
-		//Let's add a filter
-		InputFilter[] currentFilters = mAnswer.getFilters();
-		InputFilter[] newFilters = new InputFilter[currentFilters.length + 1];
-		System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
-		newFilters[currentFilters.length] = filter;
-		
-		mAnswer.setFilters(newFilters);
-	}
+        //Let's add a filter
+        InputFilter[] currentFilters = mAnswer.getFilters();
+        InputFilter[] newFilters = new InputFilter[currentFilters.length + 1];
+        System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
+        newFilters[currentFilters.length] = filter;
+        
+        mAnswer.setFilters(newFilters);
+    }
 
-	protected void setTextInputType(EditText mAnswer) {
-    	if(secret) {
-        	mAnswer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+    protected void setTextInputType(EditText mAnswer) {
+        if(secret) {
+            mAnswer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         mAnswer.setText(null);
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mAnswer.getText().toString().trim();
@@ -160,6 +168,10 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Put focus on text input field and display soft keyboard if appropriate.
@@ -182,6 +194,10 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.view.View#onKeyDown(int, android.view.KeyEvent)
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.isAltPressed() == true) {
@@ -192,46 +208,69 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mAnswer.setOnLongClickListener(l);
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();
         mAnswer.cancelLongPress();
     }
 
-	@Override
-	public void onClick(View v) {
-		//revert to default editor behavior
-		setFocus(getContext());
+    /*
+     * (non-Javadoc)
+     * @see android.view.View.OnClickListener#onClick(android.view.View)
+     */
+    @Override
+    public void onClick(View v) {
+        //revert to default editor behavior
+        setFocus(getContext());
         mAnswer.setImeOptions(EditorInfo.IME_ACTION_UNSPECIFIED);
-	}
-	
-	@Override
-	public void acceptFocus() {
-		mAnswer.performClick();
-	}
+    }
+    
+    @Override
+    public void acceptFocus() {
+        mAnswer.performClick();
+    }
 
-	@Override
-	public void afterTextChanged(Editable s) {
-		widgetEntryChanged();
-	}
+    /*
+     * (non-Javadoc)
+     * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
+     */
+    @Override
+    public void afterTextChanged(Editable s) {
+        widgetEntryChanged();
+    }
 
-	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {
-		// TODO Auto-generated method stub
-		
-	}
+    /*
+     * (non-Javadoc)
+     * @see android.text.TextWatcher#beforeTextChanged(java.lang.CharSequence, int, int, int)
+     */
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+            int after) {
+        // TODO Auto-generated method stub
+        
+    }
 
-	@Override
-	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		// TODO Auto-generated method stub
-		
-	}
-
+    /*
+     * (non-Javadoc)
+     * @see android.text.TextWatcher#onTextChanged(java.lang.CharSequence, int, int, int)
+     */
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // TODO Auto-generated method stub
+        
+    }
 }

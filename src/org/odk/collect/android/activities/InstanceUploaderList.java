@@ -62,6 +62,10 @@ public class InstanceUploaderList extends ListActivity {
     private boolean mToggled = false;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +74,10 @@ public class InstanceUploaderList extends ListActivity {
         mUploadButton = (Button) findViewById(R.id.upload_button);
         mUploadButton.setOnClickListener(new OnClickListener() {
 
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View arg0) {
                 ConnectivityManager connectivityManager =
@@ -98,6 +106,10 @@ public class InstanceUploaderList extends ListActivity {
 
         mToggleButton = (Button) findViewById(R.id.toggle_button);
         mToggleButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 // toggle selections of items to all or none
@@ -174,6 +186,10 @@ public class InstanceUploaderList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -183,6 +199,10 @@ public class InstanceUploaderList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onMenuItemSelected(int, android.view.MenuItem)
+     */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
@@ -200,6 +220,10 @@ public class InstanceUploaderList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -219,6 +243,10 @@ public class InstanceUploaderList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onRestoreInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -231,6 +259,10 @@ public class InstanceUploaderList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -242,6 +274,10 @@ public class InstanceUploaderList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (resultCode == RESULT_CANCELED) {

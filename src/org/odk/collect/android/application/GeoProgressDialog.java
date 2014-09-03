@@ -11,15 +11,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class GeoProgressDialog extends Dialog {
-	
-	TextView mText;
-	ImageView mImage;
-	Button mAccept;
-	Button mCancel;
-	ProgressBar mProgress;
-	boolean locationFound;
-	String mFoundMessage;
-	String mSearchMessage;
+    
+    TextView mText;
+    ImageView mImage;
+    Button mAccept;
+    Button mCancel;
+    ProgressBar mProgress;
+    boolean locationFound;
+    String mFoundMessage;
+    String mSearchMessage;
 
     public GeoProgressDialog(Context context, String foundMessage, String searchMessage) {
         super(context);
@@ -36,40 +36,40 @@ public class GeoProgressDialog extends Dialog {
     }
     
     public void setMessage(String txt){
-    	mText.setText(txt);
+        mText.setText(txt);
     }
     public void setImage(Drawable img){
-    	mImage.setImageDrawable(img);
+        mImage.setImageDrawable(img);
     }
     
     public void setOKButton(String title, View.OnClickListener ocl){
-    	mAccept.setText(title);
-    	mAccept.setOnClickListener(ocl);
+        mAccept.setText(title);
+        mAccept.setOnClickListener(ocl);
     }
     public void setCancelButton(String title, View.OnClickListener ocl){
-    	mCancel.setText(title);
-    	mCancel.setOnClickListener(ocl);
+        mCancel.setText(title);
+        mCancel.setOnClickListener(ocl);
     }
     public void setLocationFound(boolean locationFound){
-    	this.locationFound = locationFound;
-    	refreshView();
+        this.locationFound = locationFound;
+        refreshView();
     }
     
     public void refreshView(){
-    	if(locationFound){
-    		mImage.setVisibility(View.VISIBLE);
-    		mProgress.setVisibility(View.GONE);
-    		mCancel.setVisibility(View.GONE);
-    		mAccept.setVisibility(View.VISIBLE);
-    		this.setTitle(mFoundMessage);
-    	}
-    	else{
-    		this.setTitle(mSearchMessage);
-    		mImage.setVisibility(View.GONE);
-    		mCancel.setVisibility(View.VISIBLE);
-    		mAccept.setVisibility(View.GONE);
-    		mProgress.setVisibility(View.VISIBLE);
-    	}
+        if(locationFound){
+            mImage.setVisibility(View.VISIBLE);
+            mProgress.setVisibility(View.GONE);
+            mCancel.setVisibility(View.GONE);
+            mAccept.setVisibility(View.VISIBLE);
+            this.setTitle(mFoundMessage);
+        }
+        else{
+            this.setTitle(mSearchMessage);
+            mImage.setVisibility(View.GONE);
+            mCancel.setVisibility(View.VISIBLE);
+            mAccept.setVisibility(View.GONE);
+            mProgress.setVisibility(View.VISIBLE);
+        }
     }
     
 

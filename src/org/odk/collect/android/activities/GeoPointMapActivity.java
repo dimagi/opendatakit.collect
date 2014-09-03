@@ -53,6 +53,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     private boolean mGPSOn = false;
     private boolean mNetworkOn = false;
     
+    /*
+     * (non-Javadoc)
+     * @see com.google.android.maps.MapActivity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +75,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
         mCancelLocation = (Button) findViewById(R.id.cancel_location);
         mCancelLocation.setOnClickListener(new OnClickListener() {
 
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 finish();
@@ -108,6 +116,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
             mAcceptLocation = (Button) findViewById(R.id.accept_location);
             mAcceptLocation.setOnClickListener(new OnClickListener() {
 
+            	/*
+            	 * (non-Javadoc)
+            	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+            	 */
                 @Override
                 public void onClick(View v) {
                     returnLocation();
@@ -125,6 +137,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
             mShowLocation.setVisibility(View.VISIBLE);
             mShowLocation.setOnClickListener(new OnClickListener() {
 
+            	/*
+            	 * (non-Javadoc)
+            	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+            	 */
                 @Override
                 public void onClick(View v) {
                     mMapController.animateTo(mGeoPoint);
@@ -150,6 +166,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see com.google.android.maps.MapActivity#onPause()
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -159,6 +179,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see com.google.android.maps.MapActivity#onResume()
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -174,12 +198,20 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see com.google.android.maps.MapActivity#isRouteDisplayed()
+     */
     @Override
     protected boolean isRouteDisplayed() {
         return false;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onLocationChanged(android.location.Location)
+     */
     @Override
     public void onLocationChanged(Location location) {
         if (mCaptureLocation) {
@@ -201,16 +233,28 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+     */
     @Override
     public void onProviderDisabled(String provider) {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     */
     @Override
     public void onProviderEnabled(String provider) {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
+     */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }
@@ -225,6 +269,10 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
         }
 
 
+        /*
+         * (non-Javadoc)
+         * @see com.google.android.maps.Overlay#draw(android.graphics.Canvas, com.google.android.maps.MapView, boolean)
+         */
         @Override
         public void draw(Canvas canvas, MapView mapView, boolean shadow) {
             super.draw(canvas, mapView, shadow);

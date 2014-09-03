@@ -95,6 +95,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
         // launch capture intent on click
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 mErrorTextView.setVisibility(View.GONE);
@@ -134,6 +138,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
         // launch capture intent on click
         mChooseButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 mErrorTextView.setVisibility(View.GONE);
@@ -159,7 +167,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         addView(mChooseButton);
         String acq = prompt.getAppearanceHint();
         if((QuestionWidget.ACQUIREFIELD.equalsIgnoreCase(acq))){
-        	mChooseButton.setVisibility(View.GONE);
+            mChooseButton.setVisibility(View.GONE);
         }
         addView(mErrorTextView);
         mErrorTextView.setVisibility(View.GONE);
@@ -193,6 +201,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
             mImageView.setPadding(10, 10, 10, 10);
             mImageView.setAdjustViewBounds(true);
             mImageView.setOnClickListener(new View.OnClickListener() {
+            	/*
+            	 * (non-Javadoc)
+            	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+            	 */
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent("android.intent.action.VIEW");
@@ -201,36 +213,36 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
                     };
                     Cursor c = null;
                     try {
-                    	c = getContext().getContentResolver().query(
+                        c = getContext().getContentResolver().query(
                                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                                     projection, "_data='" + mInstanceFolder + mBinaryName + "'",
                                     null, null);
-	                    if (c.getCount() > 0) {
-	                        c.moveToFirst();
-	                        String id = c.getString(c.getColumnIndex("_id"));
-	
-	                        Log.i(
-	                            t,
-	                            "setting view path to: "
-	                                    + Uri.withAppendedPath(
-	                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-	                                        id));
-	
-	                        i.setDataAndType(Uri.withAppendedPath(
-	                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id),
-	                            "image/*");
-	                        try {
-	                            getContext().startActivity(i);
-	                        } catch (ActivityNotFoundException e) {
-	                            Toast.makeText(getContext(),
-	                                StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "view image"),
-	                                Toast.LENGTH_SHORT);
-	                        }
-	                    }
+                        if (c.getCount() > 0) {
+                            c.moveToFirst();
+                            String id = c.getString(c.getColumnIndex("_id"));
+    
+                            Log.i(
+                                t,
+                                "setting view path to: "
+                                        + Uri.withAppendedPath(
+                                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                            id));
+    
+                            i.setDataAndType(Uri.withAppendedPath(
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id),
+                                "image/*");
+                            try {
+                                getContext().startActivity(i);
+                            } catch (ActivityNotFoundException e) {
+                                Toast.makeText(getContext(),
+                                    StringUtils.getStringRobust(getContext(), R.string.activity_not_found, "view image"),
+                                    Toast.LENGTH_SHORT);
+                            }
+                        }
                     } finally {
-                    	if ( c != null ) {
-                    		c.close();
-                    	}
+                        if ( c != null ) {
+                            c.close();
+                        }
                     }
                 }
             });
@@ -250,13 +262,17 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         mBinaryName = null;
         
         //TODO: possibly switch back to this implementation, but causes NullPointerException right now
-    	/*
+        /*
         int del = MediaUtils.deleteImageFileFromMediaProvider(mInstanceFolder + File.separator + mBinaryName);
         Log.i(t, "Deleted " + del + " rows from media content provider");
         mBinaryName = null;*/
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         // remove the file
@@ -269,6 +285,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         if (mBinaryName != null) {
@@ -279,8 +299,12 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
+     */
     @Override
-	public void setBinaryData(Object binaryuri) {
+    public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. delete the previous image using the
         // content provider.
         if (mBinaryName != null) {
@@ -295,6 +319,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -304,12 +332,20 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
+     */
     @Override
     public boolean isWaitingForBinaryData() {
         return mWaitingForData;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mCaptureButton.setOnLongClickListener(l);
@@ -320,6 +356,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

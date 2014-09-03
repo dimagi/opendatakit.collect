@@ -40,6 +40,10 @@ public class FileManagerTabs extends TabActivity {
     private static final int FONT_SIZE = 21;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ActivityGroup#onCreate(android.os.Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

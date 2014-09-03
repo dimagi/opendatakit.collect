@@ -62,15 +62,15 @@ public class MediaLayout extends RelativeLayout {
     }
     
     protected void onHelpPressed() {
-    	
+        
     }
     
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI) {
-    	setAVT(text, audioURI, imageURI, videoURI, bigImageURI, null);
+        setAVT(text, audioURI, imageURI, videoURI, bigImageURI, null);
     }
 
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI, final String qrCodeContent) {
-    	mView_Text = text;
+        mView_Text = text;
 
         // Layout configurations for our elements in the relative layout
         RelativeLayout.LayoutParams textParams =
@@ -107,7 +107,7 @@ public class MediaLayout extends RelativeLayout {
 
                 @Override
                 public void onClick(View v) {
-                	MediaLayout.this.onHelpPressed();
+                    MediaLayout.this.onHelpPressed();
                 }
 
             });
@@ -201,46 +201,46 @@ public class MediaLayout extends RelativeLayout {
                 
                 int minimumDim = Math.min(screenWidth,  screenHeight);
 
-            	try {
-            		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(qrCodeContent,minimumDim);
+                try {
+                    QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(qrCodeContent,minimumDim);
                 
-            		image = qrCodeEncoder.encodeAsBitmap();
-            		
-            		mImageView = new ResizingImageView(getContext());
-            		mImageView.setPadding(10, 10, 10, 10);
-            		mImageView.setAdjustViewBounds(true);
-            		mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            		mImageView.setImageBitmap(image);
-            		mImageView.setId(23423534);
-            		//mImageView.resizeMaxMin(minimumHeight, maximumHeight);
-            		
-            		imageView = mImageView;
-            	} catch(Exception e) {
-            		e.printStackTrace();
-            	}
+                    image = qrCodeEncoder.encodeAsBitmap();
+                    
+                    mImageView = new ResizingImageView(getContext());
+                    mImageView.setPadding(10, 10, 10, 10);
+                    mImageView.setAdjustViewBounds(true);
+                    mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    mImageView.setImageBitmap(image);
+                    mImageView.setId(23423534);
+                    //mImageView.resizeMaxMin(minimumHeight, maximumHeight);
+                    
+                    imageView = mImageView;
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
-        	
-    	} else if (imageURI != null) {
+            
+        } else if (imageURI != null) {
             try {
-            	
-            	DisplayMetrics metrics = this.getContext().getResources().getDisplayMetrics();
-            	int maxWidth = metrics.widthPixels;
-            	int maxHeight = metrics.heightPixels;
-            	
-            	// subtract height for textviewa and buttons, if present
-            	
-            	if(mView_Text != null){
-            		maxHeight = maxHeight - mView_Text.getHeight();
-            	} if(mVideoButton != null){
-            		maxHeight = maxHeight - mVideoButton.getHeight();
-            	} else if(mAudioButton != null){
-            		maxHeight = maxHeight - mAudioButton.getHeight();
-            	}
-            	
-            	// reduce by third for safety
-            	
-            	maxHeight = (2 * maxHeight)/3;
-            	
+                
+                DisplayMetrics metrics = this.getContext().getResources().getDisplayMetrics();
+                int maxWidth = metrics.widthPixels;
+                int maxHeight = metrics.heightPixels;
+                
+                // subtract height for textviewa and buttons, if present
+                
+                if(mView_Text != null){
+                    maxHeight = maxHeight - mView_Text.getHeight();
+                } if(mVideoButton != null){
+                    maxHeight = maxHeight - mVideoButton.getHeight();
+                } else if(mAudioButton != null){
+                    maxHeight = maxHeight - mAudioButton.getHeight();
+                }
+                
+                // reduce by third for safety
+                
+                maxHeight = (2 * maxHeight)/3;
+                
                 
                 //If we didn't get an image yet, try for a norm
 
@@ -264,14 +264,14 @@ public class MediaLayout extends RelativeLayout {
                     }
 
                     if (b != null) {
-                    	mImageView = new ResizingImageView(getContext(), imageURI, bigImageURI);
+                        mImageView = new ResizingImageView(getContext(), imageURI, bigImageURI);
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
-                		
-                		if(ResizingImageView.resizeMethod.equals("full")){
+                        
+                        if(ResizingImageView.resizeMethod.equals("full")){
                             mImageView.setMaxHeight(maxHeight);
                             mImageView.setMaxWidth(maxWidth);
-                		}
+                        }
                        
                         mImageView.setImageBitmap(b);
                         mImageView.setId(23423534);
@@ -304,11 +304,11 @@ public class MediaLayout extends RelativeLayout {
         }
         
         if(imageView != null) {
-        	RelativeLayout parent = this;
+            RelativeLayout parent = this;
             imageParams.addRule(RelativeLayout.BELOW, topPane.getId());
             if (mAudioButton != null) {
                 if (!textVisible) {
-                	imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
+                    imageParams.addRule(RelativeLayout.LEFT_OF, mAudioButton.getId());
                     parent = topPane;
                 }
             }

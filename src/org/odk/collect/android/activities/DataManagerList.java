@@ -52,6 +52,10 @@ public class DataManagerList extends ListActivity {
     private static final String SELECTED = "selected";
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +64,10 @@ public class DataManagerList extends ListActivity {
         mDeleteButton = (Button) findViewById(R.id.delete_button);
         mDeleteButton.setText(getString(R.string.delete_file));
         mDeleteButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 if (mSelected.size() > 0) {
@@ -113,6 +121,10 @@ public class DataManagerList extends ListActivity {
         mAlertDialog.setMessage(getString(R.string.delete_confirm, mSelected.size()));
         DialogInterface.OnClickListener dialogYesNoListener =
             new DialogInterface.OnClickListener() {
+        		/*
+        		 * (non-Javadoc)
+        		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        		 */
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
                     switch (i) {
@@ -160,6 +172,10 @@ public class DataManagerList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -178,6 +194,10 @@ public class DataManagerList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
@@ -187,6 +207,10 @@ public class DataManagerList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onRestoreInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -199,6 +223,10 @@ public class DataManagerList extends ListActivity {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

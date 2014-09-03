@@ -70,16 +70,20 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
 
         // launch barcode capture intent on click
         mGetBarcodeButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 mWaitingForData = true;
                 try {
-                	//Set Data
-                	String data = mStringAnswer.getText().toString();
-                	if(data != null && data != "") {
-                		intent.putExtra(IntentCallout.INTENT_RESULT_VALUE, data);
-                	}
-                	
+                    //Set Data
+                    String data = mStringAnswer.getText().toString();
+                    if(data != null && data != "") {
+                        intent.putExtra(IntentCallout.INTENT_RESULT_VALUE, data);
+                    }
+                    
                     ((Activity) getContext()).startActivityForResult(intent,
                         FormEntryActivity.INTENT_CALLOUT);
                 } catch (ActivityNotFoundException e) {
@@ -107,6 +111,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         mStringAnswer.setText(null);
@@ -114,6 +122,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
@@ -125,7 +137,9 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
      * Allows answer to be set externally in {@Link FormEntryActivity}.
      */
     @Override
@@ -135,6 +149,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -144,12 +162,20 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.IBinaryWidget#isWaitingForBinaryData()
+     */
     @Override
     public boolean isWaitingForBinaryData() {
         return mWaitingForData;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mStringAnswer.setOnLongClickListener(l);
@@ -157,6 +183,10 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();
@@ -165,9 +195,9 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     }
     
     public IntentCallout getIntentCallout() {
-    	//TODO: This is really not great, but the alternative
-    	//is doubling up all of this code in the ODKView, which
-    	//is silly. It's not generalizable
-    	return ic;
+        //TODO: This is really not great, but the alternative
+        //is doubling up all of this code in the ODKView, which
+        //is silly. It's not generalizable
+        return ic;
     }
 }

@@ -41,6 +41,10 @@ public class AndroidShortcuts extends Activity {
     private String[] mNames;
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
