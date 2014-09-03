@@ -12,7 +12,6 @@ import android.os.CountDownTimer;
  */
 
 public class ODKTimer extends CountDownTimer{
-
     TimerListener mTimerListener;
     long mUntilFinished;
 
@@ -27,6 +26,7 @@ public class ODKTimer extends CountDownTimer{
      */
     @Override
     public void onFinish() {
+        mUntilFinished = 0;
         mTimerListener.notifyTimerFinished();
     }
 

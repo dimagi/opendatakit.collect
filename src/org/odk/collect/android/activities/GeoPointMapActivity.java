@@ -225,7 +225,7 @@ public class GeoPointMapActivity extends MapActivity implements LocationListener
 
                 mMapController.animateTo(mGeoPoint);
 
-                if (mLocation.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
+                if (mLocation.getAccuracy() <= GeoUtils.GOOD_ACCURACY) {
                     returnLocation();
                 }
             }
