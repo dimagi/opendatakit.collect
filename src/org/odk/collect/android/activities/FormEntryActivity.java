@@ -203,6 +203,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     private ViewGroup mViewPane;
     private View mCurrentView;
 
+    private AlertDialog mRepeatDialog;
     private AlertDialog mAlertDialog;
     private ProgressDialog mProgressDialog;
     private String mErrorMessage;
@@ -1662,18 +1663,17 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     private void createRepeatDialog() {
     	ContextThemeWrapper wrapper = new ContextThemeWrapper(this, R.style.DialogBaseTheme);
-		AlertDialog.Builder builder = new AlertDialog.Builder(wrapper);
-		
+    	
 		View view = LayoutInflater.from(wrapper).inflate(R.layout.component_repeat_new_dialog, null);
 
 
-        mAlertDialog = new AlertDialog.Builder(wrapper).create();
+        mRepeatDialog = new AlertDialog.Builder(wrapper).create();
         
-        final AlertDialog theDialog = mAlertDialog;
+        final AlertDialog theDialog = mRepeatDialog;
         
-        mAlertDialog.setView(view);
+        mRepeatDialog.setView(view);
         
-        mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
+        mRepeatDialog.setIcon(android.R.drawable.ic_dialog_info);
         
         NavigationDetails details = calculateNavigationStatus();
         
@@ -1744,8 +1744,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         
         if (mFormController.getLastRepeatCount() > 0) {
-            mAlertDialog.setTitle(StringUtils.getStringRobust(this, R.string.leaving_repeat_ask));
-            mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_another_repeat,
+            mRepeatDialog.setTitle(StringUtils.getStringRobust(this, R.string.leaving_repeat_ask));
+            mRepeatDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_another_repeat,
                 mFormController.getLastGroupText()));
             newButton.setText(StringUtils.getStringRobust(this, R.string.add_another));
             if(!nextExitsForm) {
@@ -1755,8 +1755,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             }
 
         } else {
-            mAlertDialog.setTitle(StringUtils.getStringRobust(this, R.string.entering_repeat_ask));
-            mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_repeat,
+            mRepeatDialog.setTitle(StringUtils.getStringRobust(this, R.string.entering_repeat_ask));
+            mRepeatDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_repeat,
                 mFormController.getLastGroupText()));
             newButton.setText(StringUtils.getStringRobust(this, R.string.entering_repeat));
             if(!nextExitsForm) {
@@ -1767,8 +1767,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             }
         }
         
-        mAlertDialog.setCancelable(false);
-        mAlertDialog.show();
+        mRepeatDialog.setCancelable(false);
+        mRepeatDialog.show();
 
         if(nextExitsForm) {
         	skip.setCompoundDrawables(null, doneIcon, null, null);
@@ -2195,6 +2195,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
             mAlertDialog.dismiss();
         }
+        if(mRepeatDialog != null && mRepeatDialog.isShowing()) {
+        	mRepeatDialog.dismiss();
+        }
     }
 
 
@@ -2568,6 +2571,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
             }
         }
+        this.dismissDialogs();
         finish();
     }
 

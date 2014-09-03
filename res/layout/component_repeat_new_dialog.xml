@@ -11,40 +11,43 @@
 
     <Button
         android:id="@+id/component_repeat_back"
-        android:background="@android:drawable/list_selector_background"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@android:drawable/list_selector_background"
         android:drawablePadding="5dp"
         android:drawableTop="@drawable/icon_back"
+        android:paddingBottom="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:paddingTop="15dp"
         android:text="Go Back" />
 
     <Button
         android:id="@+id/component_repeat_new"
-        android:background="@android:drawable/list_selector_background"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@android:drawable/list_selector_background"
         android:drawablePadding="5dp"
         android:drawableTop="@drawable/icon_new"
+        android:paddingBottom="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:paddingTop="15dp"
         android:text="Add Group" />
 
     <Button
         android:id="@+id/component_repeat_skip"
-        android:background="@android:drawable/list_selector_background"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@android:drawable/list_selector_background"
         android:drawablePadding="5dp"
         android:drawableTop="@drawable/icon_next"
+        android:paddingBottom="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:paddingTop="15dp"
         android:text="Do Not Add" />
 
