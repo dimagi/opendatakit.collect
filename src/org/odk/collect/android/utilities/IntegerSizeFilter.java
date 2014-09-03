@@ -27,7 +27,7 @@ public class IntegerSizeFilter implements InputFilter {
         }
         String part1 = destString.substring(0, dstart);
         String part2 = destString.substring(dend);
-        String newString = part1 + (String)source.subSequence(start, end) + part2;
+        String newString = part1 + (String)source.subSequence(start, end).toString() + part2;
         
         try {
             Integer x = Integer.parseInt((String)newString);
