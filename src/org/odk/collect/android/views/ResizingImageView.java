@@ -6,6 +6,7 @@ import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.odk.collect.android.R;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -26,34 +28,41 @@ import android.widget.Toast;
  *  and onMeasure from the ImageView super class.
  */
 
+@SuppressLint("NewApi")
 public class ResizingImageView extends ImageView {
-	
+
 	public static String resizeMethod;
 
 	private int mMaxWidth;
 	private int mMaxHeight;
-	
+
 	GestureDetector gestureDetector;
-	
+	ScaleGestureDetector scaleGestureDetector;
+
 	String imageURI;
 	String bigImageURI;
+
+	private float scaleFactor = 1.0f;
+	private float scaleFactorThreshhold = 1.2f;
 
 	public ResizingImageView(Context context) {
 		this(context, null, null);
 	}
-	
+
 	public ResizingImageView(Context context, String imageURI, String bigImageURI){
 		super(context);
 		gestureDetector = new GestureDetector(context, new GestureListener());
+		scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
 		this.imageURI = imageURI;
 		this.bigImageURI = bigImageURI;
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
-	    return gestureDetector.onTouchEvent(e);
+		scaleGestureDetector.onTouchEvent(e);
+		return gestureDetector.onTouchEvent(e);
 	}
-	
+
 	@Override
 	public void setMaxWidth(int maxWidth) {
 		super.setMaxWidth(maxWidth);
@@ -65,29 +74,40 @@ public class ResizingImageView extends ImageView {
 		super.setMaxHeight(maxHeight);
 		mMaxHeight = maxHeight;
 	}
-	
+
 	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
-	    @Override
-	    public boolean onDown(MotionEvent e) {
-	        return true;
-	    }
-	    // event when double tap occurs
-	    @Override
-	    public boolean onDoubleTap(MotionEvent e) {
-	        float x = e.getX();
-	        float y = e.getY();
-	        
-		    onDoubleClick();
-
-	        return true;
-	    }
+		@Override
+		public boolean onDown(MotionEvent e) {
+			return true;
+		}
+		// event when double tap occurs
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			setFullScreen();
+			return true;
+		}
 	}
-	
-	public void onDoubleClick(){
-		
+
+	private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+		@Override
+		public boolean onScale(ScaleGestureDetector detector) {
+			scaleFactor *= detector.getScaleFactor();
+
+			// don't let the object get too small or too large.
+			scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 5.0f));
+			
+			if(scaleFactor > scaleFactorThreshhold){
+				setFullScreen();
+			}
+			return true;
+		}
+	}
+
+	public void setFullScreen(){
+
 		String imageFileURI;
-		
+
 		if(bigImageURI != null){
 			imageFileURI = bigImageURI;
 		} else if(imageURI != null){
@@ -95,7 +115,7 @@ public class ResizingImageView extends ImageView {
 		} else{
 			return;
 		}
-		
+
 		try {
 			String imageFilename = ReferenceManager._()
 					.DeriveReference(imageFileURI).getLocalURI();
@@ -125,11 +145,11 @@ public class ResizingImageView extends ImageView {
 	 * 		maintaining the aspect ratio
 	 * "none" will leave the picture unchanged
 	 */
-	
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		
+
 		if(resizeMethod.equals("full")){
 
 			Drawable drawable = getDrawable();

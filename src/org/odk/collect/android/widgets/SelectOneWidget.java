@@ -22,11 +22,13 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.views.media.MediaLayout;
 
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -49,6 +51,8 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
     public SelectOneWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
+        int padding = (int)Math.floor(context.getResources().getDimension(R.dimen.select_padding));
+       
         mItems = prompt.getSelectChoices();
         buttons = new Vector<RadioButton>();
 
@@ -62,19 +66,22 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
 
         if (prompt.getSelectChoices() != null) {
             for (int i = 0; i < mItems.size(); i++) {
-                RadioButton r = new RadioButton(getContext());
-                r.setOnCheckedChangeListener(this);
-                r.setText(prompt.getSelectChoiceText(mItems.get(i)));
-                r.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-                r.setId(i + buttonIdBase);
-                r.setEnabled(!prompt.isReadOnly());
-                r.setFocusable(!prompt.isReadOnly());
-
-                buttons.add(r);
+                final RadioButton rb = new RadioButton(getContext());
+                rb.setText(prompt.getSelectChoiceText(mItems.get(i)));
+                rb.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+                rb.setId(i + buttonIdBase);
+                rb.setEnabled(!prompt.isReadOnly());
+                rb.setFocusable(!prompt.isReadOnly());
+                
+                buttons.add(rb);
 
                 if (mItems.get(i).getValue().equals(s)) {
-                    r.setChecked(true);
+                	rb.setChecked(true);
                 }
+                
+                //Move to be below the above setters. Not sure if that will cause
+                //problems, but I don't think it should.
+                rb.setOnCheckedChangeListener(this);
 
                 String audioURI = null;
                 audioURI =
@@ -93,8 +100,18 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
                 bigImageURI = prompt.getSpecialFormSelectChoiceText(mItems.get(i), "big-image");
 
                 MediaLayout mediaLayout = new MediaLayout(getContext());
-                mediaLayout.setAVT(r, audioURI, imageURI, videoURI, bigImageURI);
+                mediaLayout.setAVT(rb, audioURI, imageURI, videoURI, bigImageURI);
+                mediaLayout.setPadding(0, padding, 0, padding);
+                
+                mediaLayout.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+	                	rb.performClick();
+					}
+                });
                 addView(mediaLayout);
+
 
                 // Last, add the dividing line (except for the last element)
                 ImageView divider = new ImageView(getContext());
@@ -127,14 +144,18 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
             return new SelectOneData(new Selection(sc));
         }
     }
+    
+    private void onUserInteracton() {
+        // Hide the soft keyboard if it's showing.
+        InputMethodManager inputManager =
+            (InputMethodManager) this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
+    }
 
 
     @Override
     public void setFocus(Context context) {
-        // Hide the soft keyboard if it's showing.
-        InputMethodManager inputManager =
-            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
+    	onUserInteracton();
     }
 
 
@@ -150,10 +171,9 @@ public class SelectOneWidget extends QuestionWidget implements OnCheckedChangeLi
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    	onUserInteracton();
     	
-    	if(hasListener){
-    		widgetChangedListener.widgetEntryChanged();
-    	}
+    	widgetEntryChanged();
     	
         if (!isChecked) {
             // If it got unchecked, we don't care.
