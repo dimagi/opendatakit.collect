@@ -812,10 +812,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 onCurrentScreen = false;
             }
             
-            if (event == FormEntryController.EVENT_QUESTION) {
-                FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                
-            	
+            
+            
+            //Figure out if there are any events before this screen (either new repeat or relevant questions are valid)
+            if (event == FormEntryController.EVENT_QUESTION || event == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
             	//Figure out whether we're on the last screen
             	if(!details.relevantBeforeCurrentScreen && !details.isFirstScreen) {
             		
@@ -829,6 +829,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             			details.relevantBeforeCurrentScreen = true;
             		}
             	}
+            }
+            
+            if (event == FormEntryController.EVENT_QUESTION) {
+                FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                
             	
             	if(!onCurrentScreen && details.currentScreenExit != null) {
             		details.relevantAfterCurrentScreen += prompts.length;
@@ -868,7 +873,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             	//If we've already passed the current screen, this repeat
             	//junction is coming up in the future and we will need to know
             	//about it
-            	if(details.currentScreenExit != null) {
+            	if(!onCurrentScreen && details.currentScreenExit != null) {
             		details.totalQuestions++;
             		details.relevantAfterCurrentScreen++;
 
@@ -1002,7 +1007,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         //If we're at the beginning of form event, but don't show the screen for that, we need 
         //to get the next valid screen
         if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
-        		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, true)) {
+        		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, false)) {
         	this.showNextView(true);
         } else {
         	View current = createView(event);
@@ -1507,6 +1512,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             //check if we're at the beginning and not doing the whole "First screen" thing
             if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
             		!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, false)) {
+            	            	
             	//If so, we can't go all the way back here, so we've gotta hit the last index that was valid
             	mFormController.jumpToIndex(lastValidIndex);
             	
@@ -1518,8 +1524,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             		mBeenSwiped = false;
             		return;
             	}
-            	
-            	//If we did (and I'm not sure how?) catch up.
+
+            	//We might have walked all the way back still, which isn't great, 
+            	//so keep moving forward again until we find it
+            	if(lastValidIndex.isBeginningOfFormIndex()) {
+            		//there must be a repeat between where we started and the beginning of hte form, walk back up to it
+            		this.showNextView(true);
+            		return;
+            	}
             }
             View next = createView(event);
             showView(next, AnimationType.LEFT);
@@ -1657,14 +1669,17 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
         mAlertDialog = new AlertDialog.Builder(wrapper).create();
         
+        final AlertDialog theDialog = mAlertDialog;
+        
         mAlertDialog.setView(view);
         
         mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
         
         NavigationDetails details = calculateNavigationStatus();
         
-        final boolean noExitsForm = details.relevantAfterCurrentScreen == 0;
+        final boolean backExitsForm = !details.relevantBeforeCurrentScreen;
         
+        final boolean nextExitsForm = details.relevantAfterCurrentScreen == 0;
         
         Button back = (Button)view.findViewById(R.id.component_repeat_back);
         
@@ -1672,7 +1687,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 			@Override
 			public void onClick(View v) {
-            	FormEntryActivity.this.showPreviousView();
+				if(backExitsForm) {
+					FormEntryActivity.this.triggerUserQuitInput();
+				} else {
+					theDialog.dismiss();
+		            FormEntryActivity.this.refreshCurrentView(false);
+				}
 			}
         	
         });
@@ -1683,6 +1703,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 			@Override
 			public void onClick(View v) {
+                theDialog.dismiss();
                 try {
                     mFormController.newRepeat();
                 } catch (XPathTypeMismatchException e) {
@@ -1699,7 +1720,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 			@Override
 			public void onClick(View v) {
-            	if(!noExitsForm) {
+				theDialog.dismiss();
+            	if(!nextExitsForm) {
             		showNextView();
             	} else {
             		FormEntryActivity.this.triggerUserFormComplete();
@@ -1714,11 +1736,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         back.setText(StringUtils.getStringRobust(this, R.string.repeat_go_back));
         
         //Load up our icons
-        Drawable backIcon = getResources().getDrawable(R.drawable.icon_back);
-        backIcon.setBounds((int) (backIcon.getIntrinsicWidth() * 0.5), 0, (int) (backIcon.getIntrinsicWidth() * 1.5), backIcon.getIntrinsicHeight());
+        Drawable exitIcon = getResources().getDrawable(R.drawable.icon_exit);
+        exitIcon.setBounds(0, 0, exitIcon.getIntrinsicWidth(), exitIcon.getIntrinsicHeight());
 
         Drawable doneIcon = getResources().getDrawable(R.drawable.icon_done);
-        doneIcon.setBounds((int) (doneIcon.getIntrinsicWidth() * 1.5), 0, (int) (doneIcon.getIntrinsicWidth() * 0.5), doneIcon.getIntrinsicHeight());
+        doneIcon.setBounds(0, 0, doneIcon.getIntrinsicWidth(), doneIcon.getIntrinsicHeight());
         
         
         if (mFormController.getLastRepeatCount() > 0) {
@@ -1726,7 +1748,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_another_repeat,
                 mFormController.getLastGroupText()));
             newButton.setText(StringUtils.getStringRobust(this, R.string.add_another));
-            if(!noExitsForm) {
+            if(!nextExitsForm) {
             	skip.setText(StringUtils.getStringRobust(this, R.string.leave_repeat_yes));
             } else {
             	skip.setText(StringUtils.getStringRobust(this, R.string.leave_repeat_yes_exits));
@@ -1737,7 +1759,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             mAlertDialog.setMessage(StringUtils.getStringRobust(this, R.string.add_repeat,
                 mFormController.getLastGroupText()));
             newButton.setText(StringUtils.getStringRobust(this, R.string.entering_repeat));
-            if(!noExitsForm) {
+            if(!nextExitsForm) {
             	skip.setText(StringUtils.getStringRobust(this, R.string.add_repeat_no));
             } else {
             	skip.setText(StringUtils.getStringRobust(this, R.string.add_repeat_no_exits));
@@ -1748,8 +1770,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         mAlertDialog.setCancelable(false);
         mAlertDialog.show();
 
-        if(noExitsForm) {
-        	skip.setCompoundDrawables(null, null, doneIcon, null);
+        if(nextExitsForm) {
+        	skip.setCompoundDrawables(null, doneIcon, null, null);
+        } 
+        
+        if(backExitsForm) {
+        	back.setCompoundDrawables(null, exitIcon, null, null);
         }
         mBeenSwiped = false;
     }
