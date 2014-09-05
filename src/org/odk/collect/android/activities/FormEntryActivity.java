@@ -869,8 +869,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // That is, skip backwards over repeat prompts, groups that are not field-lists,
         // repeat events, and indexes in field-lists that is not the containing group.
         while (event == FormEntryController.EVENT_PROMPT_NEW_REPEAT
-                || (event == FormEntryController.EVENT_GROUP && !mFormController
-                        .indexIsInFieldList())
+                || (event == FormEntryController.EVENT_GROUP && !mFormController.indexIsInFieldList())
                 || event == FormEntryController.EVENT_REPEAT
                 || (mFormController.indexIsInFieldList() && !(event == FormEntryController.EVENT_GROUP))) {
             event = mFormController.stepToPreviousEvent();
@@ -951,7 +950,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 
     /**
-     * @return true if the current View represents a question in the form
+     * @return true If the current index of the form controller contains questions
      */
     private boolean currentPromptIsQuestion() {
         return (mFormController.getEvent() == FormEntryController.EVENT_QUESTION || mFormController
@@ -1360,6 +1359,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         createRepeatDialog();
                         break group_skip;
                     case FormEntryController.EVENT_GROUP:
+                    	//We only hit this event if we're at the _opening_ of a field
+                    	//list, so it seems totally fine to do it this way, technically
+                    	//though this should test whether the index is the field list
+                    	//host.
                         if (mFormController.indexIsInFieldList()
                                 && mFormController.getQuestionPrompts().length != 0) {
                             View nextGroupView = createView(event);
@@ -1413,6 +1416,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         if (mFormController.getEvent() != FormEntryController.EVENT_BEGINNING_OF_FORM) {
             int event = mFormController.stepToPreviousEvent();
 
+            //Step backwards until we either find a question, the beginning of the form,
+            //or a field list with valid questions inside
             while (event != FormEntryController.EVENT_BEGINNING_OF_FORM
                     && event != FormEntryController.EVENT_QUESTION
                     && !(event == FormEntryController.EVENT_GROUP
