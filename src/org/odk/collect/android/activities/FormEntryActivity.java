@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -27,12 +28,10 @@ import javax.crypto.spec.SecretKeySpec;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -63,7 +62,6 @@ import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -726,13 +724,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         ODKView oldODKV = (ODKView)mCurrentView;
         
-        ODKView newODKV =
-                new ODKView(this, mFormController.getQuestionPrompts(),
-                        mFormController.getGroupsForCurrentIndex(),
-                        mFormController.getWidgetFactory());
+        FormEntryPrompt[] newValidPrompts = mFormController.getQuestionPrompts();
+        Set<FormEntryPrompt> used = new HashSet<FormEntryPrompt>();
         
         ArrayList<QuestionWidget> oldWidgets = oldODKV.getWidgets();
-        ArrayList<QuestionWidget> newWidgets = newODKV.getWidgets();
 
         ArrayList<Integer> removeList = new ArrayList<Integer>();
 
@@ -740,12 +735,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             QuestionWidget oldWidget = oldWidgets.get(i);
             boolean stillRelevent = false;
 
-            for(int j=0;j<newWidgets.size();j++){
-                QuestionWidget newWidget = newWidgets.get(j);
-                if(oldWidget.getFormId().equals(newWidget.getFormId())){
-                    stillRelevent = true;
-                    break;
-                }
+            for(FormEntryPrompt prompt : newValidPrompts) {
+            	if(prompt.getIndex().equals(oldWidget.getPrompt().getIndex())) {
+            		stillRelevent = true;
+            		used.add(prompt);
+            	}
             }
             if(!stillRelevent){
                 removeList.add(Integer.valueOf(i));
@@ -754,22 +748,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
            // remove "atomically" to not mess up iterations
         oldODKV.removeQuestionsFromIndex(removeList);
         
-        for(int i=0; i<newWidgets.size();i++){
-            QuestionWidget newWidget = newWidgets.get(i);
-            boolean alreadyPresent = false;
-            
-            for(int j=0; j< oldWidgets.size(); j++){
-                QuestionWidget oldWidget = oldWidgets.get(j);
-                if(oldWidget.getFormId().equals(newWidget.getFormId())){
-                    alreadyPresent = true;
-                    break;
-                }
-            }
-            if(!alreadyPresent){
-                //need to add this widget; unclip from old ODKView and add to new
-                newODKV.removeWidget(newWidget);    
-                oldODKV.addQuestionToIndex(newWidget, i);
-            }
+        
+        //Now go through add add any new prompts that we need
+        for(int i = 0 ; i < newValidPrompts.length; ++i) {
+        	FormEntryPrompt prompt = newValidPrompts[i]; 
+        	if(used.contains(prompt)) {
+        		//nothing to do here
+        		continue;
+        	} 
+        	oldODKV.addQuestionToIndex(prompt, mFormController.getWidgetFactory(), i);
         }
     }
 
