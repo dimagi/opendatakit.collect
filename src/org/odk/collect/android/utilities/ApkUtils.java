@@ -97,13 +97,8 @@ public class ApkUtils {
                    if(Externalizable.class.isAssignableFrom(prototype)) {
                        classNames.add(cn);
                    }
-               } catch(IllegalAccessError e) {
-                   //nothing
-               } catch (SecurityException e) {
-                   
-               } catch (RuntimeException e){
-                   
-               } catch(Exception e) {
+               } catch(Throwable e) {
+                   //nothing should every make this crash
                }
            }
        }
