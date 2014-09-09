@@ -785,47 +785,52 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         int totalQuestions = 0;
         int completedQuestions = 0;
 
-        // Step through form and count questions
         FormIndex currentFormIndex = mFormController.getFormIndex();
         int event = mFormController.getEvent();
-        while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
-            event = mFormController.stepToPreviousEvent();
-        }
-        
-        boolean onCurrentScreen = false;
-        FormIndex currentScreenExit = null;
-        while (event != FormEntryController.EVENT_END_OF_FORM) {
-            int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
-
-            if (comparison == 0) {
-                onCurrentScreen = true;
-                mFormController.stepToNextEvent(true);
-                currentScreenExit = mFormController.getFormIndex();
-                mFormController.stepToPreviousEvent();
-            }
-            if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
-                onCurrentScreen = false;
+        try {
+            // Step through form and count questions
+            while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
+                event = mFormController.stepToPreviousEvent();
             }
             
-            if (event == FormEntryController.EVENT_QUESTION) {
-                FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                totalQuestions += prompts.length;
-                // Current questions are complete only if they're answered.
-                // Past questions are always complete.
-                // Future questions are never complete.
-                if (onCurrentScreen) {
-                    for (FormEntryPrompt prompt : prompts) {
-                      if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                          completedQuestions++;
+            boolean onCurrentScreen = false;
+            FormIndex currentScreenExit = null;
+            while (event != FormEntryController.EVENT_END_OF_FORM) {
+                int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
+    
+                if (comparison == 0) {
+                    onCurrentScreen = true;
+                    mFormController.stepToNextEvent(true);
+                    currentScreenExit = mFormController.getFormIndex();
+                    mFormController.stepToPreviousEvent();
+                }
+                if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
+                    onCurrentScreen = false;
+                }
+                
+                if (event == FormEntryController.EVENT_QUESTION) {
+                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                    totalQuestions += prompts.length;
+                    // Current questions are complete only if they're answered.
+                    // Past questions are always complete.
+                    // Future questions are never complete.
+                    if (onCurrentScreen) {
+                        for (FormEntryPrompt prompt : prompts) {
+                          if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                              completedQuestions++;
+                          }
                       }
-                  }
+                    }
+                    else if (comparison < 0) {
+                        // For previous questions, consider all "complete"
+                        completedQuestions += prompts.length;
+                    }
                 }
-                else if (comparison < 0) {
-                    // For previous questions, consider all "complete"
-                    completedQuestions += prompts.length;
-                }
+                event = mFormController.stepToNextEvent(false);
             }
-            event = mFormController.stepToNextEvent(false);
+        }
+        catch(XPathTypeMismatchException e) {
+            FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
         }
 
         // Set form back to correct state & actually update bar
