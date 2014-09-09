@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -27,12 +28,10 @@ import javax.crypto.spec.SecretKeySpec;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathException;
@@ -63,7 +62,6 @@ import org.odk.collect.android.widgets.IntentWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.TimeWidget;
 
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -726,13 +724,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         ODKView oldODKV = (ODKView)mCurrentView;
         
-        ODKView newODKV =
-                new ODKView(this, mFormController.getQuestionPrompts(),
-                        mFormController.getGroupsForCurrentIndex(),
-                        mFormController.getWidgetFactory());
+        FormEntryPrompt[] newValidPrompts = mFormController.getQuestionPrompts();
+        Set<FormEntryPrompt> used = new HashSet<FormEntryPrompt>();
         
         ArrayList<QuestionWidget> oldWidgets = oldODKV.getWidgets();
-        ArrayList<QuestionWidget> newWidgets = newODKV.getWidgets();
 
         ArrayList<Integer> removeList = new ArrayList<Integer>();
 
@@ -740,12 +735,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             QuestionWidget oldWidget = oldWidgets.get(i);
             boolean stillRelevent = false;
 
-            for(int j=0;j<newWidgets.size();j++){
-                QuestionWidget newWidget = newWidgets.get(j);
-                if(oldWidget.getFormId().equals(newWidget.getFormId())){
-                    stillRelevent = true;
-                    break;
-                }
+            for(FormEntryPrompt prompt : newValidPrompts) {
+            	if(prompt.getIndex().equals(oldWidget.getPrompt().getIndex())) {
+            		stillRelevent = true;
+            		used.add(prompt);
+            	}
             }
             if(!stillRelevent){
                 removeList.add(Integer.valueOf(i));
@@ -754,22 +748,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
            // remove "atomically" to not mess up iterations
         oldODKV.removeQuestionsFromIndex(removeList);
         
-        for(int i=0; i<newWidgets.size();i++){
-            QuestionWidget newWidget = newWidgets.get(i);
-            boolean alreadyPresent = false;
-            
-            for(int j=0; j< oldWidgets.size(); j++){
-                QuestionWidget oldWidget = oldWidgets.get(j);
-                if(oldWidget.getFormId().equals(newWidget.getFormId())){
-                    alreadyPresent = true;
-                    break;
-                }
-            }
-            if(!alreadyPresent){
-                //need to add this widget; unclip from old ODKView and add to new
-                newODKV.removeWidget(newWidget);    
-                oldODKV.addQuestionToIndex(newWidget, i);
-            }
+        
+        //Now go through add add any new prompts that we need
+        for(int i = 0 ; i < newValidPrompts.length; ++i) {
+        	FormEntryPrompt prompt = newValidPrompts[i]; 
+        	if(used.contains(prompt)) {
+        		//nothing to do here
+        		continue;
+        	} 
+        	oldODKV.addQuestionToIndex(prompt, mFormController.getWidgetFactory(), i);
         }
     }
 
@@ -869,8 +856,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // That is, skip backwards over repeat prompts, groups that are not field-lists,
         // repeat events, and indexes in field-lists that is not the containing group.
         while (event == FormEntryController.EVENT_PROMPT_NEW_REPEAT
-                || (event == FormEntryController.EVENT_GROUP && !mFormController
-                        .indexIsInFieldList())
+                || (event == FormEntryController.EVENT_GROUP && !mFormController.indexIsInFieldList())
                 || event == FormEntryController.EVENT_REPEAT
                 || (mFormController.indexIsInFieldList() && !(event == FormEntryController.EVENT_GROUP))) {
             event = mFormController.stepToPreviousEvent();
@@ -951,7 +937,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
 
     /**
-     * @return true if the current View represents a question in the form
+     * @return true If the current index of the form controller contains questions
      */
     private boolean currentPromptIsQuestion() {
         return (mFormController.getEvent() == FormEntryController.EVENT_QUESTION || mFormController
@@ -1360,6 +1346,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         createRepeatDialog();
                         break group_skip;
                     case FormEntryController.EVENT_GROUP:
+                    	//We only hit this event if we're at the _opening_ of a field
+                    	//list, so it seems totally fine to do it this way, technically
+                    	//though this should test whether the index is the field list
+                    	//host.
                         if (mFormController.indexIsInFieldList()
                                 && mFormController.getQuestionPrompts().length != 0) {
                             View nextGroupView = createView(event);
@@ -1413,6 +1403,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         if (mFormController.getEvent() != FormEntryController.EVENT_BEGINNING_OF_FORM) {
             int event = mFormController.stepToPreviousEvent();
 
+            //Step backwards until we either find a question, the beginning of the form,
+            //or a field list with valid questions inside
             while (event != FormEntryController.EVENT_BEGINNING_OF_FORM
                     && event != FormEntryController.EVENT_QUESTION
                     && !(event == FormEntryController.EVENT_GROUP

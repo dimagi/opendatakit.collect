@@ -209,7 +209,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         }
     }
     
-    public void addQuestionToIndex(QuestionWidget newQuestionWidget, int i){
+    public void addQuestionToIndex(FormEntryPrompt fep, WidgetFactory factory, int i){
 
         View divider = new View(getContext());
         divider.setBackgroundResource(android.R.drawable.divider_horizontal_bright);
@@ -221,7 +221,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.addView(divider, getViewIndex(dividerIndex));
         dividers.add(Math.max(0, i - 1), divider);
         
-        QuestionWidget qw = newQuestionWidget;
+        QuestionWidget qw = factory.createWidgetFromPrompt(fep, getContext());;
         qw.setLongClickable(true);
         qw.setOnLongClickListener(this);
         qw.setId(VIEW_ID + widgetIdCount++);
@@ -234,7 +234,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         widgets.add(i, qw);
         mView.addView((View) qw, getViewIndex(2 * i + mViewBannerCount), mLayout);
         
-        newQuestionWidget.setChangedListener(this);
+        qw.setChangedListener(this);
     }
 
 
