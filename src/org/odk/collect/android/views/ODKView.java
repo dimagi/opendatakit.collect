@@ -298,9 +298,17 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      */
     public void updateProgressBar(int progress, int max) {
         if (mProgressBar != null) {
+            setProgressBarIndeterminate(false);
             mProgressBar.setMax(max);
             mProgressBar.setProgress(progress);
         }
+    }
+    
+    /*
+     * Change progress bar to determinate or indeterminate.
+     */
+    public void setProgressBarIndeterminate(boolean indeterminate) {
+        mProgressBar.setIndeterminate(indeterminate);
     }
 
     /**

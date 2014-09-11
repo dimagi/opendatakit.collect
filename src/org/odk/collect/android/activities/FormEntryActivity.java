@@ -42,6 +42,7 @@ import org.odk.collect.android.jr.extensions.IntentCallout;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.listeners.FormSavedListener;
+import org.odk.collect.android.listeners.TimerListener;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.logic.PropertyManager;
@@ -54,6 +55,7 @@ import org.odk.collect.android.tasks.SaveToDiskTask;
 import org.odk.collect.android.utilities.Base64Wrapper;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.GeoUtils;
+import org.odk.collect.android.utilities.ODKTimer;
 import org.odk.collect.android.utilities.StringUtils;
 import org.odk.collect.android.views.ODKView;
 import org.odk.collect.android.views.ResizingImageView;
@@ -213,6 +215,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
     private FormLoaderTask mFormLoaderTask;
     private SaveToDiskTask mSaveToDiskTask;
+    private ProgressBarUpdateTask mProgressBarTask;
     
     private Uri formProviderContentURI = FormsColumns.CONTENT_URI;
     private Uri instanceProviderContentURI = InstanceColumns.CONTENT_URI;
@@ -761,84 +764,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
     /**
-     * Update progress bar's max and value, based on mCurrentView.
-     */
-    public void updateProgressBar() {
-        if(!(mCurrentView instanceof ODKView)){
-            throw new RuntimeException("Tried to update progress bar not on ODKView");
-        }
-        updateProgressBar((ODKView) mCurrentView);
-    }
-
-    /**
-     * Update progress bar's max and value.
-     * @param odkv ODKView to update
-     */
-    public void updateProgressBar(ODKView odkv) {
-        if (
-           !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-           .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
-        ) {
-            return;
-        }
-        
-        int totalQuestions = 0;
-        int completedQuestions = 0;
-
-        FormIndex currentFormIndex = mFormController.getFormIndex();
-        int event = mFormController.getEvent();
-        try {
-            // Step through form and count questions
-            while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
-                event = mFormController.stepToPreviousEvent();
-            }
-            
-            boolean onCurrentScreen = false;
-            FormIndex currentScreenExit = null;
-            while (event != FormEntryController.EVENT_END_OF_FORM) {
-                int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
-    
-                if (comparison == 0) {
-                    onCurrentScreen = true;
-                    mFormController.stepToNextEvent(true);
-                    currentScreenExit = mFormController.getFormIndex();
-                    mFormController.stepToPreviousEvent();
-                }
-                if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
-                    onCurrentScreen = false;
-                }
-                
-                if (event == FormEntryController.EVENT_QUESTION) {
-                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                    totalQuestions += prompts.length;
-                    // Current questions are complete only if they're answered.
-                    // Past questions are always complete.
-                    // Future questions are never complete.
-                    if (onCurrentScreen) {
-                        for (FormEntryPrompt prompt : prompts) {
-                          if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                              completedQuestions++;
-                          }
-                      }
-                    }
-                    else if (comparison < 0) {
-                        // For previous questions, consider all "complete"
-                        completedQuestions += prompts.length;
-                    }
-                }
-                event = mFormController.stepToNextEvent(false);
-            }
-        }
-        catch(XPathTypeMismatchException e) {
-            FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
-        }
-
-        // Set form back to correct state & actually update bar
-        mFormController.jumpToIndex(currentFormIndex);
-        odkv.updateProgressBar(completedQuestions, totalQuestions);
-    }
-
-    /**
      * Refreshes the current view. the controller and the displayed view can get out of sync due to
      * dialogs and restarts caused by screen orientation changes, so they're resynchronized here.
      */
@@ -1263,7 +1188,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
                 
-                updateProgressBar(odkv);
+                if (mProgressBarTask != null) {
+                    mProgressBarTask.cancel(true);
+                }
+                mProgressBarTask = new ProgressBarUpdateTask(odkv);
+                mProgressBarTask.execute();
                 
                 return odkv;
             default:
@@ -1271,7 +1200,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 return null;
         }
     }
-
 
     /*
      * (non-Javadoc)
@@ -2564,6 +2492,134 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     @Override
     public void widgetEntryChanged() {
         updateFormRelevencies();
-        updateProgressBar();
+        if (mProgressBarTask != null) {
+            mProgressBarTask.cancel(true);
+        }
+        mProgressBarTask = new ProgressBarUpdateTask();
+        mProgressBarTask.execute();
+    }
+    
+    /**
+     * Task to calculate min and max values for progress bar, then update the widget.
+     * @author jschweers
+     *
+     */
+    private class ProgressBarUpdateTask extends AsyncTask<Void, Void, Void> implements TimerListener {
+        private ODKView mView;
+        
+        public ProgressBarUpdateTask() {
+            super();
+            if(!(mCurrentView instanceof ODKView)){
+                throw new RuntimeException("Tried to update progress bar not on ODKView");
+            }
+            mView = (ODKView) mCurrentView;
+        }
+        
+        public ProgressBarUpdateTask(ODKView view) {
+            super();
+            mView = view;
+        }
+        
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            // Change progress bar to indeterminate if it's taking a while to update.
+            (new ODKTimer(1000, this)).start();
+        }
+        
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (
+               !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+               .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
+            ) {
+                return null;
+            }
+            
+            int totalQuestions = 0;
+            int completedQuestions = 0;
+    
+            FormIndex currentFormIndex = mFormController.getFormIndex();
+            int event = mFormController.getEvent();
+            try {
+                // Step through form and count questions
+                while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
+                    event = mFormController.stepToPreviousEvent();
+                }
+                
+                boolean onCurrentScreen = false;
+                FormIndex currentScreenExit = null;
+                while (event != FormEntryController.EVENT_END_OF_FORM) {
+                    int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
+        
+                    if (comparison == 0) {
+                        onCurrentScreen = true;
+                        mFormController.stepToNextEvent(true);
+                        currentScreenExit = mFormController.getFormIndex();
+                        mFormController.stepToPreviousEvent();
+                    }
+                    if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
+                        onCurrentScreen = false;
+                    }
+                    
+                    if (event == FormEntryController.EVENT_QUESTION) {
+                        FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                        totalQuestions += prompts.length;
+                        // Current questions are complete only if they're answered.
+                        // Past questions are always complete.
+                        // Future questions are never complete.
+                        if (onCurrentScreen) {
+                            for (FormEntryPrompt prompt : prompts) {
+                              if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                                  completedQuestions++;
+                              }
+                          }
+                        }
+                        else if (comparison < 0) {
+                            // For previous questions, consider all "complete"
+                            completedQuestions += prompts.length;
+                        }
+                    }
+                    event = mFormController.stepToNextEvent(false);
+                }
+            }
+            catch(XPathTypeMismatchException e) {
+                FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
+            }
+    
+            // Set form back to correct state & actually update bar
+            mFormController.jumpToIndex(currentFormIndex);
+            mView.updateProgressBar(completedQuestions, totalQuestions);
+
+            return null;
+        }
+        
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            // Make absolutely sure that progress bar is set back to determinate state
+            mView.setProgressBarIndeterminate(false);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see org.odk.collect.android.listeners.TimerListener#notifyTimerFinished()
+         */
+        @Override
+        public void notifyTimerFinished() {
+            if (!this.getStatus().equals(AsyncTask.Status.FINISHED)) {
+                mView.setProgressBarIndeterminate(true);
+            }
+        }
     }
 }
