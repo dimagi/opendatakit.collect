@@ -800,7 +800,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
                 if (comparison == 0) {
                     onCurrentScreen = true;
-                    mFormController.stepToNextEvent(true);
+                    mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
                     currentScreenExit = mFormController.getFormIndex();
                     mFormController.stepToPreviousEvent();
                 }
@@ -809,6 +809,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 
                 if (event == FormEntryController.EVENT_QUESTION) {
+                    System.out.println("[jls] another question");
                     FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                     totalQuestions += prompts.length;
                     // Current questions are complete only if they're answered.
@@ -826,7 +827,18 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         completedQuestions += prompts.length;
                     }
                 }
-                event = mFormController.stepToNextEvent(false);
+                else if (event == FormEntryController.EVENT_REPEAT) {
+                    System.out.println("[jls] another repeat");
+                    int questionCount = mFormController.getQuestionPrompts().length;
+                    totalQuestions += questionCount;
+                    if (comparison < 0 && !FormIndex.isSubElement(mFormController.getFormIndex(), currentFormIndex)) {
+                        // TODO: attempt to count actual number of questions
+                        // (test with multi-screen repeat groups, not just a single question list)
+                        // (test with partially-irrelevant repeat groups)
+                        completedQuestions += questionCount;
+                    }
+                }
+                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
             }
         }
         catch(XPathTypeMismatchException e) {
@@ -836,6 +848,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // Set form back to correct state & actually update bar
         mFormController.jumpToIndex(currentFormIndex);
         odkv.updateProgressBar(completedQuestions, totalQuestions);
+        System.out.println("[jls] ================= updated progress bar to " + completedQuestions + "/" + totalQuestions);
     }
 
     /**
