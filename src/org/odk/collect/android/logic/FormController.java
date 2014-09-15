@@ -220,7 +220,7 @@ public class FormController {
      * @param index
      * @return
      */
-    private boolean isFieldListHost(FormIndex index) {
+    public boolean isFieldListHost(FormIndex index) {
         // if this isn't a group, return right away
         if (!(mFormEntryController.getModel().getForm().getChild(index) instanceof GroupDef)) {
             return false;
@@ -232,6 +232,20 @@ public class FormController {
 
         GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(index); // exceptions?
         return (ODKView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
+    }
+
+    public boolean isRepeatGroupHost(FormIndex index) {
+        // if this isn't a group, return right away
+        if (!(mFormEntryController.getModel().getForm().getChild(index) instanceof GroupDef)) {
+            return false;
+        }
+        
+        //TODO: Is it possible we need to make sure this group isn't inside of another group which 
+        //is itself a field list? That would make the top group the field list host, not the 
+        //descendant group
+
+        GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(index); // exceptions?
+        return gd.getRepeat();
     }
 
 
@@ -246,6 +260,10 @@ public class FormController {
     	return fieldListHost != null;
     }
 
+    public boolean indexIsInRepeatGroup(FormIndex index) {
+    	FormIndex fieldListHost = this.getRepeatGroupHost(index);
+    	return fieldListHost != null;
+    }
 
     /**
      * Tests if the current FormIndex is located inside a group that is marked as a "field-list"
@@ -254,6 +272,10 @@ public class FormController {
      */
     public boolean indexIsInFieldList() {
         return indexIsInFieldList(mFormEntryController.getModel().getFormIndex());
+    }
+
+    public boolean indexIsInRepeatGroup() {
+        return indexIsInRepeatGroup(mFormEntryController.getModel().getFormIndex());
     }
 
 
@@ -405,6 +427,33 @@ public class FormController {
             for(FormEntryCaption caption : captions ) {
             	FormIndex parentIndex = caption.getIndex();
             	if(isFieldListHost(parentIndex)) {
+            		return parentIndex;
+            	}
+            }
+            
+            //none of this node's parents are field lists
+            return null;
+            
+        } else {
+            // Non-host elements can't have field list hosts.
+            return null;
+        }
+    }
+
+    private FormIndex getRepeatGroupHost(FormIndex child) {
+        int event = mFormEntryController.getModel().getEvent(child);
+        
+        if (event == FormEntryController.EVENT_QUESTION || event == FormEntryController.EVENT_GROUP || event == FormEntryController.EVENT_REPEAT) {
+            // caption[0..len-1]
+            // caption[len-1] == the event itself
+            // caption[len-2] == the groups containing this group
+            FormEntryCaption[] captions = mFormEntryController.getModel().getCaptionHierarchy();
+            
+            //This starts at the beginning of the heirarchy, so it'll catch the top-level 
+            //host index.
+            for(FormEntryCaption caption : captions ) {
+            	FormIndex parentIndex = caption.getIndex();
+            	if(isRepeatGroupHost(parentIndex)) {
             		return parentIndex;
             	}
             }

@@ -809,9 +809,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 
                 if (event == FormEntryController.EVENT_QUESTION) {
-                    System.out.println("[jls] another question");
                     FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                    totalQuestions += prompts.length;
+                    if (mFormController.indexIsInFieldList() || !mFormController.indexIsInRepeatGroup()) {
+                        System.out.println("[jls] adding " + prompts.length + " questions to the total, which are on this screen");
+                        totalQuestions += prompts.length;
+                    }
                     // Current questions are complete only if they're answered.
                     // Past questions are always complete.
                     // Future questions are never complete.
@@ -828,13 +830,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
                 else if (event == FormEntryController.EVENT_REPEAT) {
-                    System.out.println("[jls] another repeat");
                     int questionCount = mFormController.getQuestionPrompts().length;
+                    System.out.println("[jls] adding " + questionCount + " questions to the total, which are part of a repeat group");
                     totalQuestions += questionCount;
                     if (comparison < 0 && !FormIndex.isSubElement(mFormController.getFormIndex(), currentFormIndex)) {
                         // TODO: attempt to count actual number of questions
-                        // (test with multi-screen repeat groups, not just a single question list)
-                        // (test with partially-irrelevant repeat groups)
                         completedQuestions += questionCount;
                     }
                 }
