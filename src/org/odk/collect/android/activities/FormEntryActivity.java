@@ -787,6 +787,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
         FormIndex currentFormIndex = mFormController.getFormIndex();
         int event = mFormController.getEvent();
+        System.out.println("[jls] about to calculate progress, current event is " + event);
         try {
             // Step through form and count questions
             while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
@@ -811,29 +812,38 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 if (event == FormEntryController.EVENT_QUESTION) {
                     FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                     if (mFormController.indexIsInFieldList() || !mFormController.indexIsInRepeatGroup()) {
-                        System.out.println("[jls] adding " + prompts.length + " questions to the total, which are on this screen");
+                        //System.out.println("[jls] adding " + prompts.length + " questions to the total, which are on this screen");
                         totalQuestions += prompts.length;
-                    }
-                    // Current questions are complete only if they're answered.
-                    // Past questions are always complete.
-                    // Future questions are never complete.
-                    if (onCurrentScreen) {
-                        for (FormEntryPrompt prompt : prompts) {
-                          if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                              completedQuestions++;
-                          }
-                      }
-                    }
-                    else if (comparison < 0) {
-                        // For previous questions, consider all "complete"
-                        completedQuestions += prompts.length;
+                        // Current questions are complete only if they're answered.
+                        // Past questions are always complete.
+                        // Future questions are never complete.
+                        if (onCurrentScreen) {
+                            for (FormEntryPrompt prompt : prompts) {
+                                if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                                    completedQuestions++;
+                                }
+                            }
+                        }
+                        else if (comparison < 0) {
+                            // For previous questions, consider all "complete"
+                            completedQuestions += prompts.length;
+                        }
                     }
                 }
                 else if (event == FormEntryController.EVENT_REPEAT) {
                     int questionCount = mFormController.getQuestionPrompts().length;
-                    System.out.println("[jls] adding " + questionCount + " questions to the total, which are part of a repeat group");
+                    //System.out.println("[jls] adding " + questionCount + " questions to the total, which are part of a repeat group");
                     totalQuestions += questionCount;
-                    if (comparison < 0 && !FormIndex.isSubElement(mFormController.getFormIndex(), currentFormIndex)) {
+                    if (FormIndex.isSubElement(mFormController.getFormIndex(), currentFormIndex)) {
+                        //System.out.println("[jls] i'm not counting questions, but there are tis many prompts: " + mFormController.getQuestionPrompts().length);
+                        FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                        for (FormEntryPrompt prompt : prompts) {
+                            if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                                completedQuestions++;
+                            }
+                        }
+                    }
+                    else if (comparison < 0) {
                         // TODO: attempt to count actual number of questions
                         completedQuestions += questionCount;
                     }
