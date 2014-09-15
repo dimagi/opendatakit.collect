@@ -49,7 +49,7 @@ import android.util.Log;
 public class FormController {
 
     private static final String t = "FormController";
-    private FormEntryController mFormEntryController;
+    public FormEntryController mFormEntryController;
     
     private boolean mReadOnly;
 
@@ -307,22 +307,24 @@ public class FormController {
         return mFormEntryController.saveAnswer(data);
     }
 
+    public int stepToNextEvent(boolean stepOverGroup) {
+        return stepToNextEvent(stepOverGroup, true);
+    }
 
     /**
      * Navigates forward in the form.
      * 
      * @return the next event that should be handled by a view.
      */
-    public int stepToNextEvent(boolean stepOverGroup) {
+    public int stepToNextEvent(boolean stepOverGroup, boolean descendIntoRepeats) {
     	//TODO: this won't actually catch the case where there are nested field lists properly
         if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP && indexIsInFieldList() && stepOverGroup) {
             return stepOverGroup();
         } else {
-            int event =  mFormEntryController.stepToNextEvent();
+            int event =  mFormEntryController.stepToNextEvent(descendIntoRepeats);
             
-            //
             if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
-                return stepToNextEvent(stepOverGroup);
+                return stepToNextEvent(stepOverGroup, descendIntoRepeats);
             }
             return event;
         }
@@ -484,7 +486,7 @@ public class FormController {
         //If we're in a group, we will collect of the questions in this group
         if (element instanceof GroupDef) {
         	//Assert that this is a valid condition (only field lists return prompts)
-        	if(!this.isFieldListHost(currentIndex)) { throw new RuntimeException("Cannot get question prompts from a non-field-list group"); }
+        	//if(!this.isFieldListHost(currentIndex)) { throw new RuntimeException("Cannot get question prompts from a non-field-list group"); }
 
             // Questions to collect
             ArrayList<FormEntryPrompt> questionList = new ArrayList<FormEntryPrompt>();
