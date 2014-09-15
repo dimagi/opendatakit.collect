@@ -787,37 +787,24 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
         FormIndex currentFormIndex = mFormController.getFormIndex();
         int event = mFormController.getEvent();
-        System.out.println("[jls] about to calculate progress, current event is " + event);
         try {
             // Step through form and count questions
             while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
                 event = mFormController.stepToPreviousEvent();
             }
             
-            boolean onCurrentScreen = false;
             FormIndex currentScreenExit = null;
             while (event != FormEntryController.EVENT_END_OF_FORM) {
                 int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
     
-                if (comparison == 0) {
-                    onCurrentScreen = true;
-                    mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
-                    currentScreenExit = mFormController.getFormIndex();
-                    mFormController.stepToPreviousEvent();
-                }
-                if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
-                    onCurrentScreen = false;
-                }
-                
                 if (event == FormEntryController.EVENT_QUESTION) {
                     FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                     if (mFormController.indexIsInFieldList() || !mFormController.indexIsInRepeatGroup()) {
-                        //System.out.println("[jls] adding " + prompts.length + " questions to the total, which are on this screen");
                         totalQuestions += prompts.length;
                         // Current questions are complete only if they're answered.
                         // Past questions are always complete.
                         // Future questions are never complete.
-                        if (onCurrentScreen) {
+                        if (FormIndex.isSubIndex(currentFormIndex, mFormController.getFormIndex())) {
                             for (FormEntryPrompt prompt : prompts) {
                                 if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
                                     completedQuestions++;
@@ -832,10 +819,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
                 else if (event == FormEntryController.EVENT_REPEAT) {
                     int questionCount = mFormController.getQuestionPrompts().length;
-                    //System.out.println("[jls] adding " + questionCount + " questions to the total, which are part of a repeat group");
                     totalQuestions += questionCount;
                     if (FormIndex.isSubElement(mFormController.getFormIndex(), currentFormIndex)) {
-                        //System.out.println("[jls] i'm not counting questions, but there are tis many prompts: " + mFormController.getQuestionPrompts().length);
                         FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
                         for (FormEntryPrompt prompt : prompts) {
                             if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
@@ -844,7 +829,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         }
                     }
                     else if (comparison < 0) {
-                        // TODO: attempt to count actual number of questions
                         completedQuestions += questionCount;
                     }
                 }
@@ -858,7 +842,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // Set form back to correct state & actually update bar
         mFormController.jumpToIndex(currentFormIndex);
         odkv.updateProgressBar(completedQuestions, totalQuestions);
-        System.out.println("[jls] ================= updated progress bar to " + completedQuestions + "/" + totalQuestions);
+        System.out.println("[jls] updated progress bar to " + completedQuestions + "/" + totalQuestions);
     }
 
     /**
