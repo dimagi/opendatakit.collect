@@ -338,15 +338,15 @@ public class FormController {
      * 
      * @return the next event that should be handled by a view.
      */
-    public int stepToNextEvent(boolean stepOverGroup, boolean descendIntoRepeats) {
+    public int stepToNextEvent(boolean stepOverGroup, boolean expandRepeats) {
     	//TODO: this won't actually catch the case where there are nested field lists properly
         if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP && indexIsInFieldList() && stepOverGroup) {
             return stepOverGroup();
         } else {
-            int event =  mFormEntryController.stepToNextEvent(descendIntoRepeats);
+            int event =  mFormEntryController.stepToNextEvent(expandRepeats);
             
             if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
-                return stepToNextEvent(stepOverGroup, descendIntoRepeats);
+                return stepToNextEvent(stepOverGroup, expandRepeats);
             }
             return event;
         }
