@@ -211,6 +211,7 @@ public class FormController {
         return mFormEntryController.getModel().getForm().getInstance();
     }
 
+
     /**
      * A convenience method for determining if the current FormIndex is a group that is/should be
      * displayed as a multi-question view of all of its descendants. This is useful for returning 

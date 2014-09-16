@@ -795,18 +795,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             
             while (event != FormEntryController.EVENT_END_OF_FORM) {
                 int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
-                /*
-                 * weird is questions in a group and in the future, but the group is comparison == 0
-                 * 
-                 * so if i'm a question, and comparison > 0, BUT i'm in a group and group comparison == 0, completedQuestions++
-                 * 
-                 * so completedQuestions++ if i'm a question and any of the below are true:
-                 * - i'm in the past
-                 * - i'm in the present and i have an answer
-                 * - i'm in the future and i'm a subindex of currentFormIndex and i have an answer
-                 */
                 if (event == FormEntryController.EVENT_QUESTION) {
                     totalQuestions++;
+                    
+                    // Questions are counted as complete if any of the following are true:
+                    // - User has already passed the question, regardless of if it's been answered
+                    // - User is currently looking at the question, and it's been answered
+                    // - User is currently looking at a group containing the question, and it's been answered
                     if (comparison < 0) {
                         completedQuestions++;
                     }
@@ -822,6 +817,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         }
                     }
                 }
+
+                // STEP_OVER_GROUP will, rather counter-intuitively, make sure we visit every question inside every group
                 event = mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP, false);
             }
         }
