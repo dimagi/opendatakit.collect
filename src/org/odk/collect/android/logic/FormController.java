@@ -278,17 +278,6 @@ public class FormController {
     }
 
     /**
-     * Tests if the FormIndex 'index' is located inside a repeat group.
-     * 
-     * @param index
-     * @return true if index is in a repeat group. False otherwise.
-     */
-    public boolean indexIsInRepeatGroup(FormIndex index) {
-    	FormIndex fieldListHost = this.getRepeatGroupHost(index);
-    	return fieldListHost != null;
-    }
-
-    /**
      * Tests if the current FormIndex is located inside a group that is marked as a "field-list"
      * 
      * @return true if index is in a "field-list". False otherwise.
@@ -296,16 +285,6 @@ public class FormController {
     public boolean indexIsInFieldList() {
         return indexIsInFieldList(mFormEntryController.getModel().getFormIndex());
     }
-
-    /**
-     * Tests if the current FormIndex is located inside a repeat group.
-     * 
-     * @return true if index is in a repeat group. False otherwise.
-     */
-    public boolean indexIsInRepeatGroup() {
-        return indexIsInRepeatGroup(mFormEntryController.getModel().getFormIndex());
-    }
-
 
     /**
      * Attempts to save answer at the current FormIndex into the data model.
@@ -564,6 +543,9 @@ public class FormController {
 
         //If we're in a group, we will collect of the questions in this group
         if (element instanceof GroupDef) {
+            //Assert that this is a valid condition (only field lists return prompts)
+            if(!this.isFieldListHost(currentIndex)) { throw new RuntimeException("Cannot get question prompts from a non-field-list group"); }
+            
             // Questions to collect
             ArrayList<FormEntryPrompt> questionList = new ArrayList<FormEntryPrompt>();
                         
