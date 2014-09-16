@@ -233,6 +233,7 @@ public class FormController {
         return (ODKView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
     }
 
+
     /**
      * Tests if the FormIndex 'index' is located inside a group that is marked as a "field-list"
      * 
@@ -244,6 +245,7 @@ public class FormController {
     	return fieldListHost != null;
     }
 
+
     /**
      * Tests if the current FormIndex is located inside a group that is marked as a "field-list"
      * 
@@ -252,6 +254,7 @@ public class FormController {
     public boolean indexIsInFieldList() {
         return indexIsInFieldList(mFormEntryController.getModel().getFormIndex());
     }
+
 
     /**
      * Attempts to save answer at the current FormIndex into the data model.
@@ -387,9 +390,9 @@ public class FormController {
     }
     
     /**
-     * Retrieves the index of the group that is the host of a given FormIndex.
+     * Retrieves the index of the Group that is the host of a given field list. 
+     * 
      * @param child
-     * @param groupType FIELD_LIST or REPEAT_GROUP
      * @return
      */
     private FormIndex getFieldListHost(FormIndex child) {
@@ -401,7 +404,7 @@ public class FormController {
             // caption[len-2] == the groups containing this group
             FormEntryCaption[] captions = mFormEntryController.getModel().getCaptionHierarchy();
             
-            //This starts at the beginning of the hierarchy, so it'll catch the top-level 
+            //This starts at the beginning of the heirarchy, so it'll catch the top-level 
             //host index.
             for(FormEntryCaption caption : captions ) {
             	FormIndex parentIndex = caption.getIndex();
@@ -474,9 +477,8 @@ public class FormController {
 
     /**
      * Returns an array of relevant question prompts that should be displayed as a single screen.
-     * If the current form index is a question, it is returned. Otherwise, if the 
-     * current index is a group (e.g., field list or repeat group), returns an array of
-     * all prompts in the group.
+     * If the current form index is a question, it is returned. Otherwise if the 
+     * current index is a field list (and _only_ when it is a field list) 
      * 
      * @return
      */
