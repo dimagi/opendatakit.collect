@@ -212,9 +212,9 @@ public class FormController {
     }
 
     /**
-     * Returns true iff the given FormIndex is a group that is/should be
-     * displayed as a multi-question view of all of its descendants.
-     * This is useful for returning from the formhierarchy view to a selected index.
+     * A convenience method for determining if the current FormIndex is a group that is/should be
+     * displayed as a multi-question view of all of its descendants. This is useful for returning 
+     * from the formhierarchy view to a selected index.
      * 
      * @param index
      * @return
