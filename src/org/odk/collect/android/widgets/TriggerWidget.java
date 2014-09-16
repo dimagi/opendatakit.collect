@@ -24,7 +24,6 @@ import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -65,7 +64,7 @@ public class TriggerWidget extends QuestionWidget {
         // mActionButton.setPadding(20, 20, 20, 20);
         mTriggerButton.setEnabled(!prompt.isReadOnly());
         
-        mTriggerButton.setPadding(0, padding, 0, padding);
+        mTriggerButton.setPadding(mTriggerButton.getPaddingLeft(), padding, mTriggerButton.getPaddingRight(), padding);
 
         mTriggerButton.setOnClickListener(new View.OnClickListener() {
         	/*
