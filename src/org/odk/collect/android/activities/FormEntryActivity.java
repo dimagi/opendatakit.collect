@@ -832,7 +832,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         // Set form back to correct state & actually update bar
         mFormController.jumpToIndex(currentFormIndex);
         odkv.updateProgressBar(completedQuestions, totalQuestions);
-        System.out.println("[jls] updated progress bar to " + completedQuestions + "/" + totalQuestions);
     }
 
     /**
