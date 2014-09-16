@@ -53,9 +53,6 @@ public class FormController {
     
     private boolean mReadOnly;
     
-    private int FIELD_LIST = 1;
-    private int REPEAT_GROUP = 2;
-
     public static final boolean STEP_INTO_GROUP = true;
     public static final boolean STEP_OVER_GROUP = false;
 
@@ -215,14 +212,14 @@ public class FormController {
     }
 
     /**
-     * A convenience method for determining if the given FormIndex is some kind of group,
-     * whether a field list or a repeat group. 
+     * Returns true iff the given FormIndex is a group that is/should be
+     * displayed as a multi-question view of all of its descendants.
+     * This is useful for returning from the formhierarchy view to a selected index.
      * 
      * @param index
-     * @param FIELD_LIST or REPEAT_GROUP
      * @return
      */
-    private boolean isGroupHost(FormIndex index, int groupType) {
+    private boolean isFieldListHost(FormIndex index) {
         // if this isn't a group, return right away
         if (!(mFormEntryController.getModel().getForm().getChild(index) instanceof GroupDef)) {
             return false;
@@ -233,37 +230,7 @@ public class FormController {
         //descendant group
 
         GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(index); // exceptions?
-        if (groupType == FIELD_LIST) {
-            return (ODKView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
-        }
-        
-        if (groupType == REPEAT_GROUP) {
-            return gd.getRepeat();
-        }
-        
-        return true;
-    }
-
-    /**
-     * Returns true iff the given FormIndex is a group that is/should be
-     * displayed as a multi-question view of all of its descendants.
-     * This is useful for returning from the formhierarchy view to a selected index.
-     * 
-     * @param index
-     * @return
-     */
-    private boolean isFieldListHost(FormIndex index) {
-        return isGroupHost(index, FIELD_LIST);
-    }
-
-    /**
-     * Returns true iff the given FormIndex is a repeat group.
-     * 
-     * @param index
-     * @return
-     */
-    private boolean isRepeatGroupHost(FormIndex index) {
-        return isGroupHost(index, REPEAT_GROUP);
+        return (ODKView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
     }
 
     /**
@@ -420,32 +387,12 @@ public class FormController {
     }
     
     /**
-     * Retrieves the index of the field list that is the host of a given FormIndex. 
-     * 
-     * @param child
-     * @return
-     */
-    private FormIndex getFieldListHost(FormIndex child) {
-        return getGroupHost(child, FIELD_LIST);
-    }
-
-    /**
-     * Retrieves the index of the repeat group that is the host of a given FormIndex. 
-     * 
-     * @param child
-     * @return
-     */
-    private FormIndex getRepeatGroupHost(FormIndex child) {
-        return getGroupHost(child, REPEAT_GROUP);
-    }
-    
-    /**
      * Retrieves the index of the group that is the host of a given FormIndex.
      * @param child
      * @param groupType FIELD_LIST or REPEAT_GROUP
      * @return
      */
-    private FormIndex getGroupHost(FormIndex child, int groupType) {
+    private FormIndex getFieldListHost(FormIndex child) {
         int event = mFormEntryController.getModel().getEvent(child);
         
         if (event == FormEntryController.EVENT_QUESTION || event == FormEntryController.EVENT_GROUP || event == FormEntryController.EVENT_REPEAT) {
@@ -458,10 +405,7 @@ public class FormController {
             //host index.
             for(FormEntryCaption caption : captions ) {
             	FormIndex parentIndex = caption.getIndex();
-            	if(
-                    groupType == FIELD_LIST && isFieldListHost(parentIndex)
-                    || groupType == REPEAT_GROUP && isRepeatGroupHost(parentIndex)
-            	) {
+            	if(isFieldListHost(parentIndex)) {
             		return parentIndex;
             	}
             }
