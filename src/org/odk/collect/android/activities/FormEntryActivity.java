@@ -793,46 +793,36 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 event = mFormController.stepToPreviousEvent();
             }
             
-            FormIndex currentScreenExit = null;
             while (event != FormEntryController.EVENT_END_OF_FORM) {
                 int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
-    
+                /*
+                 * weird is questions in a group and in the future, but the group is comparison == 0
+                 * 
+                 * so if i'm a question, and comparison > 0, BUT i'm in a group and group comparison == 0, completedQuestions++
+                 * 
+                 * so completedQuestions++ if i'm a question and any of the below are true:
+                 * - i'm in the past
+                 * - i'm in the present and i have an answer
+                 * - i'm in the future and i'm a subindex of currentFormIndex and i have an answer
+                 */
                 if (event == FormEntryController.EVENT_QUESTION) {
-                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                    if (mFormController.indexIsInFieldList() || !mFormController.indexIsInRepeatGroup()) {
-                        totalQuestions += prompts.length;
-                        // Current questions are complete only if they're answered.
-                        // Past questions are always complete.
-                        // Future questions are never complete.
-                        if (FormIndex.isSubIndex(currentFormIndex, mFormController.getFormIndex())) {
-                            for (FormEntryPrompt prompt : prompts) {
-                                if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                                    completedQuestions++;
-                                }
-                            }
-                        }
-                        else if (comparison < 0) {
-                            // For previous questions, consider all "complete"
-                            completedQuestions += prompts.length;
-                        }
+                    totalQuestions++;
+                    if (comparison < 0) {
+                        completedQuestions++;
                     }
-                }
-                else if (event == FormEntryController.EVENT_REPEAT) {
-                    int questionCount = mFormController.getQuestionPrompts().length;
-                    totalQuestions += questionCount;
-                    if (FormIndex.isSubElement(mFormController.getFormIndex(), currentFormIndex)) {
-                        FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                        for (FormEntryPrompt prompt : prompts) {
-                            if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                    else {
+                        FormEntryPrompt prompt = mFormController.getQuestionPrompt();
+                        if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                            if (comparison == 0) {
+                                completedQuestions++;
+                            }
+                            else if (FormIndex.isSubElement(currentFormIndex, mFormController.getFormIndex())) {
                                 completedQuestions++;
                             }
                         }
                     }
-                    else if (comparison < 0) {
-                        completedQuestions += questionCount;
-                    }
                 }
-                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
+                event = mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP, false);
             }
         }
         catch(XPathTypeMismatchException e) {
