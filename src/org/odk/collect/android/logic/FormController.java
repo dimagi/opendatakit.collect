@@ -56,8 +56,8 @@ public class FormController {
     
     private boolean mReadOnly;
 
-    public static final boolean STEP_INTO_GROUP = true;
-    public static final boolean STEP_OVER_GROUP = false;
+    public static final boolean STEP_OVER_GROUP = true;
+    public static final boolean STEP_INTO_GROUP = false;
 
     /**
      * OpenRosa metadata tag names.
@@ -310,7 +310,6 @@ public class FormController {
         return mFormEntryController.saveAnswer(index, data);
     }
 
-
     /**
      * saveAnswer attempts to save the current answer into the data model without doing any
      * constraint checking. Only use this if you know what you're doing. For normal form filling you
@@ -324,20 +323,28 @@ public class FormController {
         return mFormEntryController.saveAnswer(data);
     }
 
+    /**
+     * Navigates forward in the form, expanding any repeats encountered.
+     * 
+     * @return the next event that should be handled by a view.
+     */
+    public int stepToNextEvent(boolean stepOverGroup) {
+       return stepToNextEvent(stepOverGroup, true);
+    }
 
     /**
      * Navigates forward in the form.
      * 
      * @return the next event that should be handled by a view.
      */
-    public int stepToNextEvent(boolean stepOverGroup) {
+    public int stepToNextEvent(boolean stepOverGroup, boolean expandRepeats) {
         if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP && indexIsInFieldList() && stepOverGroup) {
             return stepOverGroup();
         } else {
-            int event =  mFormEntryController.stepToNextEvent();
+            int event =  mFormEntryController.stepToNextEvent(expandRepeats);
             if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
                     this.mReadOnly) {
-                return stepToNextEvent(stepOverGroup);
+                return stepToNextEvent(stepOverGroup, expandRepeats);
             }
             return event;
         }
