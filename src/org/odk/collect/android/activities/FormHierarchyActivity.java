@@ -206,7 +206,7 @@ public class FormHierarchyActivity extends ListActivity {
         if (FormEntryActivity.mFormController.getEvent() == FormEntryController.EVENT_REPEAT) {
             enclosingGroupRef =
                 FormEntryActivity.mFormController.getFormIndex().getReference().toString(false);
-            FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
+            FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
         } else {
             FormIndex startTest = stepIndexOut(currentIndex);
             // If we have a 'group' tag, we want to step back until we hit a repeat or the
@@ -230,14 +230,14 @@ public class FormHierarchyActivity extends ListActivity {
             if (FormEntryActivity.mFormController.getEvent() == FormEntryController.EVENT_REPEAT) {
                 enclosingGroupRef =
                     FormEntryActivity.mFormController.getFormIndex().getReference().toString(false);
-                FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
+                FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
             }
         }
 
         int event = FormEntryActivity.mFormController.getEvent();
         if (event == FormEntryController.EVENT_BEGINNING_OF_FORM) {
             // The beginning of form has no valid prompt to display.
-            FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
+            FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
             mPath.setVisibility(View.GONE);
             jumpPreviousButton.setEnabled(false);
         } else {
@@ -261,7 +261,7 @@ public class FormHierarchyActivity extends ListActivity {
                         // index.
                         event =
                             FormEntryActivity.mFormController
-                                    .stepToNextEvent(FormController.STEP_OVER_GROUP);
+                                    .stepToNextEvent(FormController.STEP_INTO_GROUP);
                         continue;
                     }
 
@@ -286,7 +286,7 @@ public class FormHierarchyActivity extends ListActivity {
                         // next event.
                         event =
                             FormEntryActivity.mFormController
-                                    .stepToNextEvent(FormController.STEP_OVER_GROUP);
+                                    .stepToNextEvent(FormController.STEP_INTO_GROUP);
                         continue;
                     }
 
@@ -329,7 +329,7 @@ public class FormHierarchyActivity extends ListActivity {
                     break;
             }
             event =
-                FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
+                FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
         }
 
         HierarchyListAdapter itla = new HierarchyListAdapter(this);

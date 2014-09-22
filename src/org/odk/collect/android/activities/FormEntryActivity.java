@@ -818,8 +818,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
 
-                // STEP_OVER_GROUP will, rather counter-intuitively, make sure we visit every question inside every group
-                event = mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP, false);
+                // Make sure we visit every question inside every group
+                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
             }
         }
         catch(XPathTypeMismatchException e) {
@@ -1329,7 +1329,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             try{
             
             group_skip: do {
-                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
+                event = mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
                 switch (event) {
                     case FormEntryController.EVENT_QUESTION:
                     case FormEntryController.EVENT_END_OF_FORM:

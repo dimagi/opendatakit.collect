@@ -53,8 +53,8 @@ public class FormController {
     
     private boolean mReadOnly;
     
-    public static final boolean STEP_INTO_GROUP = true;
-    public static final boolean STEP_OVER_GROUP = false;
+    public static final boolean STEP_OVER_GROUP = true;
+    public static final boolean STEP_INTO_GROUP = false;
 
     /**
      * OpenRosa metadata tag names.
