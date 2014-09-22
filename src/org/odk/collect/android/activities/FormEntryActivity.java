@@ -793,40 +793,33 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 event = mFormController.stepToPreviousEvent();
             }
             
-            boolean onCurrentScreen = false;
-            FormIndex currentScreenExit = null;
             while (event != FormEntryController.EVENT_END_OF_FORM) {
                 int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
-    
-                if (comparison == 0) {
-                    onCurrentScreen = true;
-                    mFormController.stepToNextEvent(true);
-                    currentScreenExit = mFormController.getFormIndex();
-                    mFormController.stepToPreviousEvent();
-                }
-                if (onCurrentScreen && mFormController.getFormIndex().equals(currentScreenExit)) {
-                    onCurrentScreen = false;
-                }
-                
                 if (event == FormEntryController.EVENT_QUESTION) {
-                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
-                    totalQuestions += prompts.length;
-                    // Current questions are complete only if they're answered.
-                    // Past questions are always complete.
-                    // Future questions are never complete.
-                    if (onCurrentScreen) {
-                        for (FormEntryPrompt prompt : prompts) {
-                          if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                              completedQuestions++;
-                          }
-                      }
+                    totalQuestions++;
+                    
+                    // Questions are counted as complete if any of the following are true:
+                    // - User has already passed the question, regardless of if it's been answered
+                    // - User is currently looking at the question, and it's been answered
+                    // - User is currently looking at a group containing the question, and it's been answered
+                    if (comparison < 0) {
+                        completedQuestions++;
                     }
-                    else if (comparison < 0) {
-                        // For previous questions, consider all "complete"
-                        completedQuestions += prompts.length;
+                    else {
+                        FormEntryPrompt prompt = mFormController.getQuestionPrompt();
+                        if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                            if (comparison == 0) {
+                                completedQuestions++;
+                            }
+                            else if (FormIndex.isSubElement(currentFormIndex, mFormController.getFormIndex())) {
+                                completedQuestions++;
+                            }
+                        }
                     }
                 }
-                event = mFormController.stepToNextEvent(false);
+
+                // Make sure we visit every question inside every group
+                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
             }
         }
         catch(XPathTypeMismatchException e) {
@@ -1336,7 +1329,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             try{
             
             group_skip: do {
-                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
+                event = mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
                 switch (event) {
                     case FormEntryController.EVENT_QUESTION:
                     case FormEntryController.EVENT_END_OF_FORM:
