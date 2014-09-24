@@ -786,12 +786,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         int completedQuestions = 0;
 
         FormIndex currentFormIndex = mFormController.getFormIndex();
-        int event = mFormController.getEvent();
+        int event = mFormController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
         try {
-            // Step through form and count questions
-            while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
-                event = mFormController.stepToPreviousEvent();
-            }
             
             boolean onCurrentScreen = false;
             FormIndex currentScreenExit = null;
@@ -816,7 +812,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     // Future questions are never complete.
                     if (onCurrentScreen) {
                         for (FormEntryPrompt prompt : prompts) {
-                          if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                            prompt = getOnScreenPrompt(prompt, odkv);
+                        	if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
                               completedQuestions++;
                           }
                       }
@@ -839,6 +836,25 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     }
 
     /**
+     * Takes in a form entry prompt that is obtained generically and if there
+     * is already one on screen (which, for isntance, may have cached some of its data)
+     * returns the object in use currently.
+     * 
+     * @param prompt
+     * @return
+     */
+    private FormEntryPrompt getOnScreenPrompt(FormEntryPrompt prompt, ODKView view) {
+    	FormIndex index = prompt.getIndex();
+    	for(QuestionWidget widget : view.getWidgets()) {
+    		if(widget.getFormId().equals(index)) {
+    			return widget.getPrompt();
+    		}
+    	}
+    	return prompt;
+	}
+
+
+	/**
      * Refreshes the current view. the controller and the displayed view can get out of sync due to
      * dialogs and restarts caused by screen orientation changes, so they're resynchronized here.
      */
