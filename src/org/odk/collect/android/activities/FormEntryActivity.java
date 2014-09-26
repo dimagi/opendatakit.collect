@@ -918,7 +918,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
 
                 event = mFormController.stepToNextEvent(false);
-                System.out.println(mFormController.getFormIndex());
             }
         } catch (XPathTypeMismatchException e) {
             FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
