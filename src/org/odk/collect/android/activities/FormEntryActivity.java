@@ -94,6 +94,7 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ContextThemeWrapper;
@@ -118,6 +119,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -936,6 +938,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * @param odkv ODKView to update
      */
     public void updateNavigationCues() {
+        updateFloatingLabels();
     	ProgressBar progressBar = (ProgressBar)this.findViewById(R.id.nav_prog_bar);
     	
     	NavigationDetails details = calculateNavigationStatus();
@@ -981,7 +984,91 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         //We should probably be doing this based on the widgets, maybe, not the model? Hard to call.
         updateBadgeInfo(details.requiredOnScreen, details.answeredOnScreen);
     }
+    enum FloatingLabel {
+        good ("floating-good", R.drawable.label_floating_good),
+        caution ("floating-caution", R.drawable.label_floating_caution),
+        bad ("floating-bad", R.drawable.label_floating_bad);
+        
+        String label;
+        int resourceId;
+        FloatingLabel(String label, int resourceId) {
+            this.label = label;
+            this.resourceId = resourceId;
+        }
+        
+        public String getAppearance() { return label;}
+        public int getBackgroundDrawable() { return resourceId; }
+    };
     
+    private void updateFloatingLabels() {
+        //TODO: this should actually be set up to scale per screen size.
+        ArrayList<Pair<String, FloatingLabel>> smallLabels = new ArrayList<Pair<String, FloatingLabel>>();
+        ArrayList<Pair<String, FloatingLabel>> largeLabels = new ArrayList<Pair<String, FloatingLabel>>();
+        
+        FloatingLabel[] labelTypes = FloatingLabel.values();
+        
+        if(this.mCurrentView instanceof ODKView) {
+            for(QuestionWidget widget : ((ODKView)mCurrentView).getWidgets()) {
+                String hint = widget.getPrompt().getAppearanceHint();
+                if(hint == null) { continue; }
+                for(FloatingLabel type : labelTypes) {
+                    if(type.getAppearance().equals(hint)) {
+                        String widgetText = widget.getPrompt().getQuestionText();
+                        if(widgetText != null && widgetText.length() < 15) {
+                            smallLabels.add(new Pair(widgetText, type));
+                        } else {
+                            largeLabels.add(new Pair(widgetText, type));
+                        }
+                    }
+                }
+            }
+        }
+        
+        ViewGroup parent = (ViewGroup)this.findViewById(R.id.form_entry_label_layout);
+        parent.removeAllViews();
+        
+        //Ok, now go ahead and add all of the small labels
+        for(int i = 0 ; i < smallLabels.size(); i = i + 2 ) {
+            if(i + 1 < smallLabels.size()) {
+                LinearLayout.LayoutParams lpp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                lpp.setMargins(0, 1, 0, 0);
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.HORIZONTAL);
+                layout.setLayoutParams(lpp);
+                layout.setWeightSum(2);
+                
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1);
+                
+                TextView left = (TextView)View.inflate(this, R.layout.component_floating_label, null);
+                left.setLayoutParams(lp);
+                left.setText(smallLabels.get(i).first);
+                left.setBackgroundResource(smallLabels.get(i).second.resourceId);
+                layout.addView(left);
+                
+                lp.setMargins(1, 0,0,0);
+                
+                TextView right = (TextView)View.inflate(this, R.layout.component_floating_label, null);
+                right.setLayoutParams(lp);
+                right.setText(smallLabels.get(i+1).first);
+                right.setBackgroundResource(smallLabels.get(i+1).second.resourceId);
+                layout.addView(right);
+                parent.addView(layout);
+            } else {
+                largeLabels.add(smallLabels.get(i));
+            }
+        }
+        for(int i = 0 ; i < largeLabels.size(); ++i ) {
+            TextView view = (TextView)View.inflate(this, R.layout.component_floating_label, null);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, 1, 0, 0);
+            view.setLayoutParams(lp);
+            view.setText(largeLabels.get(i).first);
+            view.setBackgroundResource(largeLabels.get(i).second.resourceId);
+            parent.addView(view);
+        }
+    }
+
+
     private void updateBadgeInfo(int requiredOnScreen, int answeredOnScreen) {
     	View badgeBorder = this.findViewById(R.id.nav_badge_border_drawer);
     	TextView badge = (TextView)this.findViewById(R.id.nav_badge);
@@ -2859,5 +2946,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     public void widgetEntryChanged() {
         updateFormRelevencies();
         updateNavigationCues();
+        
     }
 }

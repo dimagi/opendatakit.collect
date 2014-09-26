@@ -13,9 +13,26 @@
         android:id="@+id/form_entry_pane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:layout_above="@+id/nav_pane"
+        android:layout_above="@+id/form_entry_labels"
         android:layout_below="@id/form_entry_header_pane">
     </FrameLayout>
+    
+    <FrameLayout
+        android:id="@+id/form_entry_labels"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_above="@+id/nav_pane">
+
+        <LinearLayout
+            android:id="@+id/form_entry_label_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+
+    </FrameLayout>
+    
 
     <ImageView
         android:id="@+id/nav_badge_border_drawer"

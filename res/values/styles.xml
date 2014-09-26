@@ -13,7 +13,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <dimen name="select_padding">15dp</dimen>
     <dimen name="nav_border_depth">2dp</dimen>
     
@@ -29,4 +29,9 @@ the License.
        <dimen name="badge_offset_side">10dp</dimen>
        
        <style name="DialogBaseTheme" parent="android:Theme.Dialog"/>
+       
+        <style name="FloatingLabel" parent="@android:style/TextAppearance">
+     	    <item name="android:background">@drawable/label_floating_good</item>
+     	    <item name="android:textColor">@color/white</item>
+     	</style>
 </resources>

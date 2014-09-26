@@ -53,4 +53,8 @@ the License.
    
     
     <color name="very_light_blue">#AAE3ECFF</color>
+    
+    <color name="solid_dark_red">#BF3D3D</color>
+    <color name="solid_dark_orange">#F57E20</color>
+    
 </resources>
