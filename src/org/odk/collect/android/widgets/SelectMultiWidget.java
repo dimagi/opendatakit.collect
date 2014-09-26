@@ -74,6 +74,10 @@ public class SelectMultiWidget extends QuestionWidget {
 
                 // when clicked, check for readonly before toggling
                 c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                	/*
+                	 * (non-Javadoc)
+                	 * @see android.widget.CompoundButton.OnCheckedChangeListener#onCheckedChanged(android.widget.CompoundButton, boolean)
+                	 */
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (!mCheckboxInit && mPrompt.isReadOnly()) {
@@ -95,7 +99,7 @@ public class SelectMultiWidget extends QuestionWidget {
                 
                 int padding = (int)Math.floor(context.getResources().getDimension(R.dimen.select_padding));
                 
-                c.setPadding(0, 0, padding, 0);
+                c.setPadding(c.getPaddingLeft(), 0, padding, 0);
                 for (int vi = 0; vi < ve.size(); vi++) {
                     // match based on value, not key
                     if (mItems.get(i).getValue().equals(ve.elementAt(vi).getValue())) {
@@ -130,10 +134,10 @@ public class SelectMultiWidget extends QuestionWidget {
                 
                 mediaLayout.setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-	                	c.performClick();
-					}
+                    @Override
+                    public void onClick(View v) {
+                        c.performClick();
+                    }
                 });
 
                 // Last, add the dividing line between elements (except for the last element)
@@ -150,6 +154,10 @@ public class SelectMultiWidget extends QuestionWidget {
 
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         int j = mItems.size();
@@ -164,6 +172,10 @@ public class SelectMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         Vector<Selection> vc = new Vector<Selection>();
@@ -184,6 +196,10 @@ public class SelectMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -193,6 +209,10 @@ public class SelectMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         for (CheckBox c : mCheckboxes) {
@@ -201,6 +221,10 @@ public class SelectMultiWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/date_button_top"
             android:text="+"
-            android:textSize="40dp" 
+            android:textSize="@dimen/text_largest" 
             android:textColor="#666"/>
 
         <TextView
@@ -28,7 +28,7 @@
             android:background="@drawable/date_edit"
             android:gravity="center"
             android:padding="3dp"
-            android:textSize="28dp" />
+            android:textSize="@dimen/text_larger" />
 
         <Button
             android:id="@+id/daydownbtn"
@@ -37,7 +37,7 @@
             android:layout_below="@id/daytxt"
             android:background="@drawable/date_button_bottom"
             android:text="-"
-            android:textSize="40dp"
+            android:textSize="@dimen/text_largest"
             android:textColor="#666" />
 
         <Button
@@ -48,7 +48,7 @@
             android:layout_toRightOf="@id/dayupbtn"
             android:background="@drawable/date_button_top"
             android:text="+"
-            android:textSize="40dp"
+            android:textSize="@dimen/text_largest"
             android:textColor="#666" />
 
         <TextView
@@ -61,7 +61,7 @@
             android:background="@drawable/date_edit"
             android:gravity="center"
             android:padding="3dp"
-            android:textSize="28dp" />
+            android:textSize="@dimen/text_larger" />
 
         <Button
             android:id="@+id/monthdownbtn"
@@ -72,7 +72,7 @@
             android:layout_toRightOf="@id/daydownbtn"
             android:background="@drawable/date_button_bottom"
             android:text="-"
-            android:textSize="40dp"
+            android:textSize="@dimen/text_largest"
             android:textColor="#666" />
 
         <Button
@@ -83,7 +83,7 @@
             android:layout_toRightOf="@id/monthupbtn"
             android:background="@drawable/date_button_top"
             android:text="+"
-            android:textSize="40dp"
+            android:textSize="@dimen/text_largest"
 			android:textColor="#666"/>
 
         <TextView
@@ -96,7 +96,7 @@
             android:background="@drawable/date_edit"
             android:gravity="center"
             android:padding="3dp"
-            android:textSize="28dp" />
+            android:textSize="@dimen/text_larger" />
 
         <Button
             android:id="@+id/yeardownbtn"
@@ -107,7 +107,7 @@
             android:layout_toRightOf="@id/monthdownbtn"
             android:background="@drawable/date_button_bottom"
             android:text="-"
-            android:textSize="40dp"
+            android:textSize="@dimen/text_largest"
             android:textColor="#666" />
     </RelativeLayout>
 
@@ -117,6 +117,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:gravity="center"
-        android:textSize="15sp" />
+        android:textSize="@dimen/text_small" />
 
 </LinearLayout>

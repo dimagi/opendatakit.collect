@@ -45,7 +45,7 @@ public class DecimalWidget extends StringWidget {
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
         if(!secret) {
-        	mAnswer.setSingleLine(false);
+            mAnswer.setSingleLine(false);
         }
 
         // only numbers are allowed
@@ -80,14 +80,22 @@ public class DecimalWidget extends StringWidget {
         }
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#setTextInputType(android.widget.EditText)
+     */
     @Override
     protected void setTextInputType(EditText mAnswer) {
-    	if(secret) {
-        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(secret) {
+            mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mAnswer.getText().toString().trim();

@@ -40,10 +40,14 @@ public class StringNumberWidget extends StringWidget {
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
         if(!secret) {
-        	mAnswer.setSingleLine(false);
+            mAnswer.setSingleLine(false);
         }
 
         mAnswer.setKeyListener(new DigitsKeyListener(true, true) {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.text.method.DigitsKeyListener#getAcceptedChars()
+        	 */
             @Override
             protected char[] getAcceptedChars() {
                 char[] accepted = {
@@ -62,24 +66,32 @@ public class StringNumberWidget extends StringWidget {
         //This might be redundant, but I assume that it's about there being a difference
         //between a display value somewhere. We should double check
         if (prompt.getAnswerValue() != null) {
-	        String curAnswer = getCurrentAnswer().getValue().toString().trim();
-	        try {
-	        	mAnswer.setText(curAnswer);
-	        } catch (Exception NumberFormatException) {
-	            
-	        }
+            String curAnswer = getCurrentAnswer().getValue().toString().trim();
+            try {
+                mAnswer.setText(curAnswer);
+            } catch (Exception NumberFormatException) {
+                
+            }
         }
 
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#setTextInputType(android.widget.EditText)
+     */
     @Override
     protected void setTextInputType(EditText mAnswer) {
-    	if(secret) {
-        	mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
-        	mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(secret) {
+            mAnswer.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+            mAnswer.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
         String s = mAnswer.getText().toString();

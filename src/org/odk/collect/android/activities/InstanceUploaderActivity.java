@@ -74,6 +74,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     private final static String AUTH_URI = "auth";
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +138,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.InstanceUploaderListener#uploadingComplete(java.util.HashMap)
+     */
     @Override
     public void uploadingComplete(HashMap<String, String> result) {
         try {
@@ -177,6 +185,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.InstanceUploaderListener#progressUpdate(int, int)
+     */
     @Override
     public void progressUpdate(int progress, int total) {
         mAlertMsg = getString(R.string.sending_items, progress, total);
@@ -184,6 +196,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int)
+     */
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -191,6 +207,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
                 mProgressDialog = new ProgressDialog(this);
                 DialogInterface.OnClickListener loadingButtonListener =
                     new DialogInterface.OnClickListener() {
+                		/*
+                		 * (non-Javadoc)
+                		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                		 */
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -242,6 +262,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
                 b.setMessage(getString(R.string.server_auth_credentials, url));
                 b.setView(dialogView);
                 b.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                	/*
+                	 * (non-Javadoc)
+                	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                	 */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         EditText username = (EditText) dialogView.findViewById(R.id.username_edit);
@@ -264,6 +288,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
                 });
                 b.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 
+                	/*
+                	 * (non-Javadoc)
+                	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                	 */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
@@ -277,6 +305,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -284,6 +316,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -294,12 +330,20 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onRetainNonConfigurationInstance()
+     */
     @Override
     public Object onRetainNonConfigurationInstance() {
         return mInstanceUploaderTask;
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
     @Override
     protected void onDestroy() {
         if (mInstanceUploaderTask != null) {
@@ -309,6 +353,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -318,6 +366,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
     @Override
     protected void onResume() {
         if (mInstanceUploaderTask != null) {
@@ -330,6 +382,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.InstanceUploaderListener#authRequest(java.net.URI, java.util.HashMap)
+     */
     @Override
     public void authRequest(URI url, HashMap<String, String> doneSoFar) {
         if (mProgressDialog.isShowing()) {
@@ -367,6 +423,10 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         mAlertDialog.setTitle(getString(R.string.upload_results));
         mAlertDialog.setMessage(message);
         DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {

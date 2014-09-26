@@ -41,11 +41,14 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     private Location mLocation;
     private Set<String> mProviders;
 
-    private int acceptableThreshold = 1600;
     private int millisToWait = 60000; //allow to accept location after 60 seconds
 
-	private ODKTimer mTimer;
+    private ODKTimer mTimer;
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,17 +62,21 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         setupLocationDialog();
         long mLong = -1;
         if(savedInstanceState != null){
-        	mLong = savedInstanceState.getLong("millisRemaining",-1);
+            mLong = savedInstanceState.getLong("millisRemaining",-1);
         }
-		if(mLong > 0){
-			mTimer = new ODKTimer(mLong, this);
-		}else{
-			mTimer = new ODKTimer(millisToWait, this);
-		}
-		mTimer.start();
+        if(mLong > 0){
+            mTimer = new ODKTimer(mLong, this);
+        }else{
+            mTimer = new ODKTimer(millisToWait, this);
+        }
+        mTimer.start();
 
-	}
+    }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -84,12 +91,20 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
     @Override
     protected void onResume() {
         super.onResume();
         mProviders = GeoUtils.evaluateProviders(mLocationManager);
         if (mProviders.isEmpty()) {
             DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
+                /*
+                 * (non-Javadoc)
+                 * @see android.content.DialogInterface.OnCancelListener#onCancel(android.content.DialogInterface)
+                 */
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     mLocation = null;
@@ -129,6 +144,10 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         // dialog displayed while fetching gps location
         
         OnClickListener cancelButtonListener = new OnClickListener() {
+            /*
+             * (non-Javadoc)
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
             @Override
             public void onClick(View v){
                 mLocation = null;
@@ -165,6 +184,10 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onLocationChanged(android.location.Location)
+     */
     @Override
     public void onLocationChanged(Location location) {
         mLocation = location;
@@ -172,15 +195,17 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
             mLocationDialog.setMessage(getString(R.string.location_provider_accuracy,
                 mLocation.getProvider(), truncateDouble(mLocation.getAccuracy())));
 
-            if (mLocation.getAccuracy() <= GeoUtils.ACCEPTABLE_ACCURACY) {
+            // If location is accurate, we're done
+            if (mLocation.getAccuracy() <= GeoUtils.GOOD_ACCURACY) {
                 returnLocation();
             }
             
-            if(mLocation.getAccuracy() < acceptableThreshold){
-                mLocationDialog.setLocationFound(true);
-            } else{
-                mLocationDialog.setLocationFound(false);
-            }
+            // If location isn't great but might be acceptable, notify
+            // the user and let them decide whether or not to record it
+            mLocationDialog.setLocationFound(
+                mLocation.getAccuracy() < GeoUtils.ACCEPTABLE_ACCURACY
+                || mTimer.getMillisUntilFinished() == 0
+            );
         }
     }
 
@@ -191,25 +216,37 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+     */
     @Override
     public void onProviderDisabled(String provider) {
 
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     */
     @Override
     public void onProviderEnabled(String provider) {
 
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
+     */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         switch (status) {
             case LocationProvider.AVAILABLE:
                 if (mLocation != null) {
                     mLocationDialog.setMessage(getString(R.string.location_accuracy,
-                        mLocation.getAccuracy()));
+                        (int) mLocation.getAccuracy()));
                 }
                 break;
             case LocationProvider.OUT_OF_SERVICE:
@@ -219,15 +256,22 @@ public class GeoPointActivity extends Activity implements LocationListener, Time
         }
     }
 
-	@Override
-	public void notifyTimerFinished() {
-		mLocationDialog.setLocationFound(true);
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.TimerListener#notifyTimerFinished()
+     */
+    @Override
+    public void notifyTimerFinished() {
+        onLocationChanged(mLocation);
+    }
 
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putLong("millisRemaining",mTimer.getMillisUntilFinished());
-		super.onSaveInstanceState(savedInstanceState);  
-	}
-
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putLong("millisRemaining",mTimer.getMillisUntilFinished());
+        super.onSaveInstanceState(savedInstanceState);  
+    }
 }

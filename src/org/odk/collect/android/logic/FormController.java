@@ -16,20 +16,17 @@ package org.odk.collect.android.logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.services.Logger;
-import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
@@ -75,7 +72,7 @@ public class FormController {
      */
     public static final class InstanceMetadata {
         public final String instanceId;
-    	
+        
         InstanceMetadata( String instanceId ) {
             this.instanceId = instanceId;
         }
@@ -125,7 +122,7 @@ public class FormController {
      * @return true if this form session is in read only mode
      */
     public boolean isFormReadOnly() {
-    	return mReadOnly;
+        return mReadOnly;
     }
 
 
@@ -216,18 +213,22 @@ public class FormController {
 
 
     /**
-     * A convenience method for determining if the current FormIndex is in a group that is/should be
-     * displayed as a multi-question view. This is useful for returning from the formhierarchy view
-     * to a selected index.
+     * A convenience method for determining if the current FormIndex is a group that is/should be
+     * displayed as a multi-question view of all of its descendants. This is useful for returning 
+     * from the formhierarchy view to a selected index.
      * 
      * @param index
      * @return
      */
-    private boolean groupIsFieldList(FormIndex index) {
+    private boolean isFieldListHost(FormIndex index) {
         // if this isn't a group, return right away
         if (!(mFormEntryController.getModel().getForm().getChild(index) instanceof GroupDef)) {
             return false;
         }
+        
+        //TODO: Is it possible we need to make sure this group isn't inside of another group which 
+        //is itself a field list? That would make the top group the field list host, not the 
+        //descendant group
 
         GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(index); // exceptions?
         return (ODKView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
@@ -241,26 +242,8 @@ public class FormController {
      * @return true if index is in a "field-list". False otherwise.
      */
     public boolean indexIsInFieldList(FormIndex index) {
-        int event = mFormEntryController.getModel().getEvent(index);
-        if (event == FormEntryController.EVENT_QUESTION) {
-            // caption[0..len-1]
-            // caption[len-1] == the question itself
-            // caption[len-2] == the first group it is contained in.
-            FormEntryCaption[] captions = mFormEntryController.getModel().getCaptionHierarchy();
-            if (captions.length < 2) {
-                // no group
-                return false;
-            }
-            FormEntryCaption grp = captions[captions.length - 2];
-            return groupIsFieldList(grp.getIndex());
-        } else if (event == FormEntryController.EVENT_GROUP) {
-            return groupIsFieldList(index);
-        } else {
-            // right now we only test Questions and Groups. Should we also handle
-            // repeats?
-            return false;
-        }
-
+    	FormIndex fieldListHost = this.getFieldListHost(index);
+    	return fieldListHost != null;
     }
 
 
@@ -331,13 +314,15 @@ public class FormController {
      * @return the next event that should be handled by a view.
      */
     public int stepToNextEvent(boolean stepOverGroup) {
+    	//TODO: this won't actually catch the case where there are nested field lists properly
         if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP && indexIsInFieldList() && stepOverGroup) {
             return stepOverGroup();
         } else {
             int event =  mFormEntryController.stepToNextEvent();
-            if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
-            		this.mReadOnly) {
-            	return stepToNextEvent(stepOverGroup);
+            
+            //
+            if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
+                return stepToNextEvent(stepOverGroup);
             }
             return event;
         }
@@ -345,28 +330,26 @@ public class FormController {
 
 
     /**
-     * If using a view like HierarchyView that doesn't support multi-question per screen, step over
-     * the group represented by the FormIndex.
+     * From the current state of the form controller, whose current form index
+     * must be a group element, move the form to the next index which is outside
+     * of the current group.  
      * 
      * @return
      */
     private int stepOverGroup() {
-        ArrayList<FormIndex> indicies = new ArrayList<FormIndex>();
-        GroupDef gd =
-            (GroupDef) mFormEntryController.getModel().getForm()
-                    .getChild(mFormEntryController.getModel().getFormIndex());
-        FormIndex idxChild =
-            mFormEntryController.getModel().incrementIndex(
-                mFormEntryController.getModel().getFormIndex(), true); // descend into group
-        for (int i = 0; i < gd.getChildren().size(); i++) {
-            indicies.add(idxChild);
-            // don't descend
-            idxChild = mFormEntryController.getModel().incrementIndex(idxChild, false);
-        }
-
-        // jump to the end of the group
-        mFormEntryController.jumpToIndex(indicies.get(indicies.size() - 1));
-        return stepToNextEvent(STEP_OVER_GROUP);
+    	//Get this group's index
+    	FormIndex groupIndex = this.getFormIndex();
+    	
+    	FormIndex walker = groupIndex;
+    	int event = -1;
+    	//Walk until the next index is outside of this one.
+    	while(FormIndex.isSubElement(groupIndex, walker)) {
+    		event = this.stepToNextEvent(false);
+    		walker = this.getFormIndex();
+    	}
+    	
+    	//Walker must represent the last index outside of the group now.
+    	return event;
     }
 
 
@@ -385,26 +368,52 @@ public class FormController {
         int event = mFormEntryController.stepToPreviousEvent();
         
         if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT &&
-        		this.mReadOnly) {
-        	return stepToPreviousEvent();
+                this.mReadOnly) {
+            return stepToPreviousEvent();
         }
 
 
         // If after we've stepped, we're in a field-list, jump back to the beginning of the group
-        //
-
-        if (indexIsInFieldList()
-                && mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_QUESTION) {
-            // caption[0..len-1]
-            // caption[len-1] == the question itself
-            // caption[len-2] == the first group it is contained in.
-            FormEntryCaption[] captions = mFormEntryController.getModel().getCaptionHierarchy();
-            FormEntryCaption grp = captions[captions.length - 2];
-            return mFormEntryController.jumpToIndex(grp.getIndex());
+        FormIndex host = getFieldListHost(this.getFormIndex());
+        if (host != null) {
+            return mFormEntryController.jumpToIndex(host);
         }
 
         return mFormEntryController.getModel().getEvent();
 
+    }
+    
+    /**
+     * Retrieves the index of the Group that is the host of a given field list. 
+     * 
+     * @param child
+     * @return
+     */
+    private FormIndex getFieldListHost(FormIndex child) {
+        int event = mFormEntryController.getModel().getEvent(child);
+        
+        if (event == FormEntryController.EVENT_QUESTION || event == FormEntryController.EVENT_GROUP || event == FormEntryController.EVENT_REPEAT) {
+            // caption[0..len-1]
+            // caption[len-1] == the event itself
+            // caption[len-2] == the groups containing this group
+            FormEntryCaption[] captions = mFormEntryController.getModel().getCaptionHierarchy();
+            
+            //This starts at the beginning of the heirarchy, so it'll catch the top-level 
+            //host index.
+            for(FormEntryCaption caption : captions ) {
+            	FormIndex parentIndex = caption.getIndex();
+            	if(isFieldListHost(parentIndex)) {
+            		return parentIndex;
+            	}
+            }
+            
+            //none of this node's parents are field lists
+            return null;
+            
+        } else {
+            // Non-host elements can't have field list hosts.
+            return null;
+        }
     }
 
 
@@ -461,63 +470,46 @@ public class FormController {
 
 
     /**
-     * Returns an array of question promps.
+     * Returns an array of relevant question prompts that should be displayed as a single screen.
+     * If the current form index is a question, it is returned. Otherwise if the 
+     * current index is a field list (and _only_ when it is a field list) 
      * 
      * @return
      */
     public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
-
-    	//List of indices referred to by the current question
-        ArrayList<FormIndex> indicies = new ArrayList<FormIndex>();
         FormIndex currentIndex = mFormEntryController.getModel().getFormIndex();
+        
+        IFormElement element = mFormEntryController.getModel().getForm().getChild(currentIndex);
 
         //If we're in a group, we will collect of the questions in this group
-        if (mFormEntryController.getModel().getForm().getChild(currentIndex) instanceof GroupDef) {
-        	
-        	//Get the group at this index
-            GroupDef gd = (GroupDef) mFormEntryController.getModel().getForm().getChild(currentIndex);
-            
-            // descend into group (get the index of the first child element in the group)
-            //TODO: What happens if the group is empty, do we step out?
-            FormIndex idxChild = mFormEntryController.getModel().incrementIndex(currentIndex, true);
+        if (element instanceof GroupDef) {
+        	//Assert that this is a valid condition (only field lists return prompts)
+        	if(!this.isFieldListHost(currentIndex)) { throw new RuntimeException("Cannot get question prompts from a non-field-list group"); }
 
-            //Go through each child and collect their indices
-            //NOTE: The part of the code that is iterating the loop is actually unrelated
-            //to the part that is incrementing the index (relying on the correctness of the 
-            //assumption that the list of children and the indicdes should be the same length)
-            //this might cause problems if those two things get out of sync for any reason.
-            for (int i = 0; i < gd.getChildren().size(); i++) {
-            	//Add index of current child (starting at the first)
-                indicies.add(idxChild);
-                
-                // Get the next index (but don't descend)
-                idxChild = mFormEntryController.getModel().incrementIndex(idxChild, false);
-            }
-
-            // we only display relevant questions, so create a new list of only relevant questions
+            // Questions to collect
             ArrayList<FormEntryPrompt> questionList = new ArrayList<FormEntryPrompt>();
+                        
+            //Step over all events in this field list and collect them
+            FormIndex walker = currentIndex;
             
-            //Step through all of the indices we've collected
-            for (int i = 0; i < indicies.size(); i++) {
-                FormIndex index = indicies.get(i);
-
-                //Ensure that the index represents a question, and fail fast if so. We don't support nested lists
-                if (mFormEntryController.getModel().getEvent(index) != FormEntryController.EVENT_QUESTION) {
-                    String errorMsg =
-                        "Only questions are allowed in 'field-list'.  Bad node is: "
-                                + index.getReference().toString(false);
-                    RuntimeException e = new RuntimeException(errorMsg);
-                    Log.e(t, errorMsg);
-                    throw e;
-                }
-
-                // Otherwise check whether the index refers to a currently relevant node
-                if (mFormEntryController.getModel().isIndexRelevant(index)) {
-                	//And if so, add it to the list of questions that we'll return
-                    questionList.add(mFormEntryController.getModel().getQuestionPrompt(index));
-                }
+            int event = this.getEvent();
+            while(FormIndex.isSubElement(currentIndex, walker)) {
+            	if(event == FormEntryController.EVENT_QUESTION) {
+                    questionList.add(mFormEntryController.getModel().getQuestionPrompt());
+            	}
+            	
+            	if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
+            		//TODO: What if there is a non-deterministic repeat up in the field list?
+            	}
+            	
+            	//this handles relevance for us
+            	event = this.mFormEntryController.stepToNextEvent();
+            	walker = this.getFormIndex();
             }
-            //Create a new array with all of the questions we collected.
+            
+            //Reset the controller
+            this.mFormEntryController.jumpToIndex(currentIndex);
+            
             FormEntryPrompt[] questions = new FormEntryPrompt[questionList.size()];
             //Populate the array with the collected questions
             questionList.toArray(questions);
@@ -757,18 +749,18 @@ public class FormController {
             // instance id...
             v = e.getChildrenWithName(INSTANCE_ID);
             if ( v.size() == 1 ) {
-            	instanceId = v.get(0).getValue().uncast().toString();
+                instanceId = v.get(0).getValue().uncast().toString();
             }
         }
-    	
+        
         return new InstanceMetadata(instanceId);
     }
 
 
     //CTS: Added this to protect the JR internal classes, although it's not awesome that
     //this ended up in the "logic" division. 
-	public WidgetFactory getWidgetFactory() {
-		return new WidgetFactory(mFormEntryController.getModel().getForm());
-	}
+    public WidgetFactory getWidgetFactory() {
+        return new WidgetFactory(mFormEntryController.getModel().getForm());
+    }
 
 }

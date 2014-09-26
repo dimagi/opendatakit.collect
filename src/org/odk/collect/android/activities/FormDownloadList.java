@@ -117,6 +117,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     private static final String SHOULD_EXIT = "shouldexit";
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,6 +135,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         mDownloadButton = (Button) findViewById(R.id.add_button);
         mDownloadButton.setEnabled(selectedItemCount() > 0);
         mDownloadButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 downloadSelectedFiles();
@@ -141,6 +149,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
 
         mToggleButton = (Button) findViewById(R.id.toggle_button);
         mToggleButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 // toggle selections of items to all or none
@@ -157,6 +169,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
 
         mRefreshButton = (Button) findViewById(R.id.refresh_button);
         mRefreshButton.setOnClickListener(new OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 mToggled = false;
@@ -253,6 +269,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -286,6 +306,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -317,6 +341,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, MENU_PREFERENCES, 0, getString(R.string.general_preferences)).setIcon(
@@ -325,6 +353,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onMenuItemSelected(int, android.view.MenuItem)
+     */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
@@ -337,6 +369,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int)
+     */
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -344,6 +380,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
                 mProgressDialog = new ProgressDialog(this);
                 DialogInterface.OnClickListener loadingButtonListener =
                     new DialogInterface.OnClickListener() {
+                		/*
+                		 * (non-Javadoc)
+                		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                		 */
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -395,6 +435,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
                 b.setMessage(getString(R.string.server_auth_credentials, url));
                 b.setView(dialogView);
                 b.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                	/*
+                	 * (non-Javadoc)
+                	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                	 */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         EditText username = (EditText) dialogView.findViewById(R.id.username_edit);
@@ -410,6 +454,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
                 });
                 b.setNegativeButton(getString(R.string.cancel),
                     new DialogInterface.OnClickListener() {
+                		/*
+                		 * (non-Javadoc)
+                		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+                		 */
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -460,6 +508,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onRetainNonConfigurationInstance()
+     */
     @Override
     public Object onRetainNonConfigurationInstance() {
         if (mDownloadFormsTask != null) {
@@ -470,6 +522,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onDestroy()
+     */
     @Override
     protected void onDestroy() {
         if (mDownloadFormListTask != null) {
@@ -482,6 +538,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
     @Override
     protected void onResume() {
         if (mDownloadFormListTask != null) {
@@ -497,6 +557,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
@@ -580,6 +644,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         mAlertDialog.setTitle(title);
         mAlertDialog.setMessage(message);
         DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
@@ -605,6 +673,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.FormDownloaderListener#progressUpdate(java.lang.String, int, int)
+     */
     @Override
     public void progressUpdate(String currentFile, int progress, int total) {
         mAlertMsg = getString(R.string.fetching_file, currentFile, progress, total);
@@ -612,6 +684,10 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.FormDownloaderListener#formsDownloadingComplete(java.util.HashMap)
+     */
     @Override
     public void formsDownloadingComplete(HashMap<String, String> result) {
         if (mDownloadFormsTask != null) {

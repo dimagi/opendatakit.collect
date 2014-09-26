@@ -54,6 +54,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     private final String syncMsgKey = "syncmsgkey";
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +108,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onRetainNonConfigurationInstance()
+     */
     @Override
     public Object onRetainNonConfigurationInstance() {
         // pass the thread on restart
@@ -111,6 +119,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -119,7 +131,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     * 
      * Stores the path of selected form and finishes.
      */
     @Override
@@ -144,6 +159,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
     @Override
     protected void onResume() {
         mDiskSyncTask.setDiskSyncListener(this);
@@ -151,6 +170,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
     @Override
     protected void onPause() {
         mDiskSyncTask.setDiskSyncListener(null);
@@ -158,7 +181,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     }
 
 
-    /**
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.listeners.DiskSyncListener#SyncComplete(java.lang.String)
+     * 
      * Called by DiskSyncTask when the task is finished
      */
     @Override
@@ -181,6 +207,10 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
         mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
         mAlertDialog.setMessage(errorMsg);
         DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+        	 */
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {

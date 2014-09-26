@@ -12,7 +12,7 @@
     android:layout_height="fill_parent"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:text="@string/no_items_display"
-    android:textSize="21dp"
+    android:textSize="@dimen/text_large"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:gravity="center"

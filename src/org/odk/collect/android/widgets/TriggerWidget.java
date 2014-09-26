@@ -24,7 +24,6 @@ import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -65,9 +64,13 @@ public class TriggerWidget extends QuestionWidget {
         // mActionButton.setPadding(20, 20, 20, 20);
         mTriggerButton.setEnabled(!prompt.isReadOnly());
         
-        mTriggerButton.setPadding(0, padding, 0, padding);
+        mTriggerButton.setPadding(mTriggerButton.getPaddingLeft(), padding, mTriggerButton.getPaddingRight(), padding);
 
         mTriggerButton.setOnClickListener(new View.OnClickListener() {
+        	/*
+        	 * (non-Javadoc)
+        	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+        	 */
             @Override
             public void onClick(View v) {
                 if (mTriggerButton.isChecked()) {
@@ -75,7 +78,7 @@ public class TriggerWidget extends QuestionWidget {
                 } else {
                     mStringAnswer.setText(null);
                 }
-            	TriggerWidget.this.widgetEntryChanged();
+                TriggerWidget.this.widgetEntryChanged();
             }
         });
 
@@ -95,13 +98,17 @@ public class TriggerWidget extends QuestionWidget {
         }
 
         if(mInteractive) {
-	        // finish complex layout
-	        this.addView(mTriggerButton);
-	        // this.addView(mStringAnswer);
+            // finish complex layout
+            this.addView(mTriggerButton);
+            // this.addView(mStringAnswer);
         }
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#clearAnswer()
+     */
     @Override
     public void clearAnswer() {
         mStringAnswer.setText(null);
@@ -109,11 +116,15 @@ public class TriggerWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#getAnswer()
+     */
     @Override
     public IAnswerData getAnswer() {
-    	if(!mInteractive) {
-    		return new StringData(mOK);
-    	}
+        if(!mInteractive) {
+            return new StringData(mOK);
+        }
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
@@ -123,6 +134,10 @@ public class TriggerWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setFocus(android.content.Context)
+     */
     @Override
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
@@ -132,6 +147,10 @@ public class TriggerWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#setOnLongClickListener(android.view.View.OnLongClickListener)
+     */
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mTriggerButton.setOnLongClickListener(l);
@@ -139,6 +158,10 @@ public class TriggerWidget extends QuestionWidget {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.QuestionWidget#cancelLongPress()
+     */
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();

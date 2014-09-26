@@ -71,33 +71,33 @@ public abstract class QuestionWidget extends LinearLayout {
 
 
     public QuestionWidget(Context context, FormEntryPrompt p) {
-    	this(context, p, null);
+        this(context, p, null);
     }
     
     public QuestionWidget(Context context, FormEntryPrompt p, WidgetChangedListener w){
-    	super(context);
-    	
-    	if(w!=null){
-    		hasListener = false;
-    		widgetChangedListener = w;
-    	}
-    	this.setOnClickListener(new OnClickListener() {
+        super(context);
+        
+        if(w!=null){
+            hasListener = false;
+            widgetChangedListener = w;
+        }
+        this.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				QuestionWidget.this.acceptFocus();
-			}
-    		
-    	});
-    	
-    	hasListener = (w != null);
-    	
-    	
+            @Override
+            public void onClick(View v) {
+                QuestionWidget.this.acceptFocus();
+            }
+            
+        });
+        
+        hasListener = (w != null);
+        
+        
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
             String question_font =
                 settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
-            	mQuestionFontsize = new Integer(question_font).intValue();
+                mQuestionFontsize = new Integer(question_font).intValue();
             mAnswerFontsize = mQuestionFontsize + 2;
 
             mPrompt = p;
@@ -118,43 +118,43 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
 
-	protected void acceptFocus() {
-		
-	}
+    protected void acceptFocus() {
+        
+    }
 
 
     private void addHelpPlaceholder(FormEntryPrompt p) {
-    	helpPlaceholder = new FrameLayout(this.getContext());
-    	helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+        helpPlaceholder = new FrameLayout(this.getContext());
+        helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT));
-    	
-    	if("help".equals(p.getSpecialFormQuestionText("help"))) {
-	        String specialHelpText = p.getSpecialFormQuestionText("help-text");
-	        
-	        String specialHelpImage = p.getSpecialFormQuestionText("help-image");
-	        String specialHelpVideo = p.getSpecialFormQuestionText("help-video");
-	        
-	        TextView helpText = new TextView(getContext());
-	        helpText.setText(specialHelpText);
-	        helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-	        helpText.setPadding(0, 0, 0, 7);
-	        helpText.setId(38475483); // assign random id
-	
-	        
-	        MediaLayout helpLayout = new MediaLayout(getContext());
-	        helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
-	        helpLayout.setPadding(15, 15, 15, 15);
-	        
-	        helpLayout.setBackgroundResource(color.very_light_blue);
-	        helpPlaceholder.addView(helpLayout);
-    	}
+        
+        if("help".equals(p.getSpecialFormQuestionText("help"))) {
+            String specialHelpText = p.getSpecialFormQuestionText("help-text");
+            
+            String specialHelpImage = p.getSpecialFormQuestionText("help-image");
+            String specialHelpVideo = p.getSpecialFormQuestionText("help-video");
+            
+            TextView helpText = new TextView(getContext());
+            helpText.setText(specialHelpText);
+            helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+            helpText.setPadding(0, 0, 0, 7);
+            helpText.setId(38475483); // assign random id
+    
+            
+            MediaLayout helpLayout = new MediaLayout(getContext());
+            helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
+            helpLayout.setPadding(15, 15, 15, 15);
+            
+            helpLayout.setBackgroundResource(color.very_light_blue);
+            helpPlaceholder.addView(helpLayout);
+        }
 
-    	this.addView(helpPlaceholder);
-    	
-    	helpPlaceholder.setVisibility(View.GONE);
-	}
+        this.addView(helpPlaceholder);
+        
+        helpPlaceholder.setVisibility(View.GONE);
+    }
 
-	public FormEntryPrompt getPrompt() {
+    public FormEntryPrompt getPrompt() {
         return mPrompt;
     }
 
@@ -176,6 +176,10 @@ public abstract class QuestionWidget extends LinearLayout {
         public URLSpanNoUnderline(String url) {
             super(url);
         }
+        /*
+         * (non-Javadoc)
+         * @see android.text.style.ClickableSpan#updateDrawState(android.text.TextPaint)
+         */
         @Override public void updateDrawState(TextPaint ds) {
             super.updateDrawState(ds);
             ds.setUnderlineText(false);
@@ -183,37 +187,37 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     public void notifyOnScreen(String text, boolean strong){
-    	if(strong){
-    		this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
-    	} else{
-    		this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_warn));
-    	}
-    	
-    	if(this.toastView == null) {
-    		this.toastView = View.inflate(this.getContext(), R.layout.toast_view, this).findViewById(R.id.toast_view_root);
-    		focusPending = true;
-    	} else {
-    		if(this.toastView.getVisibility() != View.VISIBLE) {
-    			this.toastView.setVisibility(View.VISIBLE);
-    			focusPending = true;
-    		}
-    	}
-    	TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
-    	messageView.setText(text);
-    	
-    	//If the toastView already exists, we can just scroll to it right now
-    	//if not, we actually have to do it later, when we lay this all back out
-    	if(!focusPending) {
-    		requestChildViewOnScreen(messageView);
-    	}
+        if(strong){
+            this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
+        } else{
+            this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_warn));
+        }
+        
+        if(this.toastView == null) {
+            this.toastView = View.inflate(this.getContext(), R.layout.toast_view, this).findViewById(R.id.toast_view_root);
+            focusPending = true;
+        } else {
+            if(this.toastView.getVisibility() != View.VISIBLE) {
+                this.toastView.setVisibility(View.VISIBLE);
+                focusPending = true;
+            }
+        }
+        TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
+        messageView.setText(text);
+        
+        //If the toastView already exists, we can just scroll to it right now
+        //if not, we actually have to do it later, when we lay this all back out
+        if(!focusPending) {
+            requestChildViewOnScreen(messageView);
+        }
     }
     
     public void notifyWarning(String text) {
-    	notifyOnScreen(text, false);
+        notifyOnScreen(text, false);
     }
     
     public void notifyInvalid(String text) {
-    	notifyOnScreen(text, true);
+        notifyOnScreen(text, true);
     }
     
     /*
@@ -224,86 +228,86 @@ public abstract class QuestionWidget extends LinearLayout {
      * will be fully visible in addition to the subview.
      */
     private void requestChildViewOnScreen(View child) {
-    	
-    	//Get the rectangle that wants to put itself on the screen
+        
+        //Get the rectangle that wants to put itself on the screen
         Rect vitalPortion = new Rect();
         child.getDrawingRect(vitalPortion);
-	    
+        
         //Save a reference to it in case we have to manipulate it later.
-	    Rect vitalPortionSaved = new Rect();
-	    child.getDrawingRect(vitalPortionSaved);
-	    
-	    //Then get the bounding rectangle for this whole view.
-	    Rect wholeView = new Rect();
-	    this.getDrawingRect(wholeView);
-	    
-	    //If we don't know enough about the screen, just default to asking to see the
-	    //subview that was requested.
-	    if(mFrameHeight == -1){
-	    	child.requestRectangleOnScreen(vitalPortion);
-	    	return;
-	    }	    
-	    
-	    //If the whole view fits, just request that we display the whole thing.
-	    if(wholeView.height() < mFrameHeight) {
-	    	this.requestRectangleOnScreen(wholeView);
-	    	return;
-	    }
-	    
-	    //The whole view will not fit, we need to scale down our requested focus.
-	    //Trying to construct the "ideal" rectangle here is actually pretty hard
-	    //but the base case is just to see if we can get the view onto the screen from
-	    //the bottom or the top
-	    
-	    int topY = wholeView.top;
-	    int bottomY = wholeView.bottom;
-	    
-	    //shrink the view to contain only the current frame size.
-	    wholeView.inset(0, (wholeView.height() - mFrameHeight) / 2);
-	    wholeView.offsetTo(wholeView.left, topY);
-	    
-	    //The view is now the size of the frame and anchored back at the top. 
-	    
-	    //Now let's contextualize where the child view actually is in this frame.
-	    this.offsetDescendantRectToMyCoords(child, vitalPortion);
-	    
-	    //If the newly transformed view now contains the child portion, we're good
-	    if(wholeView.contains(vitalPortion)) {
-	    	this.requestRectangleOnScreen(wholeView);
-	    	return;
-	    }
-	    
-	    //otherwise, move to the requested frame to be at the bottom of this view
-	    wholeView.offsetTo(wholeView.left, bottomY - wholeView.height());
-	    
-	    //now see if the transformed view contains the vital portion
-	    if(wholeView.contains(vitalPortion)) {
-	    	this.requestRectangleOnScreen(wholeView);
-	    	return;
-	    }
+        Rect vitalPortionSaved = new Rect();
+        child.getDrawingRect(vitalPortionSaved);
+        
+        //Then get the bounding rectangle for this whole view.
+        Rect wholeView = new Rect();
+        this.getDrawingRect(wholeView);
+        
+        //If we don't know enough about the screen, just default to asking to see the
+        //subview that was requested.
+        if(mFrameHeight == -1){
+            child.requestRectangleOnScreen(vitalPortion);
+            return;
+        }        
+        
+        //If the whole view fits, just request that we display the whole thing.
+        if(wholeView.height() < mFrameHeight) {
+            this.requestRectangleOnScreen(wholeView);
+            return;
+        }
+        
+        //The whole view will not fit, we need to scale down our requested focus.
+        //Trying to construct the "ideal" rectangle here is actually pretty hard
+        //but the base case is just to see if we can get the view onto the screen from
+        //the bottom or the top
+        
+        int topY = wholeView.top;
+        int bottomY = wholeView.bottom;
+        
+        //shrink the view to contain only the current frame size.
+        wholeView.inset(0, (wholeView.height() - mFrameHeight) / 2);
+        wholeView.offsetTo(wholeView.left, topY);
+        
+        //The view is now the size of the frame and anchored back at the top. 
+        
+        //Now let's contextualize where the child view actually is in this frame.
+        this.offsetDescendantRectToMyCoords(child, vitalPortion);
+        
+        //If the newly transformed view now contains the child portion, we're good
+        if(wholeView.contains(vitalPortion)) {
+            this.requestRectangleOnScreen(wholeView);
+            return;
+        }
+        
+        //otherwise, move to the requested frame to be at the bottom of this view
+        wholeView.offsetTo(wholeView.left, bottomY - wholeView.height());
+        
+        //now see if the transformed view contains the vital portion
+        if(wholeView.contains(vitalPortion)) {
+            this.requestRectangleOnScreen(wholeView);
+            return;
+        }
 
-	    //Otherwise the child is hidden in the frame, so it won't matter which
-	    //we choose.
-	    child.requestRectangleOnScreen(vitalPortionSaved);
+        //Otherwise the child is hidden in the frame, so it won't matter which
+        //we choose.
+        child.requestRectangleOnScreen(vitalPortionSaved);
     }
     
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		super.onLayout(changed, l, t, r, b);
-		
-		//If we're coming back in after we just laid out adding a new element that needs
-		//focus, we can now scroll to it, since it's actually had its spacing declared.
-		if(changed && focusPending) {
-			focusPending = false;
-			if(this.toastView == null) {
-				//NOTE: This shouldn't be possible, but if it doesn't happen
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        
+        //If we're coming back in after we just laid out adding a new element that needs
+        //focus, we can now scroll to it, since it's actually had its spacing declared.
+        if(changed && focusPending) {
+            focusPending = false;
+            if(this.toastView == null) {
+                //NOTE: This shouldn't be possible, but if it doesn't happen
                 //we don't wanna crash. Look here if focus isn't getting grabbed
                 //for some reason (there's no other negative consequence)
-			} else {
-				TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
-				requestChildViewOnScreen(messageView);
-			}
-		}
-	}
+            } else {
+                TextView messageView = (TextView)this.toastView.findViewById(R.id.message);
+                requestChildViewOnScreen(messageView);
+            }
+        }
+    }
     
     private void stripUnderlines(TextView textView) {
         Spannable s = (Spannable)textView.getText();
@@ -342,14 +346,14 @@ public abstract class QuestionWidget extends LinearLayout {
         mQuestionText.setId(38475483); // assign random id
 
         if(p.getLongText()!= null){
-        	if(p.getLongText().contains("\u260E")){
-        		if(Linkify.addLinks(mQuestionText,Linkify.PHONE_NUMBERS)){
-        			stripUnderlines(mQuestionText);
-        		}
-        		else{
-        			System.out.println("this should be an error I'm thinking?");
-        		}
-        	}
+            if(p.getLongText().contains("\u260E")){
+                if(Linkify.addLinks(mQuestionText,Linkify.PHONE_NUMBERS)){
+                    stripUnderlines(mQuestionText);
+                }
+                else{
+                    System.out.println("this should be an error I'm thinking?");
+                }
+            }
         }
         // Wrap to the size of the parent view
         mQuestionText.setHorizontallyScrolling(false);
@@ -361,14 +365,14 @@ public abstract class QuestionWidget extends LinearLayout {
         // Create the layout for audio, image, text
         MediaLayout mediaLayout = new MediaLayout(getContext()) {
             protected void onHelpPressed() {
-            	fireHelpText(p);
+                fireHelpText(p);
             }
 
         };
         
         String helpText = p.getSpecialFormQuestionText("help");
         if("help".equals(helpText)) {
-        	videoURI = helpText;
+            videoURI = helpText;
         }
         
         
@@ -378,56 +382,56 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     private void fireHelpText(FormEntryPrompt prompt) {
-    	
+        
 
         if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
-        		getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
-        	
-	        AlertDialog mAlertDialog = new AlertDialog.Builder(this.getContext()).create();
-	        mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
-	        mAlertDialog.setTitle("");
-	        
-	        String specialHelpText = prompt.getSpecialFormQuestionText("help-text");
-	        
-	        String specialHelpImage = prompt.getSpecialFormQuestionText("help-image");
-	        String specialHelpVideo = prompt.getSpecialFormQuestionText("help-video");
-	        
-	        ScrollView scrollView = new ScrollView(this.getContext());
-	        TextView helpText = new TextView(getContext());
-	        helpText.setText(specialHelpText);
-	        helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-	        helpText.setPadding(0, 0, 0, 7);
-	        helpText.setId(38475483); // assign random id
-	
-	        
-	        MediaLayout helpLayout = new MediaLayout(getContext());
-	        helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
-	        helpLayout.setPadding(15, 15, 15, 15);
-	        
-	        scrollView.addView(helpLayout);
-	        mAlertDialog.setView(scrollView);
-	        
-	        //mAlertDialog.setMessage();
-	        DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
-	            @Override
-	            public void onClick(DialogInterface dialog, int i) {
-	                switch (i) {
-	                    case DialogInterface.BUTTON1:
-	                        dialog.cancel();
-	                        break;
-	                }
-	            }
-	        };
-	        mAlertDialog.setCancelable(true);
-	        mAlertDialog.setButton(StringUtils.getStringRobust(this.getContext(), R.string.ok), errorListener);
-	        mAlertDialog.show();
+                getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
+            
+            AlertDialog mAlertDialog = new AlertDialog.Builder(this.getContext()).create();
+            mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
+            mAlertDialog.setTitle("");
+            
+            String specialHelpText = prompt.getSpecialFormQuestionText("help-text");
+            
+            String specialHelpImage = prompt.getSpecialFormQuestionText("help-image");
+            String specialHelpVideo = prompt.getSpecialFormQuestionText("help-video");
+            
+            ScrollView scrollView = new ScrollView(this.getContext());
+            TextView helpText = new TextView(getContext());
+            helpText.setText(specialHelpText);
+            helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+            helpText.setPadding(0, 0, 0, 7);
+            helpText.setId(38475483); // assign random id
+    
+            
+            MediaLayout helpLayout = new MediaLayout(getContext());
+            helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
+            helpLayout.setPadding(15, 15, 15, 15);
+            
+            scrollView.addView(helpLayout);
+            mAlertDialog.setView(scrollView);
+            
+            //mAlertDialog.setMessage();
+            DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int i) {
+                    switch (i) {
+                        case DialogInterface.BUTTON1:
+                            dialog.cancel();
+                            break;
+                    }
+                }
+            };
+            mAlertDialog.setCancelable(true);
+            mAlertDialog.setButton(StringUtils.getStringRobust(this.getContext(), R.string.ok), errorListener);
+            mAlertDialog.show();
         } else {
-    	
-	    	if(helpPlaceholder.getVisibility() == View.GONE) {
-	    		expand(helpPlaceholder);
-	    	} else {
-	    		collapse(helpPlaceholder);
-	    	}
+        
+            if(helpPlaceholder.getVisibility() == View.GONE) {
+                expand(helpPlaceholder);
+            } else {
+                collapse(helpPlaceholder);
+            }
         }
     }
     
@@ -485,14 +489,14 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     public void updateFrameSize(int width, int height) {
-    	int maxHelpHeight = height / 4;
-    	if(mHelpText != null) {
-    		mHelpText.updateMaxHeight(maxHelpHeight);
-    	}
-    	mFrameHeight = height;
+        int maxHelpHeight = height / 4;
+        if(mHelpText != null) {
+            mHelpText.updateMaxHeight(maxHelpHeight);
+        }
+        mFrameHeight = height;
     }
 
-	/**
+    /**
      * Add a TextView containing the help text.
      */
     private void addHelpText(FormEntryPrompt p) {
@@ -513,11 +517,11 @@ public abstract class QuestionWidget extends LinearLayout {
     }
 
     protected int getMaxHintHeight() {
-		return -1;
-	}
+        return -1;
+    }
 
 
-	/**
+    /**
      * Every subclassed widget should override this, adding any views they may contain, and calling
      * super.cancelLongPress()
      */
@@ -532,46 +536,46 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     protected IAnswerData getCurrentAnswer() {
-    	IAnswerData current = mPrompt.getAnswerValue();
-    	if(current == null) { return null; }
-    	return getTemplate().cast(current.uncast());
+        IAnswerData current = mPrompt.getAnswerValue();
+        if(current == null) { return null; }
+        return getTemplate().cast(current.uncast());
     }
     
     protected IAnswerData getTemplate() {
-    	return AnswerDataFactory.template(mPrompt.getControlType(), mPrompt.getDataType());
+        return AnswerDataFactory.template(mPrompt.getControlType(), mPrompt.getDataType());
     }
 
 
-	public void hideHintText() {
-		mHelpText.setVisibility(View.GONE);
-	}
-	
-	public FormIndex getFormId(){
-		return mPrompt.getIndex();
-	}
-	
-	public void setChangedListener(WidgetChangedListener wcl){
-		widgetChangedListener = wcl;
-		hasListener = true;
-	}
-	
-	public void widgetEntryChanged(){
-		if(this.toastView != null) {
-			this.toastView.setVisibility(View.GONE);
-			this.setBackgroundDrawable(null);
-		}
-		if(hasListener){
-			widgetChangedListener.widgetEntryChanged();
-		}
-	}
-	
-	public void checkFileSize(File file){
-		if(FileUtils.isFileOversized(file)){
-			this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, FileUtils.getFileSize(file)+""));
-		}
-	}
-	
-	public void checkFileSize(String filepath){
-		checkFileSize(new File(filepath));
-	}
+    public void hideHintText() {
+        mHelpText.setVisibility(View.GONE);
+    }
+    
+    public FormIndex getFormId(){
+        return mPrompt.getIndex();
+    }
+    
+    public void setChangedListener(WidgetChangedListener wcl){
+        widgetChangedListener = wcl;
+        hasListener = true;
+    }
+    
+    public void widgetEntryChanged(){
+        if(this.toastView != null) {
+            this.toastView.setVisibility(View.GONE);
+            this.setBackgroundDrawable(null);
+        }
+        if(hasListener){
+            widgetChangedListener.widgetEntryChanged();
+        }
+    }
+    
+    public void checkFileSize(File file){
+        if(FileUtils.isFileOversized(file)){
+            this.notifyWarning(StringUtils.getStringRobust(getContext(), R.string.attachment_oversized, FileUtils.getFileSize(file)+""));
+        }
+    }
+    
+    public void checkFileSize(String filepath){
+        checkFileSize(new File(filepath));
+    }
 }

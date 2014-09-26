@@ -72,7 +72,7 @@ public class FileUtils {
 
     
     public static byte[] getFileAsBytes(File file) {
-    	return getFileAsBytes(file, null);
+        return getFileAsBytes(file, null);
     }
 
     public static byte[] getFileAsBytes(File file, SecretKeySpec symetricKey) {
@@ -81,9 +81,9 @@ public class FileUtils {
         try {
             is = new FileInputStream(file);
             if(symetricKey != null) {
-            	Cipher cipher = Cipher.getInstance("AES");
-            	cipher.init(Cipher.DECRYPT_MODE, symetricKey);
-            	is = new CipherInputStream(is, cipher);
+                Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.DECRYPT_MODE, symetricKey);
+                is = new CipherInputStream(is, cipher);
             }
             
             //CTS - Removed a lot of weird checks  here. file size < max int? We're shoving this 
@@ -114,15 +114,15 @@ public class FileUtils {
             return null;
 
         } catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} finally {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
             // Close the input stream
             try {
                 is.close();
@@ -227,10 +227,10 @@ public class FileUtils {
      */
     public static void copyFile(File sourceFile, File destFile) {
         if (sourceFile.exists()) {
-        	if(destFile.isDirectory()) {
-        		destFile = new File(destFile, sourceFile.getName());
-        	}
-        	
+            if(destFile.isDirectory()) {
+                destFile = new File(destFile, sourceFile.getName());
+            }
+            
             FileChannel src;
             try {
                 src = new FileInputStream(sourceFile).getChannel();
@@ -281,8 +281,8 @@ public class FileUtils {
             try {
                 doc = XFormParser.getXMLDocument(isr);
             } catch(IOException e) {
-            	e.printStackTrace();
-            	throw new XFormParseException("IO Exception during form parsing: " + e.getMessage());
+                e.printStackTrace();
+                throw new XFormParseException("IO Exception during form parsing: " + e.getMessage());
             } finally {
                 try {
                     isr.close();
@@ -360,11 +360,11 @@ public class FileUtils {
     }
     
     public static boolean isFileOversized(File mf){
-    	double length = getFileSize(mf);
-    	return length > WARNING_SIZE;
+        double length = getFileSize(mf);
+        return length > WARNING_SIZE;
     }
     
     public static double getFileSize(File mf){
-    	return mf.length()/(1024);
+        return mf.length()/(1024);
     }
 }

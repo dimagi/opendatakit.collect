@@ -43,7 +43,7 @@
             android:paddingBottom="20dp"
             android:paddingTop="10dp"
             android:text="title"
-            android:textSize="21dp"
+            android:textSize="@dimen/text_large"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="left"
                     android:text="@+string/backup"
-                    android:textSize="21dp" />
+                    android:textSize="@dimen/text_large" />
             </LinearLayout>
 
             <LinearLayout
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="right"
                     android:text="@+string/advance"
-                    android:textSize="21dp" />
+                    android:textSize="@dimen/text_large" />
             </LinearLayout>
         </LinearLayout>
 
