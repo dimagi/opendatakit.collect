@@ -739,10 +739,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             boolean stillRelevent = false;
 
             for(FormEntryPrompt prompt : newValidPrompts) {
-            	if(prompt.getIndex().equals(oldWidget.getPrompt().getIndex())) {
-            		stillRelevent = true;
-            		used.add(prompt);
-            	}
+                if(prompt.getIndex().equals(oldWidget.getPrompt().getIndex())) {
+                    stillRelevent = true;
+                    used.add(prompt);
+                }
             }
             if(!stillRelevent){
                 removeList.add(Integer.valueOf(i));
@@ -754,12 +754,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         //Now go through add add any new prompts that we need
         for(int i = 0 ; i < newValidPrompts.length; ++i) {
-        	FormEntryPrompt prompt = newValidPrompts[i]; 
-        	if(used.contains(prompt)) {
-        		//nothing to do here
-        		continue;
-        	} 
-        	oldODKV.addQuestionToIndex(prompt, mFormController.getWidgetFactory(), i);
+            FormEntryPrompt prompt = newValidPrompts[i]; 
+            if(used.contains(prompt)) {
+                //nothing to do here
+                continue;
+            } 
+            oldODKV.addQuestionToIndex(prompt, mFormController.getWidgetFactory(), i);
         }
     }
 
@@ -1279,10 +1279,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         createRepeatDialog();
                         break group_skip;
                     case FormEntryController.EVENT_GROUP:
-                    	//We only hit this event if we're at the _opening_ of a field
-                    	//list, so it seems totally fine to do it this way, technically
-                    	//though this should test whether the index is the field list
-                    	//host.
+                        //We only hit this event if we're at the _opening_ of a field
+                        //list, so it seems totally fine to do it this way, technically
+                        //though this should test whether the index is the field list
+                        //host.
                         if (mFormController.indexIsInFieldList()
                                 && mFormController.getQuestionPrompts().length != 0) {
                             View nextGroupView = createView(event);
@@ -2547,13 +2547,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             int completedQuestions = 0;
     
             FormIndex currentFormIndex = mFormController.getFormIndex();
-            int event = mFormController.getEvent();
+            int event = mFormController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
             try {
-                // Step through form and count questions
-                while (event != FormEntryController.EVENT_BEGINNING_OF_FORM) {
-                    event = mFormController.stepToPreviousEvent();
-                }
-                
                 boolean onCurrentScreen = false;
                 FormIndex currentScreenExit = null;
                 while (event != FormEntryController.EVENT_END_OF_FORM) {
@@ -2577,10 +2572,11 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         // Future questions are never complete.
                         if (onCurrentScreen) {
                             for (FormEntryPrompt prompt : prompts) {
-                              if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
-                                  completedQuestions++;
-                              }
-                          }
+                                prompt = getOnScreenPrompt(prompt, odkv);
+                                if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
+                                    completedQuestions++;
+                                }
+                            }
                         }
                         else if (comparison < 0) {
                             // For previous questions, consider all "complete"
@@ -2599,6 +2595,24 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             mView.updateProgressBar(completedQuestions, totalQuestions);
 
             return null;
+        }
+
+        /**
+         * Takes in a form entry prompt that is obtained generically and if there
+         * is already one on screen (which, for isntance, may have cached some of its data)
+         * returns the object in use currently.
+         * 
+         * @param prompt
+         * @return
+         */
+        private FormEntryPrompt getOnScreenPrompt(FormEntryPrompt prompt, ODKView view) {
+            FormIndex index = prompt.getIndex();
+            for(QuestionWidget widget : view.getWidgets()) {
+                if(widget.getFormId().equals(index)) {
+                    return widget.getPrompt();
+                }
+            }
+            return prompt;
         }
         
         /*

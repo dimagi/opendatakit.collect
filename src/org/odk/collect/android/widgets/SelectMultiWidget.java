@@ -99,7 +99,7 @@ public class SelectMultiWidget extends QuestionWidget {
                 
                 int padding = (int)Math.floor(context.getResources().getDimension(R.dimen.select_padding));
                 
-                c.setPadding(0, 0, padding, 0);
+                c.setPadding(c.getPaddingLeft(), 0, padding, 0);
                 for (int vi = 0; vi < ve.size(); vi++) {
                     // match based on value, not key
                     if (mItems.get(i).getValue().equals(ve.elementAt(vi).getValue())) {
