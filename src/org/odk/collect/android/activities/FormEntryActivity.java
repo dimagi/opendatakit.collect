@@ -937,8 +937,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * 
      * @param odkv ODKView to update
      */
-    public void updateNavigationCues() {
-        updateFloatingLabels();
+    public void updateNavigationCues(View view) {
+        updateFloatingLabels(view);
     	ProgressBar progressBar = (ProgressBar)this.findViewById(R.id.nav_prog_bar);
     	
     	NavigationDetails details = calculateNavigationStatus();
@@ -1000,15 +1000,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         public int getBackgroundDrawable() { return resourceId; }
     };
     
-    private void updateFloatingLabels() {
+    private void updateFloatingLabels(View currentView) {
         //TODO: this should actually be set up to scale per screen size.
         ArrayList<Pair<String, FloatingLabel>> smallLabels = new ArrayList<Pair<String, FloatingLabel>>();
         ArrayList<Pair<String, FloatingLabel>> largeLabels = new ArrayList<Pair<String, FloatingLabel>>();
         
         FloatingLabel[] labelTypes = FloatingLabel.values();
         
-        if(this.mCurrentView instanceof ODKView) {
-            for(QuestionWidget widget : ((ODKView)mCurrentView).getWidgets()) {
+        if(currentView instanceof ODKView) {
+            for(QuestionWidget widget : ((ODKView)currentView).getWidgets()) {
                 String hint = widget.getPrompt().getAppearanceHint();
                 if(hint == null) { continue; }
                 for(FloatingLabel type : labelTypes) {
@@ -1023,6 +1023,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
             }
         }
+    
         
         ViewGroup parent = (ViewGroup)this.findViewById(R.id.form_entry_label_layout);
         parent.removeAllViews();
@@ -1528,7 +1529,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
                 
-                updateNavigationCues();
+                updateNavigationCues(odkv);
                 
                 return odkv;
             default:
@@ -2664,7 +2665,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
          */
 
         refreshCurrentView();
-        updateNavigationCues();
+        updateNavigationCues(this.mCurrentView);
     }
 
 
@@ -2945,7 +2946,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     @Override
     public void widgetEntryChanged() {
         updateFormRelevencies();
-        updateNavigationCues();
+        updateNavigationCues(this.mCurrentView);
         
     }
 }
