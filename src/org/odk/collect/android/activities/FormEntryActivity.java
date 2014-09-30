@@ -46,6 +46,7 @@ import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.logic.PropertyManager;
 import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.preferences.PreferencesActivity.ProgressBarMode;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -300,6 +301,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         }
 
         setContentView(R.layout.screen_form_entry);
+        setNavBarVisibility();
         
         ImageButton nextButton = (ImageButton)this.findViewById(R.id.nav_btn_next);
         ImageButton prevButton = (ImageButton)this.findViewById(R.id.nav_btn_prev);
@@ -939,9 +941,21 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     public void updateNavigationCues(View view) {
         updateFloatingLabels(view);
+
+        ProgressBarMode mode = PreferencesActivity.getProgressBarMode(this);
+        
+        setNavBarVisibility();
+        
+        if(mode == ProgressBarMode.None) { return; }
+        
+        NavigationDetails details = calculateNavigationStatus();
+        
+        if(mode == ProgressBarMode.ProgressOnly && view instanceof ODKView) {
+            ((ODKView)view).updateProgressBar(details.completedQuestions, details.totalQuestions);
+            return;
+        }
+
     	ProgressBar progressBar = (ProgressBar)this.findViewById(R.id.nav_prog_bar);
-    	
-    	NavigationDetails details = calculateNavigationStatus();
     	
         ImageButton nextButton = (ImageButton)this.findViewById(R.id.nav_btn_next);
         ImageButton prevButton = (ImageButton)this.findViewById(R.id.nav_btn_prev);
@@ -983,6 +997,17 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         //We should probably be doing this based on the widgets, maybe, not the model? Hard to call.
         updateBadgeInfo(details.requiredOnScreen, details.answeredOnScreen);
+    }
+    private void setNavBarVisibility() {
+        
+        //Make sure the nav bar visibility is set
+        int navBarVisibility = PreferencesActivity.getProgressBarMode(this).useNavigationBar() ? View.VISIBLE : View.GONE;
+        View nav = this.findViewById(R.id.nav_pane);
+        if(nav.getVisibility() != navBarVisibility) {
+            nav.setVisibility(navBarVisibility);
+            this.findViewById(R.id.nav_badge_border_drawer).setVisibility(navBarVisibility);
+            this.findViewById(R.id.nav_badge).setVisibility(navBarVisibility);
+        }
     }
     enum FloatingLabel {
         good ("floating-good", R.drawable.label_floating_good),
@@ -1145,8 +1170,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         //If we're at the beginning of form event, but don't show the screen for that, we need 
         //to get the next valid screen
-        if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
-            !PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, false)) {
+        if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && !PreferencesActivity.showFirstScreen(this)) {
             this.showNextView(true);
         } else {
             View current = createView(event);
@@ -1684,10 +1708,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 event = mFormController.stepToPreviousEvent();
                 lastValidIndex = mFormController.getFormIndex();
             }
-            
+                        
             //check if we're at the beginning and not doing the whole "First screen" thing
-            if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && 
-                !PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, false)) {
+            if(event == FormEntryController.EVENT_BEGINNING_OF_FORM && !PreferencesActivity.showFirstScreen(this)) {
                 
                 //If so, we can't go all the way back here, so we've gotta hit the last index that was valid
                 mFormController.jumpToIndex(lastValidIndex);
@@ -1850,11 +1873,17 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         mRepeatDialog.setIcon(android.R.drawable.ic_dialog_info);
         
-        NavigationDetails details = calculateNavigationStatus();
+        boolean navBar = PreferencesActivity.getProgressBarMode(this).useNavigationBar();
         
-        final boolean backExitsForm = !details.relevantBeforeCurrentScreen;
+        //this is super gross...
+        NavigationDetails details = null;
+        if(navBar) {
+            details = calculateNavigationStatus();
+        }
         
-        final boolean nextExitsForm = details.relevantAfterCurrentScreen == 0;
+        final boolean backExitsForm = navBar && !details.relevantBeforeCurrentScreen;
+        
+        final boolean nextExitsForm = navBar && details.relevantAfterCurrentScreen == 0;
         
         Button back = (Button)view.findViewById(R.id.component_repeat_back);
         

@@ -51,7 +51,7 @@
         android:id="@id/nav_pane"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/screen_form_entry_bottom_anchor"
         android:background="@drawable/top_border_black"
         android:paddingBottom="5dp"
         android:paddingTop="5dp" >
@@ -108,5 +108,11 @@
         android:textColor="@drawable/white"
         android:textStyle="bold"
         android:visibility="invisible" />
+    
+    <View 
+        android:id="@id/screen_form_entry_bottom_anchor"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

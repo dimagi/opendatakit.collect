@@ -1,17 +1,23 @@
 
 package org.odk.collect.android.views;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.preferences.PreferencesActivity.ProgressBarMode;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
-import org.odk.collect.android.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,16 +27,11 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewParent;
 import android.view.View.OnLongClickListener;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * This class is
@@ -50,7 +51,9 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
     private ArrayList<QuestionWidget> widgets;
-    private ArrayList<View> dividers;    
+    private ArrayList<View> dividers;
+    private ProgressBar mProgressBar;
+    
     private int mQuestionFontsize;
 
     public final static String FIELD_LIST = "field-list";
@@ -60,6 +63,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     private int widgetIdCount = 0;
     private int mViewBannerCount = 0;
+
+    private boolean mProgressEnabled;
 
 
     public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory) {
@@ -104,6 +109,28 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.setOrientation(LinearLayout.VERTICAL);
         mView.setGravity(Gravity.TOP);
         mView.setPadding(0, 7, 0, 0);
+        
+        if(PreferencesActivity.getProgressBarMode(mContext) == ProgressBarMode.ProgressOnly) {
+            this.mProgressEnabled = true;
+        }
+
+        // Construct progress bar
+        if (mProgressEnabled) {
+            mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
+            mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
+            
+            LinearLayout.LayoutParams barLayout =
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+            barLayout.setMargins(15, 15, 15, 15);
+            barLayout.gravity = Gravity.BOTTOM;
+            
+            LinearLayout barView = new LinearLayout(getContext());
+            barView.setOrientation(LinearLayout.VERTICAL);
+            barView.setGravity(Gravity.BOTTOM);
+            barView.addView((View) mProgressBar);
+            mView.addView(barView, barLayout);
+        }
 
         mLayout =
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
@@ -194,7 +221,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         if(i > 0) {
             dividerIndex += 2 * i - 1;
         }
-        mView.addView(divider, dividerIndex);
+        mView.addView(divider, getViewIndex(dividerIndex));
         dividers.add(Math.max(0, i - 1), divider);
         
         QuestionWidget qw = factory.createWidgetFromPrompt(fep, getContext());;
@@ -208,7 +235,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 //        }
 
         widgets.add(i, qw);
-        mView.addView((View) qw, 2 * i + mViewBannerCount, mLayout);
+        mView.addView((View) qw, getViewIndex(2 * i + mViewBannerCount), mLayout);
         
         qw.setChangedListener(this);
     }
@@ -268,8 +295,18 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     }
 
     /**
+     * Update progress bar
+     * @param progress Current value
+     * @param max Progress bar will be given range 0..max
+     */
+    public void updateProgressBar(int progress, int max) {
         if (mProgressBar != null) {
+            mProgressBar.setMax(max);
+            mProgressBar.setProgress(progress);
+        }
     }
+
+    /**
      * // * Add a TextView containing the hierarchy of groups to which the question belongs. //
      */
     private void addGroupText(FormEntryCaption[] groups) {
@@ -430,7 +467,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * @param questionIndex Index in question list.
      */
     public void removeWidget(int questionIndex){
-		mView.removeViewAt(questionIndex);
+        mView.removeViewAt(getViewIndex(questionIndex));
     }
     
     /**
@@ -440,4 +477,18 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     public void removeWidget(View v){
         mView.removeView(v);
     }
+
+    /**
+     * Translate question index to view index.
+     * @param questionIndex Index in the list of questions.
+     * @return Index of question's view in mView.
+     */
+    private int getViewIndex(int questionIndex) {
+        // Account for progress bar
+        if (mProgressEnabled) {
+            return questionIndex + 1;
+        }
+        return questionIndex;
+    }
+    
 }
