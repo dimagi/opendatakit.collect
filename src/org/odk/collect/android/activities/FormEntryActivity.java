@@ -2572,7 +2572,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         // Future questions are never complete.
                         if (onCurrentScreen) {
                             for (FormEntryPrompt prompt : prompts) {
-                                prompt = getOnScreenPrompt(prompt, odkv);
+                                prompt = getOnScreenPrompt(prompt, mView);
                                 if (prompt.getAnswerValue() != null || prompt.getDataType() == Constants.DATATYPE_NULL) {
                                     completedQuestions++;
                                 }
