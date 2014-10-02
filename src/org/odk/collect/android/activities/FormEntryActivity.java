@@ -2507,7 +2507,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      * @author jschweers
      *
      */
-    private class ProgressBarUpdateTask extends AsyncTask<Void, Void, Double> implements TimerListener {
+    private class ProgressBarUpdateTask extends AsyncTask<Void, Void, Integer> implements TimerListener {
         private ODKView mView;
         
         public ProgressBarUpdateTask() {
@@ -2538,7 +2538,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Double doInBackground(Void... nothing) {
+        protected Integer doInBackground(Void... nothing) {
             if (
                !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
@@ -2601,7 +2601,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
             // Set form back to correct state
             mFormController.jumpToIndex(currentFormIndex);
-            return (double) completedQuestions * 100 / totalQuestions;
+            return (int) completedQuestions * 100 / totalQuestions;
         }
 
         /**
@@ -2627,9 +2627,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Double result) {
+        protected void onPostExecute(Integer result) {
             // Actually update bar
-            mView.updateProgressBar(result.intValue(), 100);
+            mView.updateProgressBar(result, 100);
 
             // Make absolutely sure that progress bar is set back to determinate state
             mView.setProgressBarIndeterminate(false);
