@@ -2501,10 +2501,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     /**
      * Task to calculate min and max values for progress bar, then update the widget.
+     * 
+     * Result is the percentage complete for updating the progress bar.
+     * 
      * @author jschweers
      *
      */
-    private class ProgressBarUpdateTask extends AsyncTask<Void, Void, Void> implements TimerListener {
+    private class ProgressBarUpdateTask extends AsyncTask<Void, Void, Double> implements TimerListener {
         private ODKView mView;
         
         public ProgressBarUpdateTask() {
@@ -2535,7 +2538,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Double doInBackground(Void... nothing) {
             if (
                !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
@@ -2596,16 +2599,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
             }
     
-            // Set form back to correct state & actually update bar
+            // Set form back to correct state
             mFormController.jumpToIndex(currentFormIndex);
-            mView.updateProgressBar(completedQuestions, totalQuestions);
-
-            return null;
+            return (double) completedQuestions * 100 / totalQuestions;
         }
 
         /**
          * Takes in a form entry prompt that is obtained generically and if there
-         * is already one on screen (which, for isntance, may have cached some of its data)
+         * is already one on screen (which, for instance, may have cached some of its data)
          * returns the object in use currently.
          * 
          * @param prompt
@@ -2626,7 +2627,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Double result) {
+            // Actually update bar
+            mView.updateProgressBar(result.intValue(), 100);
+
             // Make absolutely sure that progress bar is set back to determinate state
             mView.setProgressBarIndeterminate(false);
         }
