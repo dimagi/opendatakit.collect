@@ -2583,6 +2583,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                             completedQuestions += prompts.length;
                         }
                     }
+                    
+                    // Bail if task has been canceled
+                    if (isCancelled()) {
+                        return null;
+                    }
+                    
                     event = mFormController.stepToNextEvent(false);
                 }
             }
