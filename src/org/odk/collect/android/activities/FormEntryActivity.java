@@ -1904,17 +1904,16 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         Button newButton = (Button)view.findViewById(R.id.component_repeat_new);
 
         newButton.setOnClickListener(new OnClickListener() {
-
-			@Override
+                        @Override
 			public void onClick(View v) {
-                theDialog.dismiss();
-                try {
-                    mFormController.newRepeat();
-                } catch (XPathTypeMismatchException e) {
-                    FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
-                    return;
-                }
-                showNextView();				
+                            theDialog.dismiss();
+                            try {
+                                mFormController.newRepeat();
+                            } catch (XPathTypeMismatchException e) {
+                                FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
+                                return;
+                            }
+                            showNextView();				
 			}
         });
         
