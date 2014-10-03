@@ -911,7 +911,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
 
-                event = mFormController.stepToNextEvent(false);
+                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
             }
         } catch (XPathTypeMismatchException e) {
             FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
@@ -1616,7 +1616,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             try{
             
             group_skip: do {
-                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP);
+                event = mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP);
                 switch (event) {
                     case FormEntryController.EVENT_QUESTION:
                     case FormEntryController.EVENT_END_OF_FORM:
