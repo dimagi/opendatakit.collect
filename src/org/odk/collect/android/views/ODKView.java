@@ -1,17 +1,23 @@
 
 package org.odk.collect.android.views;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.WidgetChangedListener;
 import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.preferences.PreferencesActivity.ProgressBarMode;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
-import org.odk.collect.android.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,17 +27,11 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewParent;
 import android.view.View.OnLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * This class is
@@ -63,6 +63,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     
     private int widgetIdCount = 0;
     private int mViewBannerCount = 0;
+
+    private boolean mProgressEnabled;
 
 
     public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory) {
@@ -107,12 +109,13 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mView.setOrientation(LinearLayout.VERTICAL);
         mView.setGravity(Gravity.TOP);
         mView.setPadding(0, 7, 0, 0);
+        
+        if(PreferencesActivity.getProgressBarMode(mContext) == ProgressBarMode.ProgressOnly) {
+            this.mProgressEnabled = true;
+        }
 
         // Construct progress bar
-        if (
-           PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext())
-           .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)
-        ) {
+        if (mProgressEnabled) {
             mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);
             mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
             
@@ -482,8 +485,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      */
     private int getViewIndex(int questionIndex) {
         // Account for progress bar
-        if (PreferenceManager.getDefaultSharedPreferences(mContext)
-                .getBoolean(PreferencesActivity.KEY_PROGRESS_BAR, true)) {
+        if (mProgressEnabled) {
             return questionIndex + 1;
         }
         return questionIndex;

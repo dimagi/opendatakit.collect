@@ -51,6 +51,11 @@ public class TriggerWidget extends QuestionWidget {
 
     public TriggerWidget(Context context, FormEntryPrompt prompt, boolean interactive) {
         super(context, prompt);
+        
+        if(prompt.getAppearanceHint() != null && prompt.getAppearanceHint().startsWith("floating-")) {
+            this.setVisibility(View.GONE);
+        }
+        
         mPrompt = prompt;
         mInteractive = interactive;
         
