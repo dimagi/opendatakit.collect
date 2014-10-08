@@ -224,7 +224,7 @@ public class ResizingImageView extends ImageView {
 
             Drawable drawable = getDrawable();
             if (drawable != null) {
-                Pair<Integer,Integer> mPair = this.getWidthHeight(widthMeasureSpec, heightMeasureSpec, drawable, .5);
+                Pair<Integer,Integer> mPair = this.getWidthHeight(widthMeasureSpec, heightMeasureSpec, drawable, .7);
                 setMeasuredDimension(mPair.first, mPair.second);
             }
         }
