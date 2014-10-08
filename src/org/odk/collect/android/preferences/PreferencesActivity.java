@@ -71,6 +71,7 @@ public class PreferencesActivity extends PreferenceActivity implements
     public static String KEY_SHOW_START_SCREEN = "odk_show_entry_screen";
     public static String KEY_HELP_MODE_TRAY = "help_mode_tray";
     public static String KEY_PROGRESS_BAR = "progress_bar";
+    public static String KEY_NAVIGATION_BAR = "pref_nav_bar";
     
 
     public static String KEY_AUTH = "auth";
@@ -596,4 +597,38 @@ public class PreferencesActivity extends PreferenceActivity implements
         };
         return returnFilter;
     }
+    
+    public enum ProgressBarMode {
+        None (false, false),
+        ProgressOnly (true, false),
+        NavBar (true, true),
+        //NOTE: We can't actually handle this yet
+        NavBarNoProgress (false, true);
+        
+        boolean progress = false;
+        boolean nav = false;
+        
+        private ProgressBarMode(boolean progress, boolean nav) { this.progress = progress; this.nav = nav; }
+        
+        public boolean useNavigationBar() { return nav;} 
+        public boolean useProgressBar() { return progress; }
+    }
+    
+    public static ProgressBarMode getProgressBarMode(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean navBar = prefs.getBoolean(KEY_NAVIGATION_BAR, false);
+        boolean progressBar = prefs.getBoolean(KEY_PROGRESS_BAR, true);
+        if(!navBar && !progressBar) { return ProgressBarMode.None;}
+        else if(!navBar && progressBar) { return ProgressBarMode.ProgressOnly;}
+        else if(navBar && !progressBar) { return ProgressBarMode.NavBarNoProgress;}
+        else { return ProgressBarMode.NavBar;}
+    }
+
+
+    public static boolean showFirstScreen(Context context) {
+        return !PreferencesActivity.getProgressBarMode(context).useNavigationBar() && 
+                PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PreferencesActivity.KEY_SHOW_START_SCREEN, true);
+    }
+    
+        
 }

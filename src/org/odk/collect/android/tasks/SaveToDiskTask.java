@@ -389,7 +389,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
 
         int event;
         while ((event =
-            FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_OVER_GROUP)) != FormEntryController.EVENT_END_OF_FORM) {
+            FormEntryActivity.mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP)) != FormEntryController.EVENT_END_OF_FORM) {
             if (event != FormEntryController.EVENT_QUESTION) {
                 continue;
             } else {

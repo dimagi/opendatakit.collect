@@ -26,6 +26,7 @@ the License.
     <drawable name="translucent_background">#e0000000</drawable>
     <drawable name="transparent_background">#00000000</drawable>
 
+    <color name="white">#ffffff</color>
     <color name="solid_red">#f00</color>
     <color name="solid_blue">#0000ff</color>
     <color name="solid_green">#f0f0</color>
@@ -37,10 +38,23 @@ the License.
     <color name="dark_blue">#000080</color>
     <color name="light_red">#F5A6A6</color>
     <color name="dark_red">#20959699</color>
+    
+    <color name="dark_grey">#A3A3A3</color>
+    
     <color name="bright_blue_grad_start">#ff266cc9</color>
     <color name="bright_blue_grad_end">#ff1e559e</color>
-    <color name="grey_grad_start">#ff8e9caf</color>
-    <color name="grey_grad_end">#ff70829a</color>
+    <color name="grey_grad_start">#A0A6A8</color>
+    <color name="grey_grad_end">#868A8C</color>
+    
+    <color name="bright_green_grad_start">#2C9746</color>
+    <color name="bright_green_grad_end">#247A38</color>
+    
+    <color name="pale_blue">#E2ECF0</color>
+   
+    
     <color name="very_light_blue">#AAE3ECFF</color>
-
+    
+    <color name="solid_dark_red">#BF3D3D</color>
+    <color name="solid_dark_orange">#F57E20</color>
+    
 </resources>
