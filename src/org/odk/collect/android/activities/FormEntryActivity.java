@@ -941,6 +941,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         if(mode == ProgressBarMode.None) { return; }
         
+        // jls: What should be done here? Right now, calculation exists both in the 
+        // ProgressBarUpdateTask (async) and in calculateNavigationStatus (sync).
+        // Should calculateNavigationStatus be async? But then the UI will block.
+        /*if (mProgressBarTask != null) {
+            mProgressBarTask.cancel(true);
+        }
+        mProgressBarTask = new ProgressBarUpdateTask(view);
+        mProgressBarTask.execute();*/
+
         NavigationDetails details = calculateNavigationStatus();
         
         if(mode == ProgressBarMode.ProgressOnly && view instanceof ODKView) {
@@ -1527,11 +1536,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
                 
-                /*if (mProgressBarTask != null) {
-                    mProgressBarTask.cancel(true);
-                }
-                mProgressBarTask = new ProgressBarUpdateTask(odkv);
-                mProgressBarTask.execute();*/
                 updateNavigationCues(odkv);
                 
                 return odkv;
@@ -2953,11 +2957,24 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     public void widgetEntryChanged() {
         updateFormRelevencies();
         updateNavigationCues(this.mCurrentView);
-        /*if (mProgressBarTask != null) {
-            mProgressBarTask.cancel(true);
+    }
+
+    /**
+     * Takes in a form entry prompt that is obtained generically and if there
+     * is already one on screen (which, for instance, may have cached some of its data)
+     * returns the object in use currently.
+     * 
+     * @param prompt
+     * @return
+     */
+    private FormEntryPrompt getOnScreenPrompt(FormEntryPrompt prompt, ODKView view) {
+        FormIndex index = prompt.getIndex();
+        for(QuestionWidget widget : view.getWidgets()) {
+            if(widget.getFormId().equals(index)) {
+                return widget.getPrompt();
+            }
         }
-        mProgressBarTask = new ProgressBarUpdateTask();
-        mProgressBarTask.execute();*/
+        return prompt;
     }
     
     /**
@@ -2970,14 +2987,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     private class ProgressBarUpdateTask extends AsyncTask<Void, Void, Integer> implements TimerListener {
         private ODKView mView;
-        
-        public ProgressBarUpdateTask() {
-            super();
-            if(!(mCurrentView instanceof ODKView)){
-                throw new RuntimeException("Tried to update progress bar not on ODKView");
-            }
-            mView = (ODKView) mCurrentView;
-        }
         
         public ProgressBarUpdateTask(ODKView view) {
             super();
@@ -3065,24 +3074,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             return (int) completedQuestions * 100 / totalQuestions;
         }
 
-        /**
-         * Takes in a form entry prompt that is obtained generically and if there
-         * is already one on screen (which, for instance, may have cached some of its data)
-         * returns the object in use currently.
-         * 
-         * @param prompt
-         * @return
-         */
-        private FormEntryPrompt getOnScreenPrompt(FormEntryPrompt prompt, ODKView view) {
-            FormIndex index = prompt.getIndex();
-            for(QuestionWidget widget : view.getWidgets()) {
-                if(widget.getFormId().equals(index)) {
-                    return widget.getPrompt();
-                }
-            }
-            return prompt;
-        }
-        
         /*
          * (non-Javadoc)
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
