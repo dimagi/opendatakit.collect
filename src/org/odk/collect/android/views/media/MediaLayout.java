@@ -268,7 +268,7 @@ public class MediaLayout extends RelativeLayout {
                         mImageView.setPadding(10, 10, 10, 10);
                         mImageView.setAdjustViewBounds(true);
                         
-                        if(ResizingImageView.resizeMethod.equals("full")){
+                        if(ResizingImageView.resizeMethod.equals("full") || ResizingImageView.resizeMethod.equals("half")){
                             mImageView.setMaxHeight(maxHeight);
                             mImageView.setMaxWidth(maxWidth);
                         }
