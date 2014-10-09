@@ -79,12 +79,13 @@ public class IntentCallout implements Externalizable {
         Intent i = new Intent();
         if(className != null){
             i.setAction(className);
+            if(component != null){
+                i.setComponent(new ComponentName(component, className));
+            }
         } if(type != null){
             i.setType(type);
         } if(data != null){
             i.setData(Uri.parse(data));
-        } if(component != null){
-            i.setComponent(new ComponentName(component, className));
         }
         for(Enumeration<String> en = refs.keys() ; en.hasMoreElements() ;) {
             String key = en.nextElement();
