@@ -42,7 +42,7 @@ import android.widget.Toast;
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
 public class IntentWidget extends QuestionWidget implements IBinaryWidget {
-    private Button mGetBarcodeButton;
+    private Button launchIntentButton;
     private TextView mStringAnswer;
     private boolean mWaitingForData;
     private Intent intent;
@@ -61,15 +61,15 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
         params.setMargins(7, 5, 7, 5);
         
         // set button formatting
-        mGetBarcodeButton = new Button(getContext());
-        mGetBarcodeButton.setText(StringUtils.getStringRobust(getContext(), R.string.intent_callout_button));
-        mGetBarcodeButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mGetBarcodeButton.setPadding(20, 20, 20, 20);
-        mGetBarcodeButton.setEnabled(!prompt.isReadOnly());
-        mGetBarcodeButton.setLayoutParams(params);
+        launchIntentButton = new Button(getContext());
+        setButtonLabel();
+        launchIntentButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+        launchIntentButton.setPadding(20, 20, 20, 20);
+        launchIntentButton.setEnabled(!prompt.isReadOnly());
+        launchIntentButton.setLayoutParams(params);
 
         // launch barcode capture intent on click
-        mGetBarcodeButton.setOnClickListener(new View.OnClickListener() {
+        launchIntentButton.setOnClickListener(new View.OnClickListener() {
         	/*
         	 * (non-Javadoc)
         	 * @see android.view.View.OnClickListener#onClick(android.view.View)
@@ -102,12 +102,20 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
 
         String s = prompt.getAnswerText();
         if (s != null) {
-            mGetBarcodeButton.setText(StringUtils.getStringRobust(getContext(), R.string.intent_callout_button_update));
+            launchIntentButton.setText(StringUtils.getStringRobust(getContext(), R.string.intent_callout_button_update));
             mStringAnswer.setText(s);
         }
         // finish complex layout
-        addView(mGetBarcodeButton);
+        addView(launchIntentButton);
         addView(mStringAnswer);
+    }
+    
+    public void setButtonLabel(){
+        if(ic.getButtonLabel() != null){
+            launchIntentButton.setText(ic.getButtonLabel());
+        } else{
+            launchIntentButton.setText(StringUtils.getStringRobust(getContext(), R.string.intent_callout_button));
+        }
     }
 
 
@@ -118,7 +126,7 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     @Override
     public void clearAnswer() {
         mStringAnswer.setText(null);
-        mGetBarcodeButton.setText(StringUtils.getStringRobust(getContext(), R.string.intent_callout_button));
+        setButtonLabel();
     }
 
 
@@ -179,7 +187,7 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     @Override
     public void setOnLongClickListener(OnLongClickListener l) {
         mStringAnswer.setOnLongClickListener(l);
-        mGetBarcodeButton.setOnLongClickListener(l);
+        launchIntentButton.setOnLongClickListener(l);
     }
 
 
@@ -190,7 +198,7 @@ public class IntentWidget extends QuestionWidget implements IBinaryWidget {
     @Override
     public void cancelLongPress() {
         super.cancelLongPress();
-        mGetBarcodeButton.cancelLongPress();
+        launchIntentButton.cancelLongPress();
         mStringAnswer.cancelLongPress();
     }
     
