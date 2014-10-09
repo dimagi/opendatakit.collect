@@ -33,6 +33,12 @@ public class IntentExtensionParser implements IElementHandler {
 
         String id = e.getAttributeValue(null, "id");
         String className = e.getAttributeValue(null, "class");
+        
+        String component = e.getAttributeValue(null, "component");
+        String type = e.getAttributeValue(null, "type");
+        String data = e.getAttributeValue(null, "data");
+        
+        String label = e.getAttributeValue(null, "button-label");
 
         Hashtable<String, TreeReference> extras = new Hashtable<String, TreeReference>();
         Hashtable<String, TreeReference> response = new Hashtable<String, TreeReference>();
@@ -59,7 +65,7 @@ public class IntentExtensionParser implements IElementHandler {
             }
         }
 
-        form.getExtension(AndroidXFormExtensions.class).registerIntent(id, new IntentCallout(className, extras, response));
+        form.getExtension(AndroidXFormExtensions.class).registerIntent(id, new IntentCallout(className, extras, response, type, component, data, label));
     }
 
 }

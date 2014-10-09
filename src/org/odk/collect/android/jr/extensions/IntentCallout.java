@@ -26,7 +26,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.views.ODKView;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -42,6 +44,11 @@ public class IntentCallout implements Externalizable {
     
     private FormDef form;
     
+    private String type;
+    private String component;
+    private String data;
+    private String buttonLabel;
+    
     // Generic Extra from intent callout extensions
     public static final String INTENT_RESULT_VALUE = "odk_intent_data";
     
@@ -53,10 +60,15 @@ public class IntentCallout implements Externalizable {
         
     }
     
-    public IntentCallout(String className,  Hashtable<String, TreeReference> refs, Hashtable<String, TreeReference> responses) {
+    public IntentCallout(String className, Hashtable<String, TreeReference> refs, Hashtable<String, TreeReference> responses, 
+            String type, String component, String data, String buttonLabel) {
         this.className = className;
         this.refs = refs;
         this.responses = responses;
+        this.type = type;
+        this.component = component;
+        this.data = data;
+        this.buttonLabel = buttonLabel;
     }
     
     protected void attachToForm(FormDef form) {
@@ -64,7 +76,16 @@ public class IntentCallout implements Externalizable {
     }
     
     public Intent generate(EvaluationContext ec) {
-        Intent i = new Intent(className);
+        Intent i = new Intent();
+        if(className != null){
+            i.setAction(className);
+        } if(type != null){
+            i.setType(type);
+        } if(data != null){
+            i.setData(Uri.parse(data));
+        } if(component != null){
+            i.setComponent(new ComponentName(component, className));
+        }
         for(Enumeration<String> en = refs.keys() ; en.hasMoreElements() ;) {
             String key = en.nextElement();
             AbstractTreeElement e = ec.resolveReference(refs.get(key));
@@ -168,6 +189,10 @@ public class IntentCallout implements Externalizable {
         ExtUtil.writeString(out, className);
         ExtUtil.write(out, new ExtWrapMap(refs));
         ExtUtil.write(out, new ExtWrapMap(responses));
+    }
+    
+    public String getButtonLabel(){
+        return buttonLabel;
     }
 
 }
