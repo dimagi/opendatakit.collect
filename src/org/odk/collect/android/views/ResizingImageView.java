@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -96,7 +97,7 @@ public class ResizingImageView extends ImageView {
         public boolean onDown(MotionEvent e) {
             return true;
         }
-        
+
         /*
          * (non-Javadoc)
          * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
@@ -119,7 +120,7 @@ public class ResizingImageView extends ImageView {
 
             // don't let the object get too small or too large.
             scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 5.0f));
-            
+
             if(scaleFactor > scaleFactorThreshhold){
                 setFullScreen();
             }
@@ -156,6 +157,42 @@ public class ResizingImageView extends ImageView {
         }
     }
 
+    public Pair<Integer,Integer> getWidthHeight(int widthMeasureSpec, int heightMeasureSpec, Drawable drawable, double scaleFactor){
+
+        int wMode = MeasureSpec.getMode(widthMeasureSpec);
+        int hMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        // Calculate the most appropriate size for the view. Take into
+        // account minWidth, minHeight, maxWith, maxHeigh and allowed size
+        // for the view, then scale by the scaleFactor
+
+        int maxWidth = wMode == MeasureSpec.AT_MOST
+                ? Math.min(MeasureSpec.getSize(widthMeasureSpec), mMaxWidth)
+                        : mMaxWidth;
+                int maxHeight = hMode == MeasureSpec.AT_MOST
+                        ? Math.min(MeasureSpec.getSize(heightMeasureSpec), mMaxHeight)
+                                : mMaxHeight;
+
+                        float dWidth = dipToPixels(getContext(), drawable.getIntrinsicWidth());
+                        float dHeight = dipToPixels(getContext(), drawable.getIntrinsicHeight());
+                        float ratio = (dWidth) / dHeight;
+
+                        int width = (int) Math.min(Math.max(dWidth, getSuggestedMinimumWidth()), maxWidth);
+                        int height = (int) (width / ratio);
+
+                        height = Math.min(Math.max(height, getSuggestedMinimumHeight()), maxHeight);
+                        width = (int) (height * ratio);
+
+                        if (width > maxWidth) {
+                            width = maxWidth;
+                            height = (int) (width / ratio);
+                        }
+
+                        Pair<Integer,Integer> mPair = new Pair<Integer,Integer>((int)(width * scaleFactor), (int)(height * scaleFactor));
+
+                        return mPair;
+    }
+
     /*
      * (non-Javadoc)
      * @see android.widget.ImageView#onMeasure(int, int)
@@ -178,39 +215,19 @@ public class ResizingImageView extends ImageView {
 
             Drawable drawable = getDrawable();
             if (drawable != null) {
-
-                int wMode = MeasureSpec.getMode(widthMeasureSpec);
-                int hMode = MeasureSpec.getMode(heightMeasureSpec);
-
-                // Calculate the most appropriate size for the view. Take into
-                // account minWidth, minHeight, maxWith, maxHeigh and allowed size
-                // for the view.
-
-                int maxWidth = wMode == MeasureSpec.AT_MOST
-                        ? Math.min(MeasureSpec.getSize(widthMeasureSpec), mMaxWidth)
-                                : mMaxWidth;
-                        int maxHeight = hMode == MeasureSpec.AT_MOST
-                                ? Math.min(MeasureSpec.getSize(heightMeasureSpec), mMaxHeight)
-                                        : mMaxHeight;
-
-                                float dWidth = dipToPixels(getContext(), drawable.getIntrinsicWidth());
-                                float dHeight = dipToPixels(getContext(), drawable.getIntrinsicHeight());
-                                float ratio = (dWidth) / dHeight;
-
-                                int width = (int) Math.min(Math.max(dWidth, getSuggestedMinimumWidth()), maxWidth);
-                                int height = (int) (width / ratio);
-
-                                height = Math.min(Math.max(height, getSuggestedMinimumHeight()), maxHeight);
-                                width = (int) (height * ratio);
-
-                                if (width > maxWidth) {
-                                    width = maxWidth;
-                                    height = (int) (width / ratio);
-                                }
-
-                                setMeasuredDimension(width, height);
+                Pair<Integer,Integer> mPair = this.getWidthHeight(widthMeasureSpec, heightMeasureSpec, drawable, 1);
+                setMeasuredDimension(mPair.first, mPair.second);
             }
-        }else if(resizeMethod.equals("width")){
+        }
+        if(resizeMethod.equals("half")){
+
+            Drawable drawable = getDrawable();
+            if (drawable != null) {
+                Pair<Integer,Integer> mPair = this.getWidthHeight(widthMeasureSpec, heightMeasureSpec, drawable, .7);
+                setMeasuredDimension(mPair.first, mPair.second);
+            }
+        }
+        else if(resizeMethod.equals("width")){
             Drawable d = getDrawable();
 
             if(d!=null){
