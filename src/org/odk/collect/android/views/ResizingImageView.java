@@ -188,8 +188,7 @@ public class ResizingImageView extends ImageView {
                             height = (int) (width / ratio);
                         }
 
-                        Pair<Integer,Integer> mPair = new Pair<Integer,Integer>(new Double(width * scaleFactor).intValue(), new Double(height * scaleFactor).intValue());
-
+                        Pair<Integer,Integer> mPair = new Pair<Integer,Integer>((int)(width * scaleFactor), (int)(height * scaleFactor));
 
                         return mPair;
     }
