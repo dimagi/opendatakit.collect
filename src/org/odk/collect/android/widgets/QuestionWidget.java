@@ -186,6 +186,14 @@ public abstract class QuestionWidget extends LinearLayout {
         }
     }
     
+    public void evaluateRequired(){
+        if(getPrompt().isRequired() &&  getAnswer() == null) {
+            this.setBackgroundResource(R.drawable.background_required);
+        } else {
+            this.setBackgroundDrawable(null);
+        }
+    }
+    
     public void notifyOnScreen(String text, boolean strong){
         if(strong){
             this.setBackgroundDrawable(this.getContext().getResources().getDrawable(R.drawable.bubble_invalid));
@@ -562,8 +570,8 @@ public abstract class QuestionWidget extends LinearLayout {
     public void widgetEntryChanged(){
         if(this.toastView != null) {
             this.toastView.setVisibility(View.GONE);
-            this.setBackgroundDrawable(null);
         }
+        evaluateRequired();
         if(hasListener){
             widgetChangedListener.widgetEntryChanged();
         }
