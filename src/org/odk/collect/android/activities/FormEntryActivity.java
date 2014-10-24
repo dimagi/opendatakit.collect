@@ -1226,6 +1226,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 Intent pref = new Intent(this, PreferencesActivity.class);
                 startActivity(pref);
                 return true;
+            case android.R.id.home:
+                triggerUserQuitInput();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -1364,11 +1367,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void setTitle(CharSequence title) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            if(this.getSupportFragmentManager().findFragmentByTag(TITLE_FRAGMENT_TAG) != null) {
-                return;
-            }
-        }
+        if(this.mHeaderString == null || this.mHeaderString.equals("")) { this.mHeaderString = title.toString();}
         super.setTitle(title);
     }
 
