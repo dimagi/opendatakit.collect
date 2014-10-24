@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
@@ -28,8 +29,10 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -65,6 +68,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     private int mViewBannerCount = 0;
 
     private boolean mProgressEnabled;
+    
+    String mGroupLabel;
 
 
     public ODKView(Context context, FormEntryPrompt questionPrompt, FormEntryCaption[] groups, WidgetFactory factory) {
@@ -86,29 +91,32 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
 
     public ODKView(Context context, FormEntryPrompt[] questionPrompts, FormEntryCaption[] groups, WidgetFactory factory, WidgetChangedListener wcl, boolean isGroup) {
         super(context);
+        mContext = context;
         
         if(wcl !=null){
             hasListener = true;
             wcListener = wcl;
         }
+
+        // display which group you are in as well as the question
+        mGroupLabel = deriveGroupText(groups);
         
         SharedPreferences settings = 
              PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
         String question_font =
                 settings.getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
-
         mQuestionFontsize = new Integer(question_font).intValue();
         
-        mContext = context;
-
         widgets = new ArrayList<QuestionWidget>();
         dividers = new ArrayList<View>();
 
         mView = new LinearLayout(getContext());
         mView.setOrientation(LinearLayout.VERTICAL);
         mView.setGravity(Gravity.TOP);
-        mView.setPadding(0, 7, 0, 0);
+        if(mGroupLabel.equals("")) {
+            mView.setPadding(0, 7, 0, 0);
+        }
         
         if(PreferencesActivity.getProgressBarMode(mContext) == ProgressBarMode.ProgressOnly) {
             this.mProgressEnabled = true;
@@ -135,7 +143,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         mLayout =
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
-        mLayout.setMargins(10, 0, 10, 0);
+        //mLayout.setMargins(10, 0, 10, 0);
 
         //Figure out if we share hint text between questions
         String hintText = null;
@@ -153,9 +161,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
                 }
             }
         }
-
-        // display which group you are in as well as the question
-        addGroupText(groups);
         
         addHintText(hintText);
         
@@ -185,6 +190,10 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             }
 
             widgets.add(qw);
+            
+            qw.evaluateRequired(); 
+            qw.setPadding(10, 0, 10, 0);
+            
             mView.addView((View) qw, mLayout);
             
             qw.setChangedListener(this);
@@ -237,6 +246,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         widgets.add(i, qw);
         mView.addView((View) qw, getViewIndex(2 * i + mViewBannerCount), mLayout);
         
+        qw.evaluateRequired();
         qw.setChangedListener(this);
     }
 
@@ -245,7 +255,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      * @return a HashMap of answers entered by the user for this set of widgets
      */
     public HashMap<FormIndex, IAnswerData> getAnswers() {
-        HashMap<FormIndex, IAnswerData> answers = new HashMap<FormIndex, IAnswerData>();
+        HashMap<FormIndex, IAnswerData> answers = new LinkedHashMap<FormIndex, IAnswerData>();
         Iterator<QuestionWidget> i = widgets.iterator();
         while (i.hasNext()) {
             /*
@@ -309,7 +319,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
     /**
      * // * Add a TextView containing the hierarchy of groups to which the question belongs. //
      */
-    private void addGroupText(FormEntryCaption[] groups) {
+    private String deriveGroupText(FormEntryCaption[] groups) {
         StringBuffer s = new StringBuffer("");
         String t = "";
         int i;
@@ -325,16 +335,23 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
                 s.append(" > ");
             }
         }
-
-        // build view
-        if (s.length() > 0) {
-            TextView tv = new TextView(getContext());
-            tv.setText(s.substring(0, s.length() - 3));
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, TEXTSIZE - 4);
-            tv.setPadding(0, 0, 0, 5);
-            mView.addView(tv, mLayout);
-            mViewBannerCount ++;
+        
+        //remove the trailing " > "
+        if(s.length() > 0) {
+            s.delete(s.length() - 2, s.length());
         }
+        
+        return s.toString();
+    }
+    
+    /**
+     * Ugh, the coupling here sucks, but this returns the group label
+     * to be used for this odk view. 
+     * 
+     * @return
+     */
+    public String getGroupLabel() {
+        return mGroupLabel;
     }
     
     private void addHintText(String hintText) {
