@@ -96,6 +96,7 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ContextThemeWrapper;
@@ -1022,6 +1023,8 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         
         FloatingLabel[] labelTypes = FloatingLabel.values();
         
+        int maxSplit = Integer.valueOf(this.getResources().getString(R.string.floating_tile_separator));
+        
         if(currentView instanceof ODKView) {
             for(QuestionWidget widget : ((ODKView)currentView).getWidgets()) {
                 String hint = widget.getPrompt().getAppearanceHint();
@@ -1029,7 +1032,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 for(FloatingLabel type : labelTypes) {
                     if(type.getAppearance().equals(hint)) {
                         String widgetText = widget.getPrompt().getQuestionText();
-                        if(widgetText != null && widgetText.length() < 15) {
+                        if(widgetText != null && widgetText.length() < maxSplit) {
                             smallLabels.add(new Pair(widgetText, type));
                         } else {
                             largeLabels.add(new Pair(widgetText, type));
@@ -1770,14 +1773,49 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         mViewPane.addView(mCurrentView, lp);
 
         mCurrentView.startAnimation(mInAnimation);
-        if (mCurrentView instanceof ODKView)
+        
+        TextView groupLabel = ((TextView)this.findViewById(R.id.form_entry_header_group_label));
+        
+        groupLabel.setVisibility(View.GONE);
+        
+        if (mCurrentView instanceof ODKView) {
             ((ODKView) mCurrentView).setFocus(this);
-        else {
+            String groupLabelText = ((ODKView) mCurrentView).getGroupLabel();
+
+            if(groupLabelText != "") {
+                String question_font = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getString(PreferencesActivity.KEY_FONT_SIZE, Collect.DEFAULT_FONTSIZE);
+                
+                int mGroupLabelFont = getGroupLabelFont(question_font);
+                groupLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mGroupLabelFont);
+                groupLabel.setText(groupLabelText);
+                groupLabel.setVisibility(View.VISIBLE);
+            }
+            
+        } else {
             InputMethodManager inputManager =
                 (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(mCurrentView.getWindowToken(), 0);
         }
     }
+    
+    private int getGroupLabelFont(String questionFont) {
+        String[] fonts = this.getResources().getStringArray(R.array.font_size_entry_values);
+        
+        int currentFont = -1;
+        for(int i = 0 ; i < fonts.length ; ++i) {
+            if(fonts[i].equals(questionFont)) {
+                currentFont = i;
+            }
+        }
+        
+        if(currentFont < 1) {
+            return Integer.valueOf(questionFont) + 2;
+        } else {
+            return (new Integer(fonts[currentFont]) + new Integer(fonts[currentFont - 1]).intValue()) / 2;
+        }
+    }
+
+
 
 
     // Hopefully someday we can use managed dialogs when the bugs are fixed
