@@ -49,12 +49,12 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
     boolean mReadOnly = false;
     protected EditText mAnswer;
     protected boolean secret = false;
-
+    
     public StringWidget(Context context, FormEntryPrompt prompt, boolean secret) {
         super(context, prompt);
         mAnswer = new EditText(context);
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
         mAnswer.setOnClickListener(this);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
@@ -149,6 +149,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
      */
     @Override
     public void clearAnswer() {
+        System.out.println("1027 clear answeR");
         mAnswer.setText(null);
     }
 
@@ -174,6 +175,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
      */
     @Override
     public void setFocus(Context context) {
+        
         // Put focus on text input field and display soft keyboard if appropriate.
         mAnswer.requestFocus();
         InputMethodManager inputManager =
@@ -272,5 +274,13 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         // TODO Auto-generated method stub
         
+    }
+    
+    public void setLastQuestion(boolean isLast){
+        if(isLast){
+            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_DONE);
+        } else{
+            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
+        }
     }
 }

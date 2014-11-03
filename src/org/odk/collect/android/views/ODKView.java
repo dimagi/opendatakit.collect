@@ -17,6 +17,7 @@ import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.preferences.PreferencesActivity.ProgressBarMode;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
+import org.odk.collect.android.widgets.StringWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
 
 import android.content.Context;
@@ -160,8 +161,11 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         addHintText(hintText);
         
         boolean first = true;
+        StringWidget last = null;
         
-        for (FormEntryPrompt p : questionPrompts) {
+        for (int i=0; i < questionPrompts.length; i++) {
+            
+            FormEntryPrompt p = questionPrompts[i];
             
             if (!first) {
                 View divider = new View(getContext());
@@ -183,11 +187,21 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             if(hintText != null) {
                 qw.hideHintText();
             }
+            
+            // if this is the last question in the list, let the question widget know.
+            
+            if(qw instanceof StringWidget){
+                last = ((StringWidget)qw);
+            }
 
             widgets.add(qw);
             mView.addView((View) qw, mLayout);
             
             qw.setChangedListener(this);
+        }
+        
+        if(last != null){
+            //last.setLastQuestion(true);
         }
         
         addView(mView);
