@@ -27,6 +27,7 @@ import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 /**
@@ -41,6 +42,7 @@ public class DecimalWidget extends StringWidget {
 
         // formatting
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
 
         // needed to make long readonly text scroll
         mAnswer.setHorizontallyScrolling(false);
@@ -107,6 +109,14 @@ public class DecimalWidget extends StringWidget {
             } catch (Exception NumberFormatException) {
                 return null;
             }
+        }
+    }
+    
+    public void setLastQuestion(boolean isLast){
+        if(isLast){
+            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_DONE);
+        } else{
+            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
         }
     }
 

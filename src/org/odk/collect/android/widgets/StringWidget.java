@@ -54,7 +54,7 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
         super(context, prompt);
         mAnswer = new EditText(context);
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
+        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         mAnswer.setOnClickListener(this);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
@@ -149,7 +149,6 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
      */
     @Override
     public void clearAnswer() {
-        System.out.println("1027 clear answeR");
         mAnswer.setText(null);
     }
 
@@ -277,10 +276,6 @@ public class StringWidget extends QuestionWidget implements OnClickListener, Tex
     }
     
     public void setLastQuestion(boolean isLast){
-        if(isLast){
-            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_DONE);
-        } else{
-            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
-        }
+           // nothing changes for Strings
     }
 }

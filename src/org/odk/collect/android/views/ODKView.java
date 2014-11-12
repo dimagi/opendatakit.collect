@@ -201,7 +201,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         }
         
         if(last != null){
-            //last.setLastQuestion(true);
+            last.setLastQuestion(true);
         }
         
         addView(mView);
