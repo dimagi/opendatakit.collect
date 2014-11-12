@@ -163,9 +163,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         boolean first = true;
         StringWidget last = null;
         
-        for (int i=0; i < questionPrompts.length; i++) {
-            
-            FormEntryPrompt p = questionPrompts[i];
+        for (FormEntryPrompt p: questionPrompts) {
             
             if (!first) {
                 View divider = new View(getContext());
