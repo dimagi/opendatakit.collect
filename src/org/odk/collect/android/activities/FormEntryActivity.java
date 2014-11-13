@@ -1254,6 +1254,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
      */
     private boolean saveAnswersForCurrentScreen(boolean evaluateConstraints, boolean failOnRequired) {
         // only try to save if the current event is a question or a field-list group
+        boolean success = true;
         if (mFormController.getEvent() == FormEntryController.EVENT_QUESTION
                 || (mFormController.getEvent() == FormEntryController.EVENT_GROUP && mFormController
                         .indexIsInFieldList())) {
@@ -1267,7 +1268,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                         if (evaluateConstraints && (saveStatus != FormEntryController.ANSWER_OK &&
                                                     (failOnRequired || saveStatus != FormEntryController.ANSWER_REQUIRED_BUT_EMPTY))) {
                             createConstraintToast(index, mFormController.getQuestionPrompt(index) .getConstraintText(), saveStatus);
-                            return false;
+                            success = false;
                         }
                     } else {
                         Log.w(t,
@@ -1279,7 +1280,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 Log.w(t, "Unknown view type rendered while current event was question or group! View type: " + mCurrentView == null ? "null" : mCurrentView.getClass().toString());
             }    
         }
-        return true;
+        return success;
     }
 
 
