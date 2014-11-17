@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1266,7 +1267,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 // Sort the answers so if there are multiple errors, we can bring focus to the first one
                 List<FormIndex> indexKeys = new ArrayList<FormIndex>();
                 indexKeys.addAll(answers.keySet());
-                Collections.sort(indexKeys);
+                Collections.sort(indexKeys, new Comparator<FormIndex>() {
+                    @Override
+                    public int compare(FormIndex arg0, FormIndex arg1) {
+                        return arg0.compareTo(arg1);
+                    }
+                });
                 
                 for (FormIndex index : indexKeys) {
                     // Within a group, you can only save for question events
