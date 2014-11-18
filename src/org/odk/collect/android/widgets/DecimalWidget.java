@@ -111,7 +111,12 @@ public class DecimalWidget extends StringWidget {
             }
         }
     }
-    
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#setLastQuestion(boolean)
+     * If this is the last question, set the action button to close the keyboard
+     */
+    @Override
     public void setLastQuestion(boolean isLast){
         if(isLast){
             mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_DONE);
