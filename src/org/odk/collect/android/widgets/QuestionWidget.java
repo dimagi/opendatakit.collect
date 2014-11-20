@@ -388,6 +388,7 @@ public abstract class QuestionWidget extends LinearLayout {
 
         };
         
+        // TODO jls
         String helpText = p.getSpecialFormQuestionText("help");
         if("help".equals(helpText)) {
             videoURI = helpText;
@@ -402,10 +403,8 @@ public abstract class QuestionWidget extends LinearLayout {
     private void fireHelpText(FormEntryPrompt prompt) {
         
 
-        System.out.println("[jls] in fireHelpText");
         if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
                 getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
-            System.out.println("[jls] in fireHelpText, and preference was on");
             
             AlertDialog mAlertDialog = new AlertDialog.Builder(this.getContext()).create();
             mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
@@ -521,7 +520,7 @@ public abstract class QuestionWidget extends LinearLayout {
      */
     private void addHelpText(FormEntryPrompt p) {
 
-        String s = p.getHelpText();
+        String s = p.getHintText();
 
         if (s != null && !s.equals("")) {
             mHelpText = new ShrinkingTextView(getContext(),this.getMaxHintHeight());

@@ -100,6 +100,7 @@ public class MediaLayout extends RelativeLayout {
         
         // Then set up the video button
         if (videoURI != null && videoURI.equals("help")) {
+            // TODO jls ?
             // Magic Help backdoor!
             mVideoButton = new ImageButton(getContext());
             mVideoButton.setImageResource(android.R.drawable.ic_menu_help);
