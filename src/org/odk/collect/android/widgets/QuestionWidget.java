@@ -128,7 +128,7 @@ public abstract class QuestionWidget extends LinearLayout {
         helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT));
         
-        String specialHelpText = p.getPlehText();
+        String specialHelpText = p.getHelpText();
         System.out.println("[jls] specialHelpText = " + specialHelpText);
         if (specialHelpText != null && !specialHelpText.equals("")) {
             
@@ -410,7 +410,7 @@ public abstract class QuestionWidget extends LinearLayout {
             mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
             mAlertDialog.setTitle("");
             
-            String specialHelpText = prompt.getPlehText();
+            String specialHelpText = prompt.getHelpText();
             
             String specialHelpImage = null; //prompt.getSpecialFormQuestionText("help-image");
             String specialHelpVideo = null; //prompt.getSpecialFormQuestionText("help-video");
