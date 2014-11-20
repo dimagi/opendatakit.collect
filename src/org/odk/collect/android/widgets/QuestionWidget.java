@@ -128,11 +128,12 @@ public abstract class QuestionWidget extends LinearLayout {
         helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT));
         
-        if("help".equals(p.getSpecialFormQuestionText("help"))) {
-            String specialHelpText = p.getSpecialFormQuestionText("help-text");
+        String specialHelpText = p.getPlehText();
+        System.out.println("[jls] specialHelpText = " + specialHelpText);
+        if (specialHelpText != null && !specialHelpText.equals("")) {
             
-            String specialHelpImage = p.getSpecialFormQuestionText("help-image");
-            String specialHelpVideo = p.getSpecialFormQuestionText("help-video");
+            String specialHelpImage = null;   // TODO jls: p.getSpecialFormQuestionText("help-image");
+            String specialHelpVideo = null;   // TODO jls: p.getSpecialFormQuestionText("help-video");
             
             TextView helpText = new TextView(getContext());
             helpText.setText(specialHelpText);
@@ -401,17 +402,19 @@ public abstract class QuestionWidget extends LinearLayout {
     private void fireHelpText(FormEntryPrompt prompt) {
         
 
+        System.out.println("[jls] in fireHelpText");
         if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
                 getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
+            System.out.println("[jls] in fireHelpText, and preference was on");
             
             AlertDialog mAlertDialog = new AlertDialog.Builder(this.getContext()).create();
             mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
             mAlertDialog.setTitle("");
             
-            String specialHelpText = prompt.getSpecialFormQuestionText("help-text");
+            String specialHelpText = prompt.getPlehText();
             
-            String specialHelpImage = prompt.getSpecialFormQuestionText("help-image");
-            String specialHelpVideo = prompt.getSpecialFormQuestionText("help-video");
+            String specialHelpImage = null; //prompt.getSpecialFormQuestionText("help-image");
+            String specialHelpVideo = null; //prompt.getSpecialFormQuestionText("help-video");
             
             ScrollView scrollView = new ScrollView(this.getContext());
             TextView helpText = new TextView(getContext());
