@@ -233,37 +233,20 @@ public class SignatureWidget extends QuestionWidget implements IBinaryWidget {
      * @see org.odk.collect.android.widgets.IBinaryWidget#setBinaryData(java.lang.Object)
      */
     @Override
-    public void setBinaryData(Object answer) {
+    public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. delete the previous image using the
         // content provider.
         if (mBinaryName != null) {
             deleteMedia();
         }
+        String binarypath = UrlUtils.getPathFromUri((Uri) binaryuri,getContext());
+        File f = new File(binarypath);
+        mBinaryName = f.getName();
+        Log.i(t, "Setting current answer to " + f.getName());
 
-        String binaryPath = UrlUtils.getPathFromUri((Uri) answer,getContext());
-        File newImage = new File(binaryPath);
-
-        if (newImage.exists()) {
-            // Add the new image to the Media content provider so that the
-            // viewing is fast in Android 2.0+
-            ContentValues values = new ContentValues(6);
-            values.put(Images.Media.TITLE, newImage.getName());
-            values.put(Images.Media.DISPLAY_NAME, newImage.getName());
-            values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis());
-            values.put(Images.Media.MIME_TYPE, "image/jpeg");
-            values.put(Images.Media.DATA, newImage.getAbsolutePath());
-
-            Uri imageURI = getContext().getContentResolver().insert(
-                    Images.Media.EXTERNAL_CONTENT_URI, values);
-            Log.i(t, "Inserting image returned uri = " + imageURI.toString());
-
-            mBinaryName = newImage.getName();
-            Log.i(t, "Setting current answer to " + newImage.getName());
-        } else {
-            Log.e(t, "NO IMAGE EXISTS at: " + newImage.getAbsolutePath());
-        }
-        setWaitingForBinaryData();
+        mWaitingForData = false;
     }
+
 
     /*
      * (non-Javadoc)

@@ -8,3 +8,6 @@ gen/
 *.swp
 *.orig
 .hg*
+
+/.cache
+/proguard_cache/
