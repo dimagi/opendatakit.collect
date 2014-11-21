@@ -59,7 +59,7 @@ public abstract class QuestionWidget extends LinearLayout {
 
     private TextView mQuestionText;
     private FrameLayout helpPlaceholder;
-    private ShrinkingTextView mHelpText;
+    private ShrinkingTextView mHintText;
     protected boolean hasListener;
     private View toastView;
     
@@ -69,7 +69,6 @@ public abstract class QuestionWidget extends LinearLayout {
     protected boolean focusPending = false;
     
     protected WidgetChangedListener widgetChangedListener;
-
 
     public QuestionWidget(Context context, FormEntryPrompt p) {
         this(context, p, null);
@@ -113,7 +112,7 @@ public abstract class QuestionWidget extends LinearLayout {
             mLayout.setMargins(10, 0, 10, 0);
             
             addQuestionText(p);
-            addHelpText(p);
+            addHintText(p);
             addHelpPlaceholder(p);
     }
     
@@ -406,8 +405,6 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     private void fireHelpText(FormEntryPrompt prompt) {
-        
-
         if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
                 getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
             
@@ -435,7 +432,6 @@ public abstract class QuestionWidget extends LinearLayout {
             scrollView.addView(helpLayout);
             mAlertDialog.setView(scrollView);
             
-            //mAlertDialog.setMessage();
             DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
@@ -513,30 +509,30 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     public void updateFrameSize(int width, int height) {
-        int maxHelpHeight = height / 4;
-        if(mHelpText != null) {
-            mHelpText.updateMaxHeight(maxHelpHeight);
+        int maxHintHeight = height / 4;
+        if(mHintText != null) {
+            mHintText.updateMaxHeight(maxHintHeight);
         }
         mFrameHeight = height;
     }
 
     /**
-     * Add a TextView containing the help text.
+     * Add a TextView containing the hint text.
      */
-    private void addHelpText(FormEntryPrompt p) {
+    private void addHintText(FormEntryPrompt p) {
 
         String s = p.getHintText();
 
         if (s != null && !s.equals("")) {
-            mHelpText = new ShrinkingTextView(getContext(),this.getMaxHintHeight());
-            mHelpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize - 3);
-            mHelpText.setPadding(0, -5, 0, 7);
+            mHintText = new ShrinkingTextView(getContext(),this.getMaxHintHeight());
+            mHintText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize - 3);
+            mHintText.setPadding(0, -5, 0, 7);
             // wrap to the widget of view
-            mHelpText.setHorizontallyScrolling(false);
-            mHelpText.setText(s);
-            mHelpText.setTypeface(null, Typeface.ITALIC);
+            mHintText.setHorizontallyScrolling(false);
+            mHintText.setText(s);
+            mHintText.setTypeface(null, Typeface.ITALIC);
 
-            addView(mHelpText, mLayout);
+            addView(mHintText, mLayout);
         }
     }
 
@@ -554,8 +550,8 @@ public abstract class QuestionWidget extends LinearLayout {
         if (mQuestionText != null) {
             mQuestionText.cancelLongPress();
         }
-        if (mHelpText != null) {
-            mHelpText.cancelLongPress();
+        if (mHintText != null) {
+            mHintText.cancelLongPress();
         }
     }
     
@@ -571,7 +567,7 @@ public abstract class QuestionWidget extends LinearLayout {
 
 
     public void hideHintText() {
-        mHelpText.setVisibility(View.GONE);
+        mHintText.setVisibility(View.GONE);
     }
     
     public FormIndex getFormId(){
