@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -110,10 +111,9 @@ public abstract class QuestionWidget extends LinearLayout {
                 new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
             mLayout.setMargins(10, 0, 10, 0);
-
+            
             addQuestionText(p);
             addHelpText(p);
-            
             addHelpPlaceholder(p);
     }
     
@@ -127,23 +127,42 @@ public abstract class QuestionWidget extends LinearLayout {
         helpPlaceholder = new FrameLayout(this.getContext());
         helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT));
-        
+     
         String specialHelpText = p.getHelpText();
-        System.out.println("[jls] specialHelpText = " + specialHelpText);
-        if (specialHelpText != null && !specialHelpText.equals("")) {
-            
-            String specialHelpImage = null;   // TODO jls: p.getSpecialFormQuestionText("help-image");
-            String specialHelpVideo = null;   // TODO jls: p.getSpecialFormQuestionText("help-video");
-            
+        String specialHelpAudio = null;
+        String specialHelpImage = null;   // TODO jls: p.getSpecialFormQuestionText("help-image");
+        String specialHelpVideo = null;   // TODO jls: p.getSpecialFormQuestionText("help-video");
+        if (
+            specialHelpText != null && !"".equals(specialHelpText)
+            || specialHelpAudio != null && !"".equals(specialHelpAudio)
+            || specialHelpImage != null && !"".equals(specialHelpImage)
+            || specialHelpVideo != null && !"".equals(specialHelpVideo)
+        ) {
+            ImageButton trigger = new ImageButton(getContext());
+            trigger.setImageResource(android.R.drawable.ic_menu_help);
+            final FormEntryPrompt prompt = p;
+            trigger.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fireHelpText(prompt);
+                }
+            });
+            trigger.setId(234982340);
+            LinearLayout triggerLayout = new LinearLayout(getContext());
+            triggerLayout.setOrientation(LinearLayout.HORIZONTAL);
+            triggerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            triggerLayout.setGravity(Gravity.RIGHT);
+            triggerLayout.addView(trigger);
+            this.addView(triggerLayout, 0);
+
             TextView helpText = new TextView(getContext());
             helpText.setText(specialHelpText);
             helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
             helpText.setPadding(0, 0, 0, 7);
             helpText.setId(38475483); // assign random id
-    
             
             MediaLayout helpLayout = new MediaLayout(getContext());
-            helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
+            helpLayout.setAVT(helpText, specialHelpAudio, specialHelpImage, specialHelpVideo, null);
             helpLayout.setPadding(15, 15, 15, 15);
             
             helpLayout.setBackgroundResource(color.very_light_blue);
@@ -381,22 +400,8 @@ public abstract class QuestionWidget extends LinearLayout {
         }
 
         // Create the layout for audio, image, text
-        MediaLayout mediaLayout = new MediaLayout(getContext()) {
-            protected void onHelpPressed() {
-                fireHelpText(p);
-            }
-
-        };
-        
-        // TODO jls
-        String helpText = p.getSpecialFormQuestionText("help");
-        if("help".equals(helpText)) {
-            videoURI = helpText;
-        }
-        
-        
+        MediaLayout mediaLayout = new MediaLayout(getContext());
         mediaLayout.setAVT(mQuestionText, audioURI, imageURI, videoURI, bigImageURI, qrCodeContent);
-
         addView(mediaLayout, mLayout);
     }
     
