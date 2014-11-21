@@ -112,8 +112,8 @@ public abstract class QuestionWidget extends LinearLayout {
             mLayout.setMargins(10, 0, 10, 0);
             
             addQuestionText(p);
-            addHintText(p);
             addHelpPlaceholder(p);
+            addHintText(p);
     }
     
 
@@ -131,45 +131,46 @@ public abstract class QuestionWidget extends LinearLayout {
         String specialHelpAudio = null;
         String specialHelpImage = null;   // TODO jls: p.getSpecialFormQuestionText("help-image");
         String specialHelpVideo = null;   // TODO jls: p.getSpecialFormQuestionText("help-video");
+        LinearLayout triggerLayout = new LinearLayout(getContext());
         if (
-            specialHelpText != null && !"".equals(specialHelpText)
-            || specialHelpAudio != null && !"".equals(specialHelpAudio)
-            || specialHelpImage != null && !"".equals(specialHelpImage)
-            || specialHelpVideo != null && !"".equals(specialHelpVideo)
+            (specialHelpText == null || "".equals(specialHelpText))
+            && (specialHelpAudio == null || "".equals(specialHelpAudio))
+            && (specialHelpImage == null || "".equals(specialHelpImage))
+            && (specialHelpVideo == null || "".equals(specialHelpVideo))
         ) {
-            ImageButton trigger = new ImageButton(getContext());
-            trigger.setImageResource(android.R.drawable.ic_menu_help);
-            final FormEntryPrompt prompt = p;
-            trigger.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    fireHelpText(prompt);
-                }
-            });
-            trigger.setId(234982340);
-            LinearLayout triggerLayout = new LinearLayout(getContext());
-            triggerLayout.setOrientation(LinearLayout.HORIZONTAL);
-            triggerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            triggerLayout.setGravity(Gravity.RIGHT);
-            triggerLayout.addView(trigger);
-            this.addView(triggerLayout, 0);
-
-            TextView helpText = new TextView(getContext());
-            helpText.setText(specialHelpText);
-            helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-            helpText.setPadding(0, 0, 0, 7);
-            helpText.setId(38475483); // assign random id
-            
-            MediaLayout helpLayout = new MediaLayout(getContext());
-            helpLayout.setAVT(helpText, specialHelpAudio, specialHelpImage, specialHelpVideo, null);
-            helpLayout.setPadding(15, 15, 15, 15);
-            
-            helpLayout.setBackgroundResource(color.very_light_blue);
-            helpPlaceholder.addView(helpLayout);
+            return;
         }
-
-        this.addView(helpPlaceholder);
         
+        ImageButton trigger = new ImageButton(getContext());
+        trigger.setImageResource(android.R.drawable.ic_menu_help);
+        final FormEntryPrompt prompt = p;
+        trigger.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fireHelpText(prompt);
+            }
+        });
+        trigger.setId(234982340);
+        triggerLayout.setOrientation(LinearLayout.HORIZONTAL);
+        triggerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        triggerLayout.setGravity(Gravity.RIGHT);
+        triggerLayout.addView(trigger);
+
+        TextView helpText = new TextView(getContext());
+        helpText.setText(specialHelpText);
+        helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+        helpText.setPadding(0, 0, 0, 7);
+        helpText.setId(38475483); // assign random id
+        
+        MediaLayout helpLayout = new MediaLayout(getContext());
+        helpLayout.setAVT(helpText, specialHelpAudio, specialHelpImage, specialHelpVideo, null);
+        helpLayout.setPadding(15, 15, 15, 15);
+        
+        helpLayout.setBackgroundResource(color.very_light_blue);
+        helpPlaceholder.addView(helpLayout);
+
+        this.addView(triggerLayout);
+        this.addView(helpPlaceholder);
         helpPlaceholder.setVisibility(View.GONE);
     }
 
