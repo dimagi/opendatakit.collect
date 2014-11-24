@@ -124,23 +124,13 @@ public abstract class QuestionWidget extends LinearLayout {
 
 
     private void addHelpPlaceholder(FormEntryPrompt p) {
+        if (!p.hasHelp()) {
+            return;
+        }
+
         helpPlaceholder = new FrameLayout(this.getContext());
         helpPlaceholder.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT));
-     
-        String specialHelpText = p.getHelpText();
-        String specialHelpAudio = p.getHelpMultimedia(FormEntryCaption.TEXT_FORM_AUDIO);
-        String specialHelpImage = p.getHelpMultimedia(FormEntryCaption.TEXT_FORM_IMAGE);
-        String specialHelpVideo = p.getHelpMultimedia(FormEntryCaption.TEXT_FORM_VIDEO);
-        LinearLayout triggerLayout = new LinearLayout(getContext());
-        if (
-            (specialHelpText == null || "".equals(specialHelpText))
-            && (specialHelpAudio == null || "".equals(specialHelpAudio))
-            && (specialHelpImage == null || "".equals(specialHelpImage))
-            && (specialHelpVideo == null || "".equals(specialHelpVideo))
-        ) {
-            return;
-        }
         
         ImageButton trigger = new ImageButton(getContext());
         trigger.setImageResource(android.R.drawable.ic_menu_help);
@@ -151,22 +141,14 @@ public abstract class QuestionWidget extends LinearLayout {
                 fireHelpText(prompt);
             }
         });
-        trigger.setId(234982340);
+        trigger.setId(847294011);
+        LinearLayout triggerLayout = new LinearLayout(getContext());
         triggerLayout.setOrientation(LinearLayout.HORIZONTAL);
         triggerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         triggerLayout.setGravity(Gravity.RIGHT);
         triggerLayout.addView(trigger);
 
-        TextView helpText = new TextView(getContext());
-        helpText.setText(specialHelpText);
-        helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-        helpText.setPadding(0, 0, 0, 7);
-        helpText.setId(38475483); // assign random id
-        
-        MediaLayout helpLayout = new MediaLayout(getContext());
-        helpLayout.setAVT(helpText, specialHelpAudio, specialHelpImage, specialHelpVideo, null);
-        helpLayout.setPadding(15, 15, 15, 15);
-        
+        MediaLayout helpLayout = createHelpLayout(p);
         helpLayout.setBackgroundResource(color.very_light_blue);
         helpPlaceholder.addView(helpLayout);
 
@@ -407,6 +389,10 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     private void fireHelpText(FormEntryPrompt prompt) {
+        if (!prompt.hasHelp()) {
+            return;
+        }
+        
         // Depending on ODK setting, help may be displayed either as
         // a dialog or inline, underneath the question text
         if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
@@ -415,23 +401,8 @@ public abstract class QuestionWidget extends LinearLayout {
             mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
             mAlertDialog.setTitle("");
             
-            String specialHelpText = prompt.getHelpText();
-            String specialHelpAudio = prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_AUDIO);
-            String specialHelpImage = prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_IMAGE);
-            String specialHelpVideo = prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_VIDEO);
-            
             ScrollView scrollView = new ScrollView(this.getContext());
-            TextView helpText = new TextView(getContext());
-            helpText.setText(specialHelpText);
-            helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-            helpText.setPadding(0, 0, 0, 7);
-            helpText.setId(38475483); // assign random id
-            
-            MediaLayout helpLayout = new MediaLayout(getContext());
-            helpLayout.setAVT(helpText, specialHelpAudio, specialHelpImage, specialHelpVideo, null);
-            helpLayout.setPadding(15, 15, 15, 15);
-            
-            scrollView.addView(helpLayout);
+            scrollView.addView(createHelpLayout(prompt));
             mAlertDialog.setView(scrollView);
             
             DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
@@ -454,6 +425,26 @@ public abstract class QuestionWidget extends LinearLayout {
                 collapse(helpPlaceholder);
             }
         }
+    }
+    
+    private MediaLayout createHelpLayout(FormEntryPrompt prompt) {
+        TextView text = new TextView(getContext());
+        text.setText(prompt.getHelpText());
+        text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
+        text.setPadding(0, 0, 0, 7);
+        text.setId(38475483); // assign random id
+        
+        MediaLayout helpLayout = new MediaLayout(getContext());
+        helpLayout.setAVT(
+            text, 
+            prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_AUDIO),
+            prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_IMAGE),
+            prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_VIDEO),
+            null
+        );
+        helpLayout.setPadding(15, 15, 15, 15);
+        
+        return helpLayout;
     }
     
     public static void expand(final View v) {

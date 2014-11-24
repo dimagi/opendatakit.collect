@@ -96,7 +96,7 @@ public class MediaLayout extends RelativeLayout {
         
         // Then set up the video button
         if (videoURI != null) {
-            // An audio file is specified
+            // A video file is specified
             mVideoButton = new ImageButton(getContext());
             mVideoButton.setImageResource(android.R.drawable.ic_media_play);
             mVideoButton.setOnClickListener(new OnClickListener() {
