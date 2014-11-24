@@ -5,6 +5,7 @@ import java.io.File;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.R.color;
@@ -128,9 +129,9 @@ public abstract class QuestionWidget extends LinearLayout {
                 FrameLayout.LayoutParams.WRAP_CONTENT));
      
         String specialHelpText = p.getHelpText();
-        String specialHelpAudio = null;
-        String specialHelpImage = null;   // TODO jls: p.getSpecialFormQuestionText("help-image");
-        String specialHelpVideo = null;   // TODO jls: p.getSpecialFormQuestionText("help-video");
+        String specialHelpAudio = p.getHelpMultimedia(FormEntryCaption.TEXT_FORM_AUDIO);
+        String specialHelpImage = p.getHelpMultimedia(FormEntryCaption.TEXT_FORM_IMAGE);
+        String specialHelpVideo = p.getHelpMultimedia(FormEntryCaption.TEXT_FORM_VIDEO);
         LinearLayout triggerLayout = new LinearLayout(getContext());
         if (
             (specialHelpText == null || "".equals(specialHelpText))
@@ -406,17 +407,18 @@ public abstract class QuestionWidget extends LinearLayout {
     }
     
     private void fireHelpText(FormEntryPrompt prompt) {
+        // Depending on ODK setting, help may be displayed either as
+        // a dialog or inline, underneath the question text
         if(!PreferenceManager.getDefaultSharedPreferences(this.getContext().getApplicationContext()).
                 getBoolean(PreferencesActivity.KEY_HELP_MODE_TRAY, false)) {
-            
             AlertDialog mAlertDialog = new AlertDialog.Builder(this.getContext()).create();
             mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
             mAlertDialog.setTitle("");
             
             String specialHelpText = prompt.getHelpText();
-            
-            String specialHelpImage = null; //prompt.getSpecialFormQuestionText("help-image");
-            String specialHelpVideo = null; //prompt.getSpecialFormQuestionText("help-video");
+            String specialHelpAudio = prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_AUDIO);
+            String specialHelpImage = prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_IMAGE);
+            String specialHelpVideo = prompt.getHelpMultimedia(FormEntryCaption.TEXT_FORM_VIDEO);
             
             ScrollView scrollView = new ScrollView(this.getContext());
             TextView helpText = new TextView(getContext());
@@ -424,10 +426,9 @@ public abstract class QuestionWidget extends LinearLayout {
             helpText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
             helpText.setPadding(0, 0, 0, 7);
             helpText.setId(38475483); // assign random id
-    
             
             MediaLayout helpLayout = new MediaLayout(getContext());
-            helpLayout.setAVT(helpText, null, specialHelpImage, specialHelpVideo, null);
+            helpLayout.setAVT(helpText, specialHelpAudio, specialHelpImage, specialHelpVideo, null);
             helpLayout.setPadding(15, 15, 15, 15);
             
             scrollView.addView(helpLayout);
@@ -447,7 +448,6 @@ public abstract class QuestionWidget extends LinearLayout {
             mAlertDialog.setButton(StringUtils.getStringRobust(this.getContext(), R.string.ok), errorListener);
             mAlertDialog.show();
         } else {
-        
             if(helpPlaceholder.getVisibility() == View.GONE) {
                 expand(helpPlaceholder);
             } else {
