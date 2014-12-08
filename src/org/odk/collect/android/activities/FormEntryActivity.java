@@ -1406,6 +1406,12 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 ((CheckBox) startView.findViewById(R.id.screen_form_entry_start_cbx_dismiss)).setText(StringUtils.getStringRobust(this, 
                         R.string.form_entry_start_hide));
                 
+                ((TextView) startView.findViewById(R.id.screen_form_entry_advance_text)).setText(StringUtils.getStringRobust(this, 
+                        R.string.advance));
+                
+                ((TextView) startView.findViewById(R.id.screen_form_entry_backup_text)).setText(StringUtils.getStringRobust(this, 
+                        R.string.backup));
+                
 
                 Drawable image = null;
                 String[] projection = {
