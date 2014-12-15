@@ -61,10 +61,6 @@ public class MediaLayout extends RelativeLayout {
         mVideoButton = null;
     }
     
-    protected void onHelpPressed() {
-        
-    }
-    
     public void setAVT(TextView text, String audioURI, String imageURI, final String videoURI, final String bigImageURI) {
         setAVT(text, audioURI, imageURI, videoURI, bigImageURI, null);
     }
@@ -99,24 +95,8 @@ public class MediaLayout extends RelativeLayout {
         }
         
         // Then set up the video button
-        if (videoURI != null && videoURI.equals("help")) {
-            // Magic Help backdoor!
-            mVideoButton = new ImageButton(getContext());
-            mVideoButton.setImageResource(android.R.drawable.ic_menu_help);
-            mVideoButton.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    MediaLayout.this.onHelpPressed();
-                }
-
-            });
-            mVideoButton.setId(234982340);
-        }
-
-        // Then set up the video button
-        else if (videoURI != null) {
-            // An audio file is specified
+        if (videoURI != null) {
+            // A video file is specified
             mVideoButton = new ImageButton(getContext());
             mVideoButton.setImageResource(android.R.drawable.ic_media_play);
             mVideoButton.setOnClickListener(new OnClickListener() {
