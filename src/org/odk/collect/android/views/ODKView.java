@@ -161,7 +161,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         addHintText(hintText);
         
         boolean first = true;
-        StringWidget last = null;
         
         for (FormEntryPrompt p: questionPrompts) {
             
@@ -185,12 +184,6 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             if(hintText != null) {
                 qw.hideHintText();
             }
-            
-            // if this is the last question in the list, let the question widget know.
-            
-            if(qw instanceof StringWidget){
-                last = ((StringWidget)qw);
-            }
 
             widgets.add(qw);
             mView.addView((View) qw, mLayout);
@@ -198,9 +191,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             qw.setChangedListener(this);
         }
         
-        if(last != null){
-            last.setLastQuestion(true);
-        }
+        updateLastQuestion();
         
         addView(mView);
     }
@@ -470,8 +461,27 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      */
     @Override
     public void widgetEntryChanged() {
+        
         updateConstraintRelevancies();
         
+        updateLastQuestion();
+        
+    }
+    
+    public void updateLastQuestion(){
+
+        StringWidget last = null;
+        
+        for(QuestionWidget q: widgets){
+            
+            if(q instanceof StringWidget){
+                if(last != null){
+                    last.setLastQuestion(false);
+                }
+                last = (StringWidget)q;
+                last.setLastQuestion(true);
+            }
+        }
     }
     
     /**
