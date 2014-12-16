@@ -282,15 +282,14 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 if (bar == null) {
                     try {
                         bar = ((Class<Fragment>)Class.forName(fragmentClass)).newInstance();
+                        
+                        //the bar will set this up for us again if we need.
                         getActionBar().setDisplayShowCustomEnabled(true);
                         getActionBar().setDisplayShowTitleEnabled(false);
                         fm.beginTransaction().add(bar, TITLE_FRAGMENT_TAG).commit();
                     } catch(Exception e) {
                         Log.w("odk-collect", "couldn't instantiate fragment: " + fragmentClass);
                     }
-                } else {
-                    getActionBar().setDisplayShowCustomEnabled(true);
-                    getActionBar().setDisplayShowTitleEnabled(false);
                 }
             }
         }
@@ -1379,12 +1378,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
     }
     
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void setTitle(CharSequence title) {
-        if(this.mHeaderString == null || this.mHeaderString.equals("")) { this.mHeaderString = title.toString();}
-        super.setTitle(title);
-    }
-
     /**
      * Creates a view given the View type and an event
      * 
