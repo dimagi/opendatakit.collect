@@ -30,6 +30,7 @@ import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 /**
@@ -46,6 +47,7 @@ public class IntegerWidget extends StringWidget {
         super(context, prompt, secret);
 
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+        mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
         
         this.number_type=num_type;
 
@@ -162,9 +164,22 @@ public class IntegerWidget extends StringWidget {
                 else{
                     return new LongData(Long.parseLong(s));
                 }
-            } catch (Exception NumberFormatException) {
+            } catch (Exception NumberFormatException) { 
                 return null;
             }
+        }
+    }
+    /*
+     * (non-Javadoc)
+     * @see org.odk.collect.android.widgets.StringWidget#setLastQuestion(boolean)
+     * If this is the last question, set the action button to close the keyboard
+     */
+    @Override
+    public void setLastQuestion(boolean isLast){
+        if(isLast){
+            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_DONE);
+        } else{
+            mAnswer.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_ACTION_NEXT);
         }
     }
 

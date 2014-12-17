@@ -17,6 +17,7 @@ import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.preferences.PreferencesActivity.ProgressBarMode;
 import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
+import org.odk.collect.android.widgets.StringWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
 
 import android.content.Context;
@@ -161,7 +162,7 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
         
         boolean first = true;
         
-        for (FormEntryPrompt p : questionPrompts) {
+        for (FormEntryPrompt p: questionPrompts) {
             
             if (!first) {
                 View divider = new View(getContext());
@@ -189,6 +190,8 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
             
             qw.setChangedListener(this);
         }
+        
+        updateLastQuestion();
         
         addView(mView);
     }
@@ -458,8 +461,27 @@ public class ODKView extends ScrollView implements OnLongClickListener, WidgetCh
      */
     @Override
     public void widgetEntryChanged() {
+        
         updateConstraintRelevancies();
         
+        updateLastQuestion();
+        
+    }
+    
+    public void updateLastQuestion(){
+
+        StringWidget last = null;
+        
+        for(QuestionWidget q: widgets){
+            
+            if(q instanceof StringWidget){
+                if(last != null){
+                    last.setLastQuestion(false);
+                }
+                last = (StringWidget)q;
+                last.setLastQuestion(true);
+            }
+        }
     }
     
     /**
