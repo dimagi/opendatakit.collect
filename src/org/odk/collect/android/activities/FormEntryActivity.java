@@ -809,8 +809,9 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 	private NavigationDetails calculateNavigationStatus() {
 		NavigationDetails details = new NavigationDetails();
 
-        FormIndex currentFormIndex = mFormController.getFormIndex();
-        int event = mFormController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+        FormIndex userFormIndex = mFormController.getFormIndex();
+        FormIndex currentFormIndex = FormIndex.createBeginningOfFormIndex();
+        int event = mFormController.getEvent(currentFormIndex);
         try {
 
             // keep track of whether there is a question that exists before the
@@ -821,7 +822,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             // _doesn't_
             // affect this form's index.
             while (event != FormEntryController.EVENT_END_OF_FORM) {
-                int comparison = mFormController.getFormIndex().compareTo(currentFormIndex);
+                int comparison = mFormController.getFormIndex().compareTo(userFormIndex);
 
                 if (comparison == 0) {
                     onCurrentScreen = true;
@@ -920,7 +921,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         }
 
         // Set form back to correct state
-        mFormController.jumpToIndex(currentFormIndex);
+        mFormController.jumpToIndex(userFormIndex);
 
         return details;
     }	
