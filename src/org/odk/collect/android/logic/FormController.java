@@ -314,6 +314,30 @@ public class FormController {
     public int stepToNextEvent(boolean stepOverGroup) {
        return stepToNextEvent(stepOverGroup, true);
     }
+    
+    public FormIndex getNextFormIndex(FormIndex index, boolean stepOverGroup) {
+        return getNextFormIndex(index, stepOverGroup, true);
+    }
+    
+    public FormIndex getNextFormIndex(FormIndex index, boolean stepOverGroup, boolean expandRepeats) {
+        //TODO: this won't actually catch the case where there are nested field lists properly
+        if (mFormEntryController.getModel().getEvent(index) == FormEntryController.EVENT_GROUP && indexIsInFieldList(index) && stepOverGroup) {
+        	// Walk until the next index is outside of this one.
+        	FormIndex walker = index;
+        	while(FormIndex.isSubElement(index, walker)) {
+        	    walker = getNextFormIndex(walker, false);
+        	}
+        	// Walker must represent the last index outside of the group now.
+        	return walker;
+        } else {
+            index = mFormEntryController.getNextIndex(index, expandRepeats);
+            int event = mFormEntryController.getModel().getEvent(index);
+            if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
+                return getNextFormIndex(index, stepOverGroup, expandRepeats);
+            }
+            return index;
+        }        
+    }
 
     /**
      * Navigates forward in the form.
@@ -475,6 +499,9 @@ public class FormController {
         mFormEntryController.setLanguage(language);
     }
 
+    public void expandRepeats(FormIndex index) {
+        mFormEntryController.expandRepeats(index);
+    }
 
     /**
      * Returns an array of relevant question prompts that should be displayed as a single screen.
