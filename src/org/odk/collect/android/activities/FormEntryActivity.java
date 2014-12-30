@@ -824,13 +824,13 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             // _doesn't_
             // affect this form's index.
             while (event != FormEntryController.EVENT_END_OF_FORM) {
-                int comparison = mFormController.getFormIndex().compareTo(userFormIndex);//jls
+                int comparison = currentFormIndex.compareTo(userFormIndex);
 
                 if (comparison == 0) {
                     onCurrentScreen = true;
                     details.currentScreenExit = mFormController.getNextFormIndex(currentFormIndex, true);
                 }
-                if (onCurrentScreen && mFormController.getFormIndex().equals(details.currentScreenExit)) {//jls
+                if (onCurrentScreen && currentFormIndex.equals(details.currentScreenExit)) {
                     onCurrentScreen = false;
                 }
 
