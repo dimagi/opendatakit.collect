@@ -822,15 +822,15 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
             // _doesn't_
             // affect this form's index.
             while (event != FormEntryController.EVENT_END_OF_FORM) {
-                int comparison = mFormController.getFormIndex().compareTo(userFormIndex);
+                int comparison = mFormController.getFormIndex().compareTo(userFormIndex);//jls
 
                 if (comparison == 0) {
                     onCurrentScreen = true;
-                    mFormController.stepToNextEvent(true);
-                    details.currentScreenExit = mFormController.getFormIndex();
-                    mFormController.stepToPreviousEvent();
+                    mFormController.stepToNextEvent(true);//jls
+                    details.currentScreenExit = mFormController.getFormIndex();//jls
+                    mFormController.stepToPreviousEvent();//jls
                 }
-                if (onCurrentScreen && mFormController.getFormIndex().equals(details.currentScreenExit)) {
+                if (onCurrentScreen && mFormController.getFormIndex().equals(details.currentScreenExit)) {//jls
                     onCurrentScreen = false;
                 }
 
@@ -857,7 +857,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
 
                 if (event == FormEntryController.EVENT_QUESTION) {
-                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();
+                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();//jls
 
                     if (!onCurrentScreen && details.currentScreenExit != null) {
                         details.relevantAfterCurrentScreen += prompts.length;
@@ -914,7 +914,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                     }
                 }
 
-                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);
+                event = mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);//jls
             }
         } catch (XPathTypeMismatchException e) {
             FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);
