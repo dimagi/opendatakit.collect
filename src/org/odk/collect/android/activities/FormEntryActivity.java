@@ -813,7 +813,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         FormIndex currentFormIndex = FormIndex.createBeginningOfFormIndex();
         mFormController.expandRepeats(currentFormIndex);
         int event = mFormController.getEvent(currentFormIndex);
-        mFormController.jumpToIndex(FormIndex.createBeginningOfFormIndex());//jls: drop this
         try {
 
             // keep track of whether there is a question that exists before the
@@ -857,7 +856,7 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
                 }
 
                 if (event == FormEntryController.EVENT_QUESTION) {
-                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts();//jls
+                    FormEntryPrompt[] prompts = mFormController.getQuestionPrompts(currentFormIndex);
 
                     if (!onCurrentScreen && details.currentScreenExit != null) {
                         details.relevantAfterCurrentScreen += prompts.length;
@@ -916,7 +915,6 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
 
                 currentFormIndex = mFormController.getNextFormIndex(currentFormIndex, FormController.STEP_INTO_GROUP, false);
                 event = mFormController.getEvent(currentFormIndex);
-                mFormController.stepToNextEvent(FormController.STEP_INTO_GROUP, false);//jls: drop
             }
         } catch (XPathTypeMismatchException e) {
             FormEntryActivity.this.createErrorDialog(e.getMessage(), EXIT);

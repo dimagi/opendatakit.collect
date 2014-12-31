@@ -503,6 +503,10 @@ public class FormController {
         mFormEntryController.expandRepeats(index);
     }
 
+    public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
+        return getQuestionPrompts(mFormEntryController.getModel().getFormIndex());
+    }
+
     /**
      * Returns an array of relevant question prompts that should be displayed as a single screen.
      * If the current form index is a question, it is returned. Otherwise if the 
@@ -510,9 +514,7 @@ public class FormController {
      * 
      * @return
      */
-    public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
-        FormIndex currentIndex = mFormEntryController.getModel().getFormIndex();
-        
+    public FormEntryPrompt[] getQuestionPrompts(FormIndex currentIndex) throws RuntimeException {
         IFormElement element = mFormEntryController.getModel().getForm().getChild(currentIndex);
 
         //If we're in a group, we will collect of the questions in this group
@@ -526,10 +528,10 @@ public class FormController {
             //Step over all events in this field list and collect them
             FormIndex walker = currentIndex;
             
-            int event = this.getEvent();
+            int event = this.getEvent(currentIndex);
             while(FormIndex.isSubElement(currentIndex, walker)) {
             	if(event == FormEntryController.EVENT_QUESTION) {
-                    questionList.add(mFormEntryController.getModel().getQuestionPrompt());
+                    questionList.add(mFormEntryController.getModel().getQuestionPrompt(walker));
             	}
             	
             	if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
@@ -537,20 +539,17 @@ public class FormController {
             	}
             	
             	//this handles relevance for us
-            	event = this.mFormEntryController.stepToNextEvent();
-            	walker = this.getFormIndex();
+            	walker = this.mFormEntryController.getNextIndex(walker);
+            	event = this.getEvent(walker);
             }
-            
-            //Reset the controller
-            this.mFormEntryController.jumpToIndex(currentIndex);
             
             FormEntryPrompt[] questions = new FormEntryPrompt[questionList.size()];
             //Populate the array with the collected questions
             questionList.toArray(questions);
             return questions;
         } else {
-            // We have a quesion, so just get the one prompt
-            return new FormEntryPrompt[] { mFormEntryController.getModel().getQuestionPrompt()};
+            // We have a question, so just get the one prompt
+            return new FormEntryPrompt[] { mFormEntryController.getModel().getQuestionPrompt(currentIndex)};
         }   
     }
 
