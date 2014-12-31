@@ -335,23 +335,16 @@ public class FormController {
     public FormIndex getNextFormIndex(FormIndex index, boolean stepOverGroup, boolean expandRepeats) {
         //TODO: this won't actually catch the case where there are nested field lists properly
         if (mFormEntryController.getModel().getEvent(index) == FormEntryController.EVENT_GROUP && indexIsInFieldList(index) && stepOverGroup) {
-        	// Walk until the next index is outside of this one.
-        	FormIndex walker = index;
-        	while(FormIndex.isSubElement(index, walker)) {
-        	    walker = getNextFormIndex(walker, false);
-        	}
-        	// Walker must represent the last index outside of the group now.
-        	return walker;
+            return getIndexPastGroup(index);
         } else {
             index = mFormEntryController.getNextIndex(index, expandRepeats);
-            int event = mFormEntryController.getModel().getEvent(index);
-            if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
+            if(mFormEntryController.getModel().getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
                 return getNextFormIndex(index, stepOverGroup, expandRepeats);
             }
             return index;
         }        
     }
-
+    
     /**
      * Navigates forward in the form.
      * 
@@ -360,11 +353,10 @@ public class FormController {
     public int stepToNextEvent(boolean stepOverGroup, boolean expandRepeats) {
     	//TODO: this won't actually catch the case where there are nested field lists properly
         if (mFormEntryController.getModel().getEvent() == FormEntryController.EVENT_GROUP && indexIsInFieldList() && stepOverGroup) {
-            return stepOverGroup();
+            FormIndex nextIndex = getIndexPastGroup(mFormEntryController.getModel().getFormIndex());
+            return jumpToIndex(nextIndex);
         } else {
             int event =  mFormEntryController.stepToNextEvent(expandRepeats);
-            
-            //
             if(event == FormEntryController.EVENT_PROMPT_NEW_REPEAT && this.mReadOnly) {
                 return stepToNextEvent(stepOverGroup, expandRepeats);
             }
@@ -374,28 +366,18 @@ public class FormController {
 
 
     /**
-     * From the current state of the form controller, whose current form index
-     * must be a group element, move the form to the next index which is outside
-     * of the current group.  
-     * 
-     * @return
+     * From the given FormIndex which must be a group element, 
+     * find the next index which is outside of that group.
+     * @return FormIndex
      */
-    private int stepOverGroup() {
-    	//Get this group's index
-    	FormIndex groupIndex = this.getFormIndex();
-    	
-    	FormIndex walker = groupIndex;
-    	int event = -1;
-    	//Walk until the next index is outside of this one.
-    	while(FormIndex.isSubElement(groupIndex, walker)) {
-    		event = this.stepToNextEvent(false);
-    		walker = this.getFormIndex();
+    private FormIndex getIndexPastGroup(FormIndex index) {
+    	// Walk until the next index is outside of this one.
+    	FormIndex walker = index;
+    	while(FormIndex.isSubElement(index, walker)) {
+    	    walker = getNextFormIndex(walker, false);
     	}
-    	
-    	//Walker must represent the last index outside of the group now.
-    	return event;
+    	return walker;
     }
-
 
     /**
      * Navigates backward in the form.
