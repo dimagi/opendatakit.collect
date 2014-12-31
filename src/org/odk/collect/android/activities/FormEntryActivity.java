@@ -814,14 +814,10 @@ public class FormEntryActivity extends FragmentActivity implements AnimationList
         mFormController.expandRepeats(currentFormIndex);
         int event = mFormController.getEvent(currentFormIndex);
         try {
-
             // keep track of whether there is a question that exists before the
             // current screen
             boolean onCurrentScreen = false;
 
-            // TODO: We can probably evaluate this with a FormIndex walk that
-            // _doesn't_
-            // affect this form's index.
             while (event != FormEntryController.EVENT_END_OF_FORM) {
                 int comparison = currentFormIndex.compareTo(userFormIndex);
 
