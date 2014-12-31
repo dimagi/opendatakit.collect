@@ -315,10 +315,23 @@ public class FormController {
        return stepToNextEvent(stepOverGroup, true);
     }
     
+    /**
+     * Get the FormIndex after the given one.
+     * @param index
+     * @param stepOverGroup
+     * @return FormIndex
+     */
     public FormIndex getNextFormIndex(FormIndex index, boolean stepOverGroup) {
         return getNextFormIndex(index, stepOverGroup, true);
     }
     
+    /**
+     * Get the FormIndex after the given one.
+     * @param index
+     * @param stepOverGroup
+     * @param expandRepeats
+     * @return FormIndex
+     */
     public FormIndex getNextFormIndex(FormIndex index, boolean stepOverGroup, boolean expandRepeats) {
         //TODO: this won't actually catch the case where there are nested field lists properly
         if (mFormEntryController.getModel().getEvent(index) == FormEntryController.EVENT_GROUP && indexIsInFieldList(index) && stepOverGroup) {
@@ -499,18 +512,27 @@ public class FormController {
         mFormEntryController.setLanguage(language);
     }
 
+    /**
+     * Expand any unexpanded repeats at the given FormIndex
+     * @param index
+     */
     public void expandRepeats(FormIndex index) {
         mFormEntryController.expandRepeats(index);
     }
 
+    /**
+     * getQuestionPrompts for the current index 
+     * @return Array of FormEntryPrompt objects
+     * @throws RuntimeException
+     */
     public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
         return getQuestionPrompts(mFormEntryController.getModel().getFormIndex());
     }
 
     /**
      * Returns an array of relevant question prompts that should be displayed as a single screen.
-     * If the current form index is a question, it is returned. Otherwise if the 
-     * current index is a field list (and _only_ when it is a field list) 
+     * If the given form index is a question, it is returned. Otherwise if the 
+     * given index is a field list (and _only_ when it is a field list) 
      * 
      * @return
      */
@@ -527,7 +549,6 @@ public class FormController {
                         
             //Step over all events in this field list and collect them
             FormIndex walker = currentIndex;
-            
             int event = this.getEvent(currentIndex);
             while(FormIndex.isSubElement(currentIndex, walker)) {
             	if(event == FormEntryController.EVENT_QUESTION) {
