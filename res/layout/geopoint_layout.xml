@@ -19,7 +19,7 @@
 		android:layout_height="wrap_content"
 		android:gravity="center_horizontal"
 		android:padding="5dip"
-		android:background="@drawable/translucent_background">
+		android:background="@color/translucent_background">
 		<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
@@ -50,7 +50,7 @@
 		<TextView
 			android:id="@+id/location_status"
 			android:text="@string/please_wait_long"
-			android:textColor="@drawable/white"
+			android:textColor="@color/white"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 	</LinearLayout>

@@ -448,7 +448,7 @@ public class DrawActivity extends Activity {
          */
         @Override
         protected void onDraw(Canvas canvas) {
-            canvas.drawColor(R.drawable.grey);
+            canvas.drawColor(R.color.dark_grey);
             canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
             canvas.drawPath(mCurrentPath, paint);
         }
