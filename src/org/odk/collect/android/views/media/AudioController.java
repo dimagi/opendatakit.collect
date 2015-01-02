@@ -93,11 +93,6 @@ public interface AudioController {
     public void saveEntityStateAndClear();
     
     /*
-     * Set up a listener to be called when the media finishes playing.
-     */
-    public void setOnCompletionListener(Object listener);
-    
-    /*
      * Return the length of the media, in seconds. May return null if
      * the media isn't in a state where duration is relevant.
      */

@@ -116,14 +116,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
             }
 
             @Override
-            public void setOnCompletionListener(Object listener) {
-                if (!(listener instanceof MediaPlayer.OnCompletionListener)) {
-                    throw new RuntimeException("Invalid listener passed to setOnCompletionListener");
-                }
-                mp.setOnCompletionListener((MediaPlayer.OnCompletionListener) listener);
-            }
-
-            @Override
             public Integer getDuration() {
                 if (!alive) {
                     return null;
@@ -370,12 +362,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
     public void startPlaying() {
         logAction("start");
-        controller.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                logAction("end");
-            }
-        });
         controller.playCurrentMediaEntity();
         setStateToPlaying();
     }
