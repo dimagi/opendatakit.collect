@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.services.Logger;
 import org.odk.collect.android.R;
 
 import android.content.Context;
@@ -41,6 +42,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
         //default implementation of controller if none is passed in
         this.controller = new AudioController() {
             private MediaPlayer mp;
+            boolean alive = false;
             
             @Override
             public MediaEntity getCurrMedia() {
@@ -62,6 +64,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
                 if (mp != null) {
                     mp.reset();
                     mp.release();
+                    alive = false;
                 }
             }
 
@@ -88,6 +91,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
 
             @Override
             public void playCurrentMediaEntity() {
+                alive = true;
                 mp.start();
             }
 
@@ -109,6 +113,30 @@ public class AudioButton extends ImageButton implements OnClickListener {
             @Override
             public void attemptSetStateToPauseForRenewal() {
                 return;
+            }
+
+            @Override
+            public void setOnCompletionListener(Object listener) {
+                if (!(listener instanceof MediaPlayer.OnCompletionListener)) {
+                    throw new RuntimeException("Invalid listener passed to setOnCompletionListener");
+                }
+                mp.setOnCompletionListener((MediaPlayer.OnCompletionListener) listener);
+            }
+
+            @Override
+            public Integer getDuration() {
+                if (!alive) {
+                    return null;
+                }
+                return mp.getDuration() / 1000;
+            }
+            
+            @Override
+            public Integer getProgress() {
+                if (!alive) {
+                    return null;
+                }
+                return mp.getCurrentPosition() / 1000;
             }
 
         };
@@ -304,13 +332,56 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public MediaState getMediaState() {
         return currentState;
     }
+    
+    private void logAction(String action) {
+        String shortURI = URI;
+        shortURI = shortURI.replaceAll("^.*\\/", "");
+        shortURI = shortURI.replaceAll("\\.[^.]+$", "");
+        String message = action + " " + shortURI;
+        Integer progress = controller.getProgress();
+        Integer duration = controller.getDuration();
+        if (progress != null && duration != null) {
+            message += " " + formatTime(progress) + "/" + formatTime(duration);
+        }
+        Logger.log("audio", message);
+    }
+    
+    private String formatTime(Integer numSeconds) {
+        if (numSeconds == null) {
+            return "";
+        }
+        int hours = (int) (numSeconds / 3600);
+        int minutes = (int) (numSeconds / 60);
+        int seconds = numSeconds % 60;
+        String returnValue = "";
+        returnValue += seconds;
+        if (seconds < 10) {
+            returnValue = "0" + returnValue;
+        }
+        returnValue = minutes + ":" + returnValue;
+        if (hours > 0) {
+            if (minutes < 10) {
+                returnValue += "0" + returnValue;
+            }
+            returnValue += hours + ":" + returnValue;
+        }
+        return returnValue;
+    }
 
     public void startPlaying() {
+        logAction("start");
+        controller.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                logAction("end");
+            }
+        });
         controller.playCurrentMediaEntity();
         setStateToPlaying();
     }
 
     public void endPlaying() {
+        logAction("stop");
         if (!currentState.equals(MediaState.Playing)) {
             controller.releaseCurrentMediaEntity();
             setStateToReady();
@@ -318,6 +389,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
 
     public void pausePlaying() {
+        logAction("pause");
         controller.pauseCurrentMediaEntity();
         setStateToPaused();
     }
