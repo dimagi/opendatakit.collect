@@ -29,6 +29,7 @@ import android.widget.Toast;
 public class AudioButton extends ImageButton implements OnClickListener {
     private final static String t = "AudioButton";
     private String URI;
+    private String shortURI;
     private MediaState currentState;
     private AudioController controller;
     private Object residingViewId;
@@ -39,6 +40,10 @@ public class AudioButton extends ImageButton implements OnClickListener {
     public AudioButton(Context context, final String URI, boolean visible) {
         super(context);
         resetButton(URI, visible);
+        shortURI = URI;
+        shortURI = shortURI.replaceAll("^.*\\/", "");
+        shortURI = shortURI.replaceAll("\\.[^.]+$", "");
+
         //default implementation of controller if none is passed in
         this.controller = new AudioController() {
             private MediaPlayer mp;
@@ -120,7 +125,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
                 if (!alive) {
                     return null;
                 }
-                return mp.getDuration() / 1000;
+                return mp.getDuration();
             }
             
             @Override
@@ -128,7 +133,7 @@ public class AudioButton extends ImageButton implements OnClickListener {
                 if (!alive) {
                     return null;
                 }
-                return mp.getCurrentPosition() / 1000;
+                return mp.getCurrentPosition();
             }
 
         };
@@ -326,9 +331,6 @@ public class AudioButton extends ImageButton implements OnClickListener {
     }
     
     private void logAction(String action) {
-        String shortURI = URI;
-        shortURI = shortURI.replaceAll("^.*\\/", "");
-        shortURI = shortURI.replaceAll("\\.[^.]+$", "");
         String message = action + " " + shortURI;
         Integer progress = controller.getProgress();
         Integer duration = controller.getDuration();
@@ -338,10 +340,11 @@ public class AudioButton extends ImageButton implements OnClickListener {
         Logger.log("audio", message);
     }
     
-    private String formatTime(Integer numSeconds) {
-        if (numSeconds == null) {
+    private String formatTime(Integer milliseconds) {
+        if (milliseconds == null) {
             return "";
         }
+        int numSeconds = Math.round(milliseconds / 1000);
         int hours = (int) (numSeconds / 3600);
         int minutes = (int) (numSeconds / 60);
         int seconds = numSeconds % 60;
